@@ -11,4 +11,4 @@ else:
 
 ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
