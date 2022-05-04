@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@jupyterlab/shared-models": "^3.3.4",
+    "ws": "^8.5.0",
+    "y-websocket": "^1.4.1"
+  }
+}
