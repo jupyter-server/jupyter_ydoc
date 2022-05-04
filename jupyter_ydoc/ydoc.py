@@ -1,8 +1,10 @@
-from typing import Dict, List, Union
+import copy
 from uuid import uuid4
 
 import y_py as Y
 from ypy_websocket.websocket_server import YDoc
+
+from .utils import cast_all
 
 
 class YBaseDoc:
@@ -96,9 +98,10 @@ class YNotebook(YBaseDoc):
 
     @source.setter
     def source(self, value):
-        cast_all(value, int, float)
-        if not value["cells"]:
-            value["cells"] = [
+        nb = copy.deepcopy(value)
+        cast_all(nb, int, float)
+        if not nb["cells"]:
+            nb["cells"] = [
                 {
                     "cell_type": "code",
                     "execution_count": None,
@@ -122,7 +125,7 @@ class YNotebook(YBaseDoc):
 
             # initialize document
             ycells = []
-            for cell in value["cells"]:
+            for cell in nb["cells"]:
                 cell_source = cell["source"]
                 if cell_source:
                     ytext = Y.YText(cell_source)
@@ -137,9 +140,9 @@ class YNotebook(YBaseDoc):
 
             if ycells:
                 self._ycells.push(t, ycells)
-            self._ymeta.set(t, "metadata", value["metadata"])
-            self._ystate.set(t, "nbformat", value["nbformat"])
-            self._ystate.set(t, "nbformatMinor", value["nbformat_minor"])
+            self._ymeta.set(t, "metadata", nb["metadata"])
+            self._ystate.set(t, "nbformat", nb["nbformat"])
+            self._ystate.set(t, "nbformatMinor", nb["nbformat_minor"])
         with self._ydoc.begin_transaction() as t:
             for ytext in ytexts_to_clear:
                 ytext.delete(t, 0, 1)
@@ -153,18 +156,3 @@ class YNotebook(YBaseDoc):
             self._subscriptions[cell] = cell.observe(callback)
         self._subscriptions[self._ycells] = self._ycells.observe(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
-
-
-def cast_all(o: Union[List, Dict], from_type, to_type) -> None:
-    if isinstance(o, list):
-        for i, v in enumerate(o):
-            if isinstance(v, from_type):
-                o[i] = to_type(v)
-            elif isinstance(v, (list, dict)):
-                cast_all(v, from_type, to_type)
-    elif isinstance(o, dict):
-        for k, v in o.items():
-            if isinstance(v, from_type):
-                o[k] = to_type(v)
-            elif isinstance(v, (list, dict)):
-                cast_all(v, from_type, to_type)
