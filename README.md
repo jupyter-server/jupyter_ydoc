@@ -21,16 +21,9 @@ print(ydocs)
 Which is just a shortcut to:
 
 ```py
-import sys
-import jupyter_ydoc
+import pkg_resources
 
-# See compatibility note on `group` keyword in https://docs.python.org/3/library/importlib.metadata.html#entry-points
-if sys.version_info < (3, 10):
-    from importlib_metadata import entry_points
-else:
-    from importlib.metadata import entry_points
-
-ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
+ydocs = {ep.name: ep.load() for ep in pkg_resources.iter_entry_points(group="jupyter_ydoc")}
 ```
 
 Or directly import them:
@@ -38,7 +31,7 @@ Or directly import them:
 from jupyter_ydoc import YFile, YNotebook
 ```
 
-The `jupyter_ydoc` entry point group can be populated with your own document, e.g. by adding the
+The `"jupyter_ydoc"` entry point group can be populated with your own documents, e.g. by adding the
 following to your package's `setup.cfg`:
 
 ```
