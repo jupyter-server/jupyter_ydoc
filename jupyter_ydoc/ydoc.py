@@ -112,47 +112,32 @@ class YNotebook(YBaseDoc):
                 }
             ]
         # workaround until ypy is fixed: https://github.com/davidbrochart/ypy-websocket/pull/9
-        ytexts_to_clear = []
         with self._ydoc.begin_transaction() as t:
             # clear document
             cells_len = len(self._ycells)
             if cells_len:
-                self._ycells.delete(t, 0, cells_len)
+                self._ycells.delete_range(t, 0, cells_len)
             for key in self._ymeta:
-                self._ymeta.delete(t, key)
+                self._ymeta.pop(t, key)
             for key in [k for k in self._ystate if k != "dirty"]:
-                self._ystate.delete(t, key)
+                self._ystate.pop(t, key)
 
             # initialize document
             ycells = []
             for cell in nb["cells"]:
-                cell_source = cell["source"]
-                if cell_source:
-                    ytext = Y.YText(cell_source)
-                else:
-                    ytext = Y.YText(" ")
-                    ytexts_to_clear.append(ytext)
-                cell["source"] = ytext
+                cell["source"] = Y.YText(cell["source"])
                 if "outputs" in cell:
                     cell["outputs"] = Y.YArray(cell["outputs"])
                 ycell = Y.YMap(cell)
                 ycells.append(ycell)
 
             if ycells:
-                self._ycells.push(t, ycells)
+                self._ycells.extend(t, ycells)
             self._ymeta.set(t, "metadata", nb["metadata"])
             self._ystate.set(t, "nbformat", nb["nbformat"])
             self._ystate.set(t, "nbformatMinor", nb["nbformat_minor"])
-        with self._ydoc.begin_transaction() as t:
-            for ytext in ytexts_to_clear:
-                ytext.delete(t, 0, 1)
 
     def observe(self, callback):
         self.unobserve()
-        for cell in self._ycells:
-            self._subscriptions[cell["source"]] = cell["source"].observe(callback)
-            if "outputs" in cell:
-                self._subscriptions[cell["outputs"]] = cell["outputs"].observe(callback)
-            self._subscriptions[cell] = cell.observe(callback)
-        self._subscriptions[self._ycells] = self._ycells.observe(callback)
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
