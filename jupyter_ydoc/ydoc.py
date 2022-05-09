@@ -111,7 +111,6 @@ class YNotebook(YBaseDoc):
                     "id": str(uuid4()),
                 }
             ]
-        # workaround until ypy is fixed: https://github.com/davidbrochart/ypy-websocket/pull/9
         with self._ydoc.begin_transaction() as t:
             # clear document
             cells_len = len(self._ycells)
