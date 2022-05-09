@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.4
+
+([Full Changelog](https://github.com/davidbrochart/jupyter_ydoc/compare/v0.1.3...d6e754a8c957582029d923cadc4e6547a324718c))
+
+### Merged PRs
+
+- Update ypy>=0.5.0 [#9](https://github.com/davidbrochart/jupyter_ydoc/pull/9) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/davidbrochart/jupyter_ydoc/graphs/contributors?from=2022-05-05&to=2022-05-09&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Adavidbrochart%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-05..2022-05-09&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.3
 
 ([Full Changelog](https://github.com/davidbrochart/jupyter_ydoc/compare/v0.1.2...c68ebe54e500edde4eb34aa598dfb7bbb4d22b63))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/davidbrochart/jupyter_ydoc/graphs/contributors?from=2022-05-05&to=2022-05-05&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Adavidbrochart%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-05..2022-05-05&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.2
 
