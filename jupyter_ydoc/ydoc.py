@@ -125,6 +125,8 @@ class YNotebook(YBaseDoc):
             ycells = []
             for cell in nb["cells"]:
                 cell["source"] = Y.YText(cell["source"])
+                if "id" not in cell:
+                    cell["id"] = str(uuid4())
                 if "outputs" in cell:
                     cell["outputs"] = Y.YArray(cell["outputs"])
                 ycell = Y.YMap(cell)
