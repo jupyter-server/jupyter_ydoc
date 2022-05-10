@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.5
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.4...5b36f6bed6c4d5a789b9dd7b06a526889e515511))
+
+### Merged PRs
+
+- Adds id to cells [#13](https://github.com/jupyter-server/jupyter_ydoc/pull/13) ([@hbcarlos](https://github.com/hbcarlos))
+- [pre-commit.ci] pre-commit autoupdate [#12](https://github.com/jupyter-server/jupyter_ydoc/pull/12) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- Transfer repo to jupyter-server org [#11](https://github.com/jupyter-server/jupyter_ydoc/pull/11) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-09&to=2022-05-10&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-09..2022-05-10&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-05-09..2022-05-10&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-05-09..2022-05-10&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-05-09..2022-05-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.4
 
 ([Full Changelog](https://github.com/davidbrochart/jupyter_ydoc/compare/v0.1.3...d6e754a8c957582029d923cadc4e6547a324718c))
@@ -15,8 +33,6 @@
 ([GitHub contributors page for this release](https://github.com/davidbrochart/jupyter_ydoc/graphs/contributors?from=2022-05-05&to=2022-05-09&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Adavidbrochart%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-05..2022-05-09&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.3
 
