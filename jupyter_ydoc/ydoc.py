@@ -35,9 +35,8 @@ class YBaseDoc:
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
-        if self.dirty != value:
-            with self._ydoc.begin_transaction() as t:
-                self._ystate.set(t, "dirty", value)
+        with self._ydoc.begin_transaction() as t:
+            self._ystate.set(t, "dirty", value)
 
     def observe(self, callback):
         raise RuntimeError("Y document observe not implemented")
