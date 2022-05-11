@@ -68,6 +68,8 @@ class YFile(YBaseDoc):
                 self._ysource.push(t, value)
 
     def observe(self, callback):
+        self.unobserve()
+        self._subscriptions[self._ystate] = self._ystate.observe(callback)
         self._subscriptions[self._ysource] = self._ysource.observe(callback)
 
 
@@ -139,5 +141,6 @@ class YNotebook(YBaseDoc):
 
     def observe(self, callback):
         self.unobserve()
+        self._subscriptions[self._ystate] = self._ystate.observe(callback)
         self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
