@@ -2,6 +2,23 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.7
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.6...b382a35a052da5b99c94d9bedaaa92634b5d1fb4))
+
+### Merged PRs
+
+- Also observe the state YMap [#19](https://github.com/jupyter-server/jupyter_ydoc/pull/19) ([@davidbrochart](https://github.com/davidbrochart))
+- Change URL to point to jupyter-server [#18](https://github.com/jupyter-server/jupyter_ydoc/pull/18) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-11&to=2022-05-11&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-11..2022-05-11&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.6
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.5...09cf7997439a7ca2a36041390a4e93984277a36c))
@@ -15,8 +32,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-10&to=2022-05-11&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-10..2022-05-11&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.5
 
