@@ -83,7 +83,6 @@ class YNotebook(YBaseDoc):
     def source(self):
         cells = self._ycells.to_json()
         meta = self._ymeta.to_json()
-        state = self._ystate.to_json()
         cast_all(cells, float, int)
         cast_all(meta, float, int)
         for cell in cells:
