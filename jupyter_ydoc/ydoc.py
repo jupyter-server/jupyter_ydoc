@@ -83,18 +83,17 @@ class YNotebook(YBaseDoc):
     def source(self):
         cells = self._ycells.to_json()
         meta = self._ymeta.to_json()
-        state = self._ystate.to_json()
         cast_all(cells, float, int)
         cast_all(meta, float, int)
         for cell in cells:
-            if "id" in cell and state["nbformat"] == 4 and state["nbformatMinor"] <= 4:
+            if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
         return dict(
             cells=cells,
             metadata=meta["metadata"],
-            nbformat=int(state["nbformat"]),
-            nbformat_minor=int(state["nbformatMinor"]),
+            nbformat=int(meta["nbformat"]),
+            nbformat_minor=int(meta["nbformat_minor"]),
         )
 
     @source.setter
@@ -136,8 +135,8 @@ class YNotebook(YBaseDoc):
             if ycells:
                 self._ycells.extend(t, ycells)
             self._ymeta.set(t, "metadata", nb["metadata"])
-            self._ystate.set(t, "nbformat", nb["nbformat"])
-            self._ystate.set(t, "nbformatMinor", nb["nbformat_minor"])
+            self._ymeta.set(t, "nbformat", nb["nbformat"])
+            self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
     def observe(self, callback):
         self.unobserve()
