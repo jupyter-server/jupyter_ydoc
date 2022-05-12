@@ -136,8 +136,8 @@ class YNotebook(YBaseDoc):
             if ycells:
                 self._ycells.extend(t, ycells)
             self._ymeta.set(t, "metadata", nb["metadata"])
-            self._ystate.set(t, "nbformat", nb["nbformat"])
-            self._ystate.set(t, "nbformatMinor", nb["nbformat_minor"])
+            self._ymeta.set(t, "nbformat", nb["nbformat"])
+            self._ymeta.set(t, "nbformatMinor", nb["nbformat_minor"])
 
     def observe(self, callback):
         self.unobserve()
