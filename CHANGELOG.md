@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.8
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.7...3662d97fadde04e70dd599523666f2716dcd14de))
+
+### Merged PRs
+
+- Move nbformat and nbformat_minor to meta YMap [#21](https://github.com/jupyter-server/jupyter_ydoc/pull/21) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-11&to=2022-05-12&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-11..2022-05-12&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-05-11..2022-05-12&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.7
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.6...b382a35a052da5b99c94d9bedaaa92634b5d1fb4))
@@ -16,8 +32,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-11&to=2022-05-11&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-05-11..2022-05-11&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.6
 
