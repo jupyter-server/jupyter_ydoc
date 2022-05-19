@@ -46,6 +46,9 @@ class YBaseDoc:
             k.unobserve(v)
         self._subscriptions = {}
 
+    def apply_update(self, update: bytes) -> None:
+        Y.apply_update(self._ydoc, update)
+
 
 class YFile(YBaseDoc):
     def __init__(self, *args, **kwargs):
