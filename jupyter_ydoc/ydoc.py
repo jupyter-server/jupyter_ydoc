@@ -1,5 +1,4 @@
 import copy
-from importlib.metadata import metadata
 from uuid import uuid4
 
 import y_py as Y
@@ -55,7 +54,6 @@ class YFile(YBaseDoc):
 
     @property
     def source(self):
-        print(str(self._ysource))
         return str(self._ysource)
 
     @source.setter
@@ -139,33 +137,27 @@ class YNotebook(YBaseDoc):
                     cell["id"] = str(uuid4())
                 cell_type = cell["cell_type"]
                 cell["source"] = Y.YText(cell["source"])
-                
                 metadata = {}
                 if 'metadata' in cell :
                     metadata = cell["metadata"]
                 cell["metadata"] = Y.YMap(metadata)
-
                 if cell_type == 'raw' or cell_type == 'markdown':
                     attachments = {}
                     if 'attachments' in cell:
                         attachments = cell["attachments"]
                     cell["attachments"] = Y.YMap(attachments)
-
                 if cell_type == 'code':
                     outputs = []
                     if 'outputs' in cell:
                         outputs = cell["outputs"]
                     cell["outputs"] = Y.YArray(outputs)
-                
                 ycell = Y.YMap(cell)
                 ycells.append(ycell)
 
             if ycells:
                 self._ycells.extend(t, ycells)
-
             for k,v in nb["metadata"].items():
                 self._ymetadata.set(t, k, v)
-
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
