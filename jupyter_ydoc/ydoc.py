@@ -1,4 +1,5 @@
 import copy
+from importlib.metadata import metadata
 from uuid import uuid4
 
 import y_py as Y
@@ -54,6 +55,7 @@ class YFile(YBaseDoc):
 
     @property
     def source(self):
+        print(str(self._ysource))
         return str(self._ysource)
 
     @source.setter
@@ -76,22 +78,28 @@ class YFile(YBaseDoc):
 class YNotebook(YBaseDoc):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._ycells = self._ydoc.get_array("cells")
         self._ymeta = self._ydoc.get_map("meta")
+        self._ycells = self._ydoc.get_array("cells")
+        self._ymetadata = self._ydoc.get_map("metadata")
 
     @property
     def source(self):
-        cells = self._ycells.to_json()
         meta = self._ymeta.to_json()
-        cast_all(cells, float, int)
+        cells = self._ycells.to_json()
+        metadata = self._ymetadata.to_json()
         cast_all(meta, float, int)
+        cast_all(cells, float, int)
+        cast_all(metadata, float, int)
         for cell in cells:
             if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
+            if (cell['cell_type'] == 'raw' or cell['cell_type'] == 'raw') and len(cell['attachments']) == 0:
+                del cell['attachments']
+
         return dict(
             cells=cells,
-            metadata=meta["metadata"],
+            metadata=metadata,
             nbformat=int(meta["nbformat"]),
             nbformat_minor=int(meta["nbformat_minor"]),
         )
@@ -113,33 +121,57 @@ class YNotebook(YBaseDoc):
             ]
         with self._ydoc.begin_transaction() as t:
             # clear document
+            # TODO: use clear
             cells_len = len(self._ycells)
-            if cells_len:
-                self._ycells.delete_range(t, 0, cells_len)
             for key in self._ymeta:
                 self._ymeta.pop(t, key)
+            if cells_len:
+                self._ycells.delete_range(t, 0, cells_len)
+            for key in self._ymetadata:
+                self._ymetadata.pop(t, key)
             for key in [k for k in self._ystate if k != "dirty"]:
                 self._ystate.pop(t, key)
 
             # initialize document
             ycells = []
             for cell in nb["cells"]:
-                cell["source"] = Y.YText(cell["source"])
                 if "id" not in cell:
                     cell["id"] = str(uuid4())
-                if "outputs" in cell:
-                    cell["outputs"] = Y.YArray(cell["outputs"])
+                cell_type = cell["cell_type"]
+                cell["source"] = Y.YText(cell["source"])
+                
+                metadata = {}
+                if 'metadata' in cell :
+                    metadata = cell["metadata"]
+                cell["metadata"] = Y.YMap(metadata)
+
+                if cell_type == 'raw' or cell_type == 'markdown':
+                    attachments = {}
+                    if 'attachments' in cell:
+                        attachments = cell["attachments"]
+                    cell["attachments"] = Y.YMap(attachments)
+
+                if cell_type == 'code':
+                    outputs = []
+                    if 'outputs' in cell:
+                        outputs = cell["outputs"]
+                    cell["outputs"] = Y.YArray(outputs)
+                
                 ycell = Y.YMap(cell)
                 ycells.append(ycell)
 
             if ycells:
                 self._ycells.extend(t, ycells)
-            self._ymeta.set(t, "metadata", nb["metadata"])
+
+            for k,v in nb["metadata"].items():
+                self._ymetadata.set(t, k, v)
+
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
     def observe(self, callback):
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
+        self._subscriptions[self._ymetadata] = self._ymetadata.observe(callback)
