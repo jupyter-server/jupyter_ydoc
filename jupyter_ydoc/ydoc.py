@@ -92,7 +92,7 @@ class YNotebook(YBaseDoc):
             if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
-            if (cell['cell_type'] == 'raw' or cell['cell_type'] == 'raw') and len(cell['attachments']) == 0:
+            if cell['cell_type'] in ["raw", "markdown"] and not cell["attachments"]:
                 del cell['attachments']
 
         return dict(
@@ -141,15 +141,13 @@ class YNotebook(YBaseDoc):
                 if 'metadata' in cell :
                     metadata = cell["metadata"]
                 cell["metadata"] = Y.YMap(metadata)
-                if cell_type == 'raw' or cell_type == 'markdown':
+                if cell_type in ["raw", "markdown"]:
                     attachments = {}
                     if 'attachments' in cell:
                         attachments = cell["attachments"]
                     cell["attachments"] = Y.YMap(attachments)
-                if cell_type == 'code':
-                    outputs = []
-                    if 'outputs' in cell:
-                        outputs = cell["outputs"]
+                elif cell_type == "code":
+                    outputs = cell.get("outputs", [])
                     cell["outputs"] = Y.YArray(outputs)
                 ycell = Y.YMap(cell)
                 ycells.append(ycell)
