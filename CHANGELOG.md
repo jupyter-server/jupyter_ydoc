@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.12
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.11...05c97a4b32b826f7c5224d8807340314a7df832d))
+
+### Merged PRs
+
+- Fix type checking when casting [#30](https://github.com/jupyter-server/jupyter_ydoc/pull/30) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-06-09&to=2022-06-30&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-06-09..2022-06-30&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.11
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.10...9329161e338ac999a1c342bce89bf4f642b426aa))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-05-19&to=2022-06-09&type=c))
 
 [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-05-19..2022-06-09&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.10
 
