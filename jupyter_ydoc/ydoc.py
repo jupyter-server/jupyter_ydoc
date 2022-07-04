@@ -62,10 +62,10 @@ class YFile(YBaseDoc):
             # clear document
             source_len = len(self._ysource)
             if source_len:
-                self._ysource.delete(t, 0, source_len)
+                self._ysource.delete_range(t, 0, source_len)
             # initialize document
             if value:
-                self._ysource.push(t, value)
+                self._ysource.extend(t, value)
 
     def observe(self, callback):
         self.unobserve()
