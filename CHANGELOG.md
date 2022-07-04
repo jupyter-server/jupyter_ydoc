@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.13
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.12...807dc511e2d3536c62d0710d2b97a21c6e704337))
+
+### Merged PRs
+
+- Update API [#32](https://github.com/jupyter-server/jupyter_ydoc/pull/32) ([@hbcarlos](https://github.com/hbcarlos))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-06-30&to=2022-07-04&type=c))
+
+[@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-06-30..2022-07-04&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.12
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.11...05c97a4b32b826f7c5224d8807340314a7df832d))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-06-09&to=2022-06-30&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-06-09..2022-06-30&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.11
 
