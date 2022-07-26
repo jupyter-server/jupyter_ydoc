@@ -2,6 +2,25 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.14
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.13...523dc9e3ff9aed516ff0b0e3f2f7528f6da02faa))
+
+### Merged PRs
+
+- Align notebook schema with JupyterLab HEAD [#38](https://github.com/jupyter-server/jupyter_ydoc/pull/38) ([@davidbrochart](https://github.com/davidbrochart))
+- [pre-commit.ci] pre-commit autoupdate [#37](https://github.com/jupyter-server/jupyter_ydoc/pull/37) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- [pre-commit.ci] pre-commit autoupdate [#36](https://github.com/jupyter-server/jupyter_ydoc/pull/36) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+- [pre-commit.ci] pre-commit autoupdate [#28](https://github.com/jupyter-server/jupyter_ydoc/pull/28) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-04&to=2022-07-26&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-04..2022-07-26&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-07-04..2022-07-26&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.13
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.12...807dc511e2d3536c62d0710d2b97a21c6e704337))
@@ -15,8 +34,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-06-30&to=2022-07-04&type=c))
 
 [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-06-30..2022-07-04&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.12
 
