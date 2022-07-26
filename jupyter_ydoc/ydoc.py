@@ -78,16 +78,13 @@ class YNotebook(YBaseDoc):
         super().__init__(*args, **kwargs)
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
-        self._ymetadata = self._ydoc.get_map("metadata")
 
     @property
     def source(self):
         meta = self._ymeta.to_json()
         cells = self._ycells.to_json()
-        metadata = self._ymetadata.to_json()
         cast_all(meta, float, int)
         cast_all(cells, float, int)
-        cast_all(metadata, float, int)
         for cell in cells:
             if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
@@ -97,7 +94,7 @@ class YNotebook(YBaseDoc):
 
         return dict(
             cells=cells,
-            metadata=metadata,
+            metadata=meta["metadata"],
             nbformat=int(meta["nbformat"]),
             nbformat_minor=int(meta["nbformat_minor"]),
         )
@@ -125,8 +122,6 @@ class YNotebook(YBaseDoc):
                 self._ymeta.pop(t, key)
             if cells_len:
                 self._ycells.delete_range(t, 0, cells_len)
-            for key in self._ymetadata:
-                self._ymetadata.pop(t, key)
             for key in [k for k in self._ystate if k != "dirty"]:
                 self._ystate.pop(t, key)
 
@@ -154,8 +149,7 @@ class YNotebook(YBaseDoc):
 
             if ycells:
                 self._ycells.extend(t, ycells)
-            for k, v in nb["metadata"].items():
-                self._ymetadata.set(t, k, v)
+            self._ymeta.set(t, "metadata", nb["metadata"])
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
@@ -164,4 +158,3 @@ class YNotebook(YBaseDoc):
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
         self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
-        self._subscriptions[self._ymetadata] = self._ymetadata.observe(callback)
