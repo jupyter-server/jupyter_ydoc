@@ -1,14 +1,14 @@
 import copy
+from typing import Any, Dict
 from uuid import uuid4
 
 import y_py as Y
-from ypy_websocket.websocket_server import YDoc
 
 from .utils import cast_all
 
 
 class YBaseDoc:
-    def __init__(self, ydoc: YDoc):
+    def __init__(self, ydoc: Y.YDoc):
         self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
         self._subscriptions = {}
@@ -23,11 +23,11 @@ class YBaseDoc:
 
     @property
     def source(self):
-        raise RuntimeError("Y document source generation not implemented")
+        return self.get()
 
     @source.setter
     def source(self, value):
-        raise RuntimeError("Y document source initialization not implemented")
+        return self.set(value)
 
     @property
     def dirty(self) -> None:
@@ -37,6 +37,12 @@ class YBaseDoc:
     def dirty(self, value: bool) -> None:
         with self._ydoc.begin_transaction() as t:
             self._ystate.set(t, "dirty", value)
+
+    def get(self):
+        raise RuntimeError("Y document get not implemented")
+
+    def set(self, value):
+        raise RuntimeError("Y document set not implemented")
 
     def observe(self, callback):
         raise RuntimeError("Y document observe not implemented")
@@ -52,12 +58,10 @@ class YFile(YBaseDoc):
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
 
-    @property
-    def source(self):
+    def get(self):
         return str(self._ysource)
 
-    @source.setter
-    def source(self, value):
+    def set(self, value):
         with self._ydoc.begin_transaction() as t:
             # clear document
             source_len = len(self._ysource)
@@ -79,18 +83,63 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
-    @property
-    def source(self):
+    def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
-        cells = self._ycells.to_json()
+        cell = self._ycells[index].to_json()
+        cast_all(cell, float, int)
+        if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
+            # strip cell IDs if we have notebook format 4.0-4.4
+            del cell["id"]
+        if cell["cell_type"] in ["raw", "markdown"] and not cell["attachments"]:
+            del cell["attachments"]
+        return cell
+
+    def append_cell(self, value: Dict[str, Any], txn=None) -> None:
+        ycell = self.create_ycell(value)
+        if txn is None:
+            with self._ydoc.begin_transaction() as txn:
+                self._ycells.append(txn, ycell)
+        else:
+            self._ycells.append(txn, ycell)
+
+    def set_cell(self, index: int, value: Dict[str, Any], txn=None) -> None:
+        ycell = self.create_ycell(value)
+        self.set_ycell(index, ycell, txn)
+
+    def create_ycell(self, value: Dict[str, Any]) -> None:
+        cell = copy.deepcopy(value)
+        if "id" not in cell:
+            cell["id"] = str(uuid4())
+        cell_type = cell["cell_type"]
+        cell["source"] = Y.YText(cell["source"])
+        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
+        if cell_type in ("raw", "markdown"):
+            cell["attachments"] = Y.YMap(cell.get("attachments", {}))
+        elif cell_type == "code":
+            cell["outputs"] = Y.YArray(cell.get("outputs", []))
+        return Y.YMap(cell)
+
+    def set_ycell(self, index: int, ycell: Y.YMap, txn=None):
+        if txn is None:
+            with self._ydoc.begin_transaction() as txn:
+                self._ycells.delete(txn, index)
+                self._ycells.insert(txn, index, ycell)
+        else:
+            self._ycells.delete(txn, index)
+            self._ycells.insert(txn, index, ycell)
+
+    def get(self):
+        meta = self._ymeta.to_json()
         cast_all(meta, float, int)
-        cast_all(cells, float, int)
-        for cell in cells:
+        cells = []
+        for i in range(len(self._ycells)):
+            cell = self.get_cell(i)
             if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
             if cell["cell_type"] in ["raw", "markdown"] and not cell["attachments"]:
                 del cell["attachments"]
+            cells.append(cell)
 
         return dict(
             cells=cells,
@@ -99,24 +148,22 @@ class YNotebook(YBaseDoc):
             nbformat_minor=int(meta["nbformat_minor"]),
         )
 
-    @source.setter
-    def source(self, value):
-        nb = copy.deepcopy(value)
+    def set(self, value):
+        nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
+        nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)
-        if not nb["cells"]:
-            nb["cells"] = [
-                {
-                    "cell_type": "code",
-                    "execution_count": None,
-                    "metadata": {},
-                    "outputs": [],
-                    "source": "",
-                    "id": str(uuid4()),
-                }
-            ]
+        cells = value["cells"] or [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                "metadata": {},
+                "outputs": [],
+                "source": "",
+                "id": str(uuid4()),
+            }
+        ]
         with self._ydoc.begin_transaction() as t:
             # clear document
-            # TODO: use clear
             cells_len = len(self._ycells)
             for key in self._ymeta:
                 self._ymeta.pop(t, key)
@@ -126,29 +173,7 @@ class YNotebook(YBaseDoc):
                 self._ystate.pop(t, key)
 
             # initialize document
-            ycells = []
-            for cell in nb["cells"]:
-                if "id" not in cell:
-                    cell["id"] = str(uuid4())
-                cell_type = cell["cell_type"]
-                cell["source"] = Y.YText(cell["source"])
-                metadata = {}
-                if "metadata" in cell:
-                    metadata = cell["metadata"]
-                cell["metadata"] = Y.YMap(metadata)
-                if cell_type in ["raw", "markdown"]:
-                    attachments = {}
-                    if "attachments" in cell:
-                        attachments = cell["attachments"]
-                    cell["attachments"] = Y.YMap(attachments)
-                elif cell_type == "code":
-                    outputs = cell.get("outputs", [])
-                    cell["outputs"] = Y.YArray(outputs)
-                ycell = Y.YMap(cell)
-                ycells.append(ycell)
-
-            if ycells:
-                self._ycells.extend(t, ycells)
+            self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
             self._ymeta.set(t, "metadata", nb["metadata"])
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
