@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.15
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.14...41a1ad194b5cd26dc405ef9d774c05dde494a489))
+
+### Merged PRs
+
+- Add YNotebook get_cell, set_cell, append_cell [#35](https://github.com/jupyter-server/jupyter_ydoc/pull/35) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-26&to=2022-07-27&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-26..2022-07-27&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.14
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.13...523dc9e3ff9aed516ff0b0e3f2f7528f6da02faa))
@@ -18,8 +34,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-04&to=2022-07-26&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-04..2022-07-26&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-07-04..2022-07-26&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.13
 
