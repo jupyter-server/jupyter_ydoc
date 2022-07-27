@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.16
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.15...780f8b8e898e31b6e82017a2bc2d04475728890f))
+
+### Merged PRs
+
+- Move ypy-websocket dependency to test [#41](https://github.com/jupyter-server/jupyter_ydoc/pull/41) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-27&to=2022-07-27&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-27..2022-07-27&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.15
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.14...41a1ad194b5cd26dc405ef9d774c05dde494a489))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-26&to=2022-07-27&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-26..2022-07-27&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.14
 
