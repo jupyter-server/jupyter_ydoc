@@ -90,7 +90,11 @@ class YNotebook(YBaseDoc):
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
             del cell["id"]
-        if "attachments" in cell and cell["cell_type"] in ["raw", "markdown"] and not cell["attachments"]:
+        if (
+            "attachments" in cell
+            and cell["cell_type"] in ["raw", "markdown"]
+            and not cell["attachments"]
+        ):
             del cell["attachments"]
         return cell
 
@@ -137,7 +141,11 @@ class YNotebook(YBaseDoc):
             if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
-            if "attachments" in cell and cell["cell_type"] in ["raw", "markdown"] and not cell["attachments"]:
+            if (
+                "attachments" in cell
+                and cell["cell_type"] in ["raw", "markdown"]
+                and not cell["attachments"]
+            ):
                 del cell["attachments"]
             cells.append(cell)
 
