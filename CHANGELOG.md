@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.1.17
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.16...106ee079e2ad9ed7c8b25693932ad921e3ea3e20))
+
+### Merged PRs
+
+- Handle missing attachment key [#43](https://github.com/jupyter-server/jupyter_ydoc/pull/43) ([@jimgoo](https://github.com/jimgoo))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-27&to=2022-08-01&type=c))
+
+[@jimgoo](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajimgoo+updated%3A2022-07-27..2022-08-01&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-07-27..2022-08-01&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.16
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.15...780f8b8e898e31b6e82017a2bc2d04475728890f))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-27&to=2022-07-27&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-07-27..2022-07-27&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.15
 
