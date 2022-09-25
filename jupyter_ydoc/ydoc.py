@@ -122,7 +122,7 @@ class YNotebook(YBaseDoc):
             cell["attachments"] = Y.YMap(cell.get("attachments", {}))
         elif cell_type == "code":
             cell["outputs"] = Y.YArray(cell.get("outputs", []))
-        
+
         return Y.YMap(cell)
 
     def set_ycell(self, index: int, ycell: Y.YMap, txn=None):
