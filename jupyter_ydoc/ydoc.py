@@ -116,11 +116,13 @@ class YNotebook(YBaseDoc):
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
         cell["source"] = Y.YText(cell["source"])
-        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
+        cell["metadata"] = cell.get("metadata", {})
+
         if cell_type in ("raw", "markdown"):
             cell["attachments"] = Y.YMap(cell.get("attachments", {}))
         elif cell_type == "code":
             cell["outputs"] = Y.YArray(cell.get("outputs", []))
+
         return Y.YMap(cell)
 
     def set_ycell(self, index: int, ycell: Y.YMap, txn=None):
@@ -170,6 +172,7 @@ class YNotebook(YBaseDoc):
                 "id": str(uuid4()),
             }
         ]
+
         with self._ydoc.begin_transaction() as t:
             # clear document
             cells_len = len(self._ycells)
