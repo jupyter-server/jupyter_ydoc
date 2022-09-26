@@ -116,7 +116,7 @@ class YNotebook(YBaseDoc):
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
         cell["source"] = Y.YText(cell["source"])
-        cell["metadata"] = cell.get("metadata", {})
+        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
 
         if cell_type in ("raw", "markdown"):
             cell["attachments"] = Y.YMap(cell.get("attachments", {}))
