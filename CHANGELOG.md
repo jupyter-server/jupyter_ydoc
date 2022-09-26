@@ -2,6 +2,23 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.2.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.17...55dc65afafb669d0a5552e485cf860d402740dc7))
+
+### Merged PRs
+
+- Use hatch [#51](https://github.com/jupyter-server/jupyter_ydoc/pull/51) ([@davidbrochart](https://github.com/davidbrochart))
+- Removes YMap for cell metadata [#50](https://github.com/jupyter-server/jupyter_ydoc/pull/50) ([@hbcarlos](https://github.com/hbcarlos))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-08-01&to=2022-09-26&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-08-01..2022-09-26&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-08-01..2022-09-26&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-08-01..2022-09-26&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.1.17
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.1.16...106ee079e2ad9ed7c8b25693932ad921e3ea3e20))
@@ -15,8 +32,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-07-27&to=2022-08-01&type=c))
 
 [@jimgoo](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajimgoo+updated%3A2022-07-27..2022-08-01&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-07-27..2022-08-01&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.1.16
 
