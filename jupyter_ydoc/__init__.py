@@ -1,7 +1,14 @@
-import pkg_resources
+import sys
 
 from .ydoc import YFile, YNotebook  # noqa
 
-ydocs = {ep.name: ep.load() for ep in pkg_resources.iter_entry_points(group="jupyter_ydoc")}
+# See compatibility note on `group` keyword in
+# https://docs.python.org/3/library/importlib.metadata.html#entry-points
+if sys.version_info < (3, 10):
+    from importlib_metadata import entry_points
+else:
+    from importlib.metadata import entry_points
+
+ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
 
 __version__ = "0.3.0a0"
