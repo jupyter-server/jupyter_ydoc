@@ -86,7 +86,7 @@ class YNotebook(YBaseDoc):
     def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
         cell = self._ycells[index].to_json()
-        cast_all(cell, float, int)
+        cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
             del cell["id"]
@@ -136,7 +136,7 @@ class YNotebook(YBaseDoc):
 
     def get(self):
         meta = self._ymeta.to_json()
-        cast_all(meta, float, int)
+        cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
             cell = self.get_cell(i)
@@ -161,7 +161,7 @@ class YNotebook(YBaseDoc):
     def set(self, value):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
-        cast_all(nb, int, float)
+        cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
         cells = value["cells"] or [
             {
                 "cell_type": "code",
