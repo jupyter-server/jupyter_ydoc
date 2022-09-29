@@ -4,7 +4,7 @@
 
 ## 0.2.1
 
-No merged PRs
+Back-port of #56, #57 and #59.
 
 <!-- <END NEW CHANGELOG ENTRY> -->
 
