@@ -96,11 +96,15 @@ class YNotebook(YBaseDoc):
         self._ycells = self._ydoc.get_array("cells")
 
     def __del__(self):
-        self._ycells.unobserve(self.on_cells_changed)
+        self._ycells.unobserve(self._on_cells_changed)
 
     def initialize(self):
+        """
+        Call this method after initializing the document, to listen for changes
+        in the list of cells.
+        """
         # Listen for changes after applying the updates from the ystore
-        self._ycells.observe(self.on_cells_changed)
+        self._ycells.observe(self._on_cells_changed)
 
     def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
@@ -208,13 +212,25 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
-    def on_cells_changed(self, event):
+    def _on_cells_changed(self, event):
+        """
+        Handle a change in the cells list.
+
+        Parameters
+        ----------
+            event: YArrayEvent
+        """
         if len(event.target) == 0 :
             # We can not update a YItem from the callback
             # create a task to do it later
             asyncio.create_task(self.append_new_cell())
     
     async def append_new_cell(self):
+        """
+        Adds a new empty cell to the document.
+
+        Note: This is an async method to be able to call it from an event loop.
+        """
         self.append_cell({
             "cell_type": "code",
             "execution_count": None,
