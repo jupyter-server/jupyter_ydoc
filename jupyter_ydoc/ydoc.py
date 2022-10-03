@@ -87,6 +87,8 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
+        self._ycells.observe(self.on_cells_changed)
+
     def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
         cell = self._ycells[index].to_json()
@@ -192,6 +194,10 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "metadata", nb["metadata"])
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
+
+    def on_cells_changed(self, event):
+        print("[YNOTEBOOK] ON_CELLS_CHANGED:", event)
+
 
     def observe(self, callback):
         self.unobserve()
