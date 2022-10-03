@@ -1,5 +1,6 @@
 import copy
 from abc import ABC, abstractmethod
+import asyncio
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -40,6 +41,10 @@ class YBaseDoc(ABC):
             self._ystate.set(t, "dirty", value)
 
     @abstractmethod
+    def initialize(self):
+        pass
+    
+    @abstractmethod
     def get(self):
         pass
 
@@ -61,6 +66,9 @@ class YFile(YBaseDoc):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
+    
+    def initialize(self):
+        pass
 
     def get(self):
         return str(self._ysource)
@@ -87,6 +95,11 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
+    def __del__(self):
+        self._ycells.unobserve(self.on_cells_changed)
+
+    def initialize(self):
+        # Listen for changes after applying the updates from the ystore
         self._ycells.observe(self.on_cells_changed)
 
     def get_cell(self, index: int) -> Dict[str, Any]:
@@ -196,8 +209,20 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
     def on_cells_changed(self, event):
-        print("[YNOTEBOOK] ON_CELLS_CHANGED:", event)
-
+        if len(event.target) == 0 :
+            # We can not update a YItem from the callback
+            # create a task to do it later
+            asyncio.create_task(self.append_new_cell())
+    
+    async def append_new_cell(self):
+        self.append_cell({
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": "",
+            "id": str(uuid4()),
+        })
 
     def observe(self, callback):
         self.unobserve()
