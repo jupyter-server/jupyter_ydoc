@@ -13,6 +13,16 @@ from jupyter_ydoc.utils import cast_all
 files_dir = Path(__file__).parent / "files"
 
 
+def stringify_source(nb: dict) -> dict:
+    """Stringify in-place the cell sources."""
+    for cell in nb["cells"]:
+        cell["source"] = (
+            "".join(cell["source"]) if isinstance(cell["source"], list) else cell["source"]
+        )
+
+    return nb
+
+
 class YTest:
     def __init__(self, ydoc: Y.YDoc, timeout: float = 1.0):
         self.timeout = timeout
@@ -42,8 +52,17 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
     ynotebook = YNotebook(ydoc)
     websocket = await connect("ws://localhost:1234/my-roomname")
     WebsocketProvider(ydoc, websocket)
-    nb = json.loads((files_dir / "nb0.ipynb").read_text())
+    nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
     ynotebook.source = nb
     ytest = YTest(ydoc)
     await ytest.change()
     assert ytest.source == nb
+
+
+def test_plotly_renderer():
+    """This test checks in particular that the type cast is not breaking the data."""
+    ydoc = Y.YDoc()
+    ynotebook = YNotebook(ydoc)
+    nb = stringify_source(json.loads((files_dir / "plotly_renderer.ipynb").read_text()))
+    ynotebook.source = nb
+    assert ynotebook.source == nb
