@@ -16,9 +16,12 @@ files_dir = Path(__file__).parent / "files"
 def stringify_source(nb: dict) -> dict:
     """Stringify in-place the cell sources."""
     for cell in nb["cells"]:
-        cell["source"] = "".join(cell["source"]) if isinstance(cell["source"], list) else cell["source"]
+        cell["source"] = (
+            "".join(cell["source"]) if isinstance(cell["source"], list) else cell["source"]
+        )
 
     return nb
+
 
 class YTest:
     def __init__(self, ydoc: Y.YDoc, timeout: float = 1.0):
