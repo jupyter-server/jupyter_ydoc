@@ -31,7 +31,7 @@ jobs:
         run: |
           echo "::set-output name=dir::$(pip cache dir)"
       - name: Cache pip
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ${{ steps.pip-cache.outputs.dir }}
           key: ${{ runner.os }}-pip-${{ hashFiles('setup.cfg') }}
@@ -40,7 +40,7 @@ jobs:
             ${{ runner.os }}-pip-
       - name: Cache checked links
         if: ${{ matrix.group == 'link_check' }}
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pytest-link-check
           key: ${{ runner.os }}-linkcheck-${{ hashFiles('**/*.md', '**/*.rst') }}-md-links
