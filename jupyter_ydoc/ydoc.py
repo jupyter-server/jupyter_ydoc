@@ -1,4 +1,5 @@
 import copy
+from abc import ABC, abstractmethod
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -7,7 +8,7 @@ import y_py as Y
 from .utils import cast_all
 
 
-class YBaseDoc:
+class YBaseDoc(ABC):
     def __init__(self, ydoc: Y.YDoc):
         self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
@@ -38,14 +39,17 @@ class YBaseDoc:
         with self._ydoc.begin_transaction() as t:
             self._ystate.set(t, "dirty", value)
 
+    @abstractmethod
     def get(self):
-        raise RuntimeError("Y document get not implemented")
+        pass
 
+    @abstractmethod
     def set(self, value):
-        raise RuntimeError("Y document set not implemented")
+        pass
 
+    @abstractmethod
     def observe(self, callback):
-        raise RuntimeError("Y document observe not implemented")
+        pass
 
     def unobserve(self):
         for k, v in self._subscriptions.items():
