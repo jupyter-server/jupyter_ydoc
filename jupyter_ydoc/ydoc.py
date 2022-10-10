@@ -1,6 +1,6 @@
+import asyncio
 import copy
 from abc import ABC, abstractmethod
-import asyncio
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -43,7 +43,7 @@ class YBaseDoc(ABC):
     @abstractmethod
     def initialize(self):
         pass
-    
+
     @abstractmethod
     def get(self):
         pass
@@ -66,7 +66,7 @@ class YFile(YBaseDoc):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
-    
+
     def initialize(self):
         pass
 
@@ -201,13 +201,13 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
     def _get_empty_code_cell():
-        return { 
-            "cell_type": "code", 
-            "execution_count": None, 
-            "metadata": {}, 
-            "outputs": [], 
-            "source": "", 
-            "id": str(uuid4()), 
+        return {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": "",
+            "id": str(uuid4()),
         }
 
     def _on_after_transaction(self, event):
@@ -218,9 +218,9 @@ class YNotebook(YBaseDoc):
         ----------
             event: YArrayEvent
         """
-        if len(self._ycells) == 0 :
+        if len(self._ycells) == 0:
             asyncio.create_task(self._add_empty_cell())
-    
+
     async def _add_empty_cell(self):
         ycell = self.create_ycell(self._get_empty_code_cell())
         with self._ydoc.begin_transaction() as txn:
