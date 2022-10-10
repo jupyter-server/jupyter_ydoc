@@ -95,16 +95,13 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
-    def __del__(self):
-        self._ycells.unobserve(self._on_cells_changed)
-
     def initialize(self):
         """
         Call this method after initializing the document, to listen for changes
         in the list of cells.
         """
         # Listen for changes after applying the updates from the ystore
-        self._ycells.observe(self._on_cells_changed)
+        self._ydoc.observe_after_transaction(self._on_after_transaction)
 
     def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
@@ -139,7 +136,7 @@ class YNotebook(YBaseDoc):
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
         cell["source"] = Y.YText(cell["source"])
-        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
+        cell["metadata"] = cell.get("metadata", {})
 
         if cell_type in ("raw", "markdown"):
             cell["attachments"] = Y.YMap(cell.get("attachments", {}))
@@ -212,7 +209,7 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
-    def _on_cells_changed(self, event):
+    def _on_after_transaction(self, event):
         """
         Handle a change in the cells list.
 
@@ -220,18 +217,11 @@ class YNotebook(YBaseDoc):
         ----------
             event: YArrayEvent
         """
-        if len(event.target) == 0 :
-            # We can not update a YItem from the callback
-            # create a task to do it later
-            asyncio.create_task(self.append_new_cell())
+        if len(self._ycells) == 0 :
+            asyncio.create_task(self._add_empty_cell())
     
-    async def append_new_cell(self):
-        """
-        Adds a new empty cell to the document.
-
-        Note: This is an async method to be able to call it from an event loop.
-        """
-        self.append_cell({
+    async def _add_empty_cell(self):
+        ycell = self.create_ycell({
             "cell_type": "code",
             "execution_count": None,
             "metadata": {},
@@ -239,6 +229,8 @@ class YNotebook(YBaseDoc):
             "source": "",
             "id": str(uuid4()),
         })
+        with self._ydoc.begin_transaction() as txn:
+            self._ycells.append(txn, ycell)
 
     def observe(self, callback):
         self.unobserve()
