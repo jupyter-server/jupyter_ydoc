@@ -182,16 +182,7 @@ class YNotebook(YBaseDoc):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
-        cells = value["cells"] or [
-            {
-                "cell_type": "code",
-                "execution_count": None,
-                "metadata": {},
-                "outputs": [],
-                "source": "",
-                "id": str(uuid4()),
-            }
-        ]
+        cells = value["cells"] or [self._get_empty_code_cell()]
 
         with self._ydoc.begin_transaction() as t:
             # clear document
@@ -209,6 +200,16 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
+    def _get_empty_code_cell():
+        return { 
+            "cell_type": "code", 
+            "execution_count": None, 
+            "metadata": {}, 
+            "outputs": [], 
+            "source": "", 
+            "id": str(uuid4()), 
+        }
+
     def _on_after_transaction(self, event):
         """
         Handle a change in the cells list.
@@ -221,14 +222,7 @@ class YNotebook(YBaseDoc):
             asyncio.create_task(self._add_empty_cell())
     
     async def _add_empty_cell(self):
-        ycell = self.create_ycell({
-            "cell_type": "code",
-            "execution_count": None,
-            "metadata": {},
-            "outputs": [],
-            "source": "",
-            "id": str(uuid4()),
-        })
+        ycell = self.create_ycell(self._get_empty_code_cell())
         with self._ydoc.begin_transaction() as txn:
             self._ycells.append(txn, ycell)
 
