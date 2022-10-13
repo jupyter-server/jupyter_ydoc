@@ -96,7 +96,7 @@ class YNotebook(YBaseDoc):
             del cell["id"]
         if (
             "attachments" in cell
-            and cell["cell_type"] in ["raw", "markdown"]
+            and cell["cell_type"] in ("raw", "markdown")
             and not cell["attachments"]
         ):
             del cell["attachments"]
@@ -123,7 +123,8 @@ class YNotebook(YBaseDoc):
         cell["metadata"] = Y.YMap(cell.get("metadata", {}))
 
         if cell_type in ("raw", "markdown"):
-            cell["attachments"] = cell.get("attachments", {})
+            if "attachments" in cell and not cell["attachments"]:
+                del cell["attachments"]
         elif cell_type == "code":
             cell["outputs"] = Y.YArray(cell.get("outputs", []))
 
