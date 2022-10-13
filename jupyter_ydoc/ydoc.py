@@ -123,7 +123,7 @@ class YNotebook(YBaseDoc):
         cell["metadata"] = Y.YMap(cell.get("metadata", {}))
 
         if cell_type in ("raw", "markdown"):
-            cell["attachments"] = Y.YMap(cell.get("attachments", {}))
+            cell["attachments"] = cell.get("attachments", {})
         elif cell_type == "code":
             cell["outputs"] = Y.YArray(cell.get("outputs", []))
 
