@@ -2,11 +2,29 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.2.2
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.2.1...ae5e46d3e4756f80452e9416e70ac6aa9ab7475a))
+
+### Bugs fixed
+
+- Removes YMap for attachements [#77](https://github.com/jupyter-server/jupyter_ydoc/pull/77) ([@fcollonval](https://github.com/fcollonval))
+
+### Other merged PRs
+
+- Add path document attribute [#82](https://github.com/jupyter-server/jupyter_ydoc/pull/82) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-09-29&to=2022-10-26&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-09-29..2022-10-26&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2022-09-29..2022-10-26&type=Issues) | [@meeseeksmachine](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ameeseeksmachine+updated%3A2022-09-29..2022-10-26&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-09-29..2022-10-26&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.2.1
 
 Back-port of #56, #57 and #59.
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.2.0
 
