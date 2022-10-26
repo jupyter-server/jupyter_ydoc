@@ -38,6 +38,15 @@ class YBaseDoc:
         with self._ydoc.begin_transaction() as t:
             self._ystate.set(t, "dirty", value)
 
+    @property
+    def path(self) -> None:
+        return self._ystate.get("path")
+
+    @path.setter
+    def path(self, value: str) -> None:
+        with self._ydoc.begin_transaction() as t:
+            self._ystate.set(t, "path", value)
+
     def get(self):
         raise RuntimeError("Y document get not implemented")
 
@@ -181,7 +190,7 @@ class YNotebook(YBaseDoc):
                 self._ymeta.pop(t, key)
             if cells_len:
                 self._ycells.delete_range(t, 0, cells_len)
-            for key in [k for k in self._ystate if k != "dirty"]:
+            for key in [k for k in self._ystate if k not in ("dirty", "path")]:
                 self._ystate.pop(t, key)
 
             # initialize document
