@@ -2,6 +2,45 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.0a1
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.3.0a0...6dcc9ec61f4b022ec43bdaa7916bd58de481c761))
+
+### Enhancements made
+
+- Add path document attribute [#81](https://github.com/jupyter-server/jupyter_ydoc/pull/81) ([@davidbrochart](https://github.com/davidbrochart))
+- Make YBaseDoc an abstract base class [#74](https://github.com/jupyter-server/jupyter_ydoc/pull/74) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Bugs fixed
+
+- Removes YMap for attachements [#77](https://github.com/jupyter-server/jupyter_ydoc/pull/77) ([@fcollonval](https://github.com/fcollonval))
+- Drop `pkg_resources` [#59](https://github.com/jupyter-server/jupyter_ydoc/pull/59) ([@jtpio](https://github.com/jtpio))
+
+### Maintenance and upkeep improvements
+
+- Bump tj-actions/changed-files from 31.0.3 to 33.0.0 [#80](https://github.com/jupyter-server/jupyter_ydoc/pull/80) ([@dependabot](https://github.com/dependabot))
+- Bump pre-commit/action from 2.0.0 to 3.0.0 [#72](https://github.com/jupyter-server/jupyter_ydoc/pull/72) ([@dependabot](https://github.com/dependabot))
+- Bump actions/checkout from 2 to 3 [#71](https://github.com/jupyter-server/jupyter_ydoc/pull/71) ([@dependabot](https://github.com/dependabot))
+- Bump actions/setup-python from 2 to 4 [#70](https://github.com/jupyter-server/jupyter_ydoc/pull/70) ([@dependabot](https://github.com/dependabot))
+- Bump actions/cache from 1 to 3 [#69](https://github.com/jupyter-server/jupyter_ydoc/pull/69) ([@dependabot](https://github.com/dependabot))
+- Bump actions/setup-node from 2 to 3 [#68](https://github.com/jupyter-server/jupyter_ydoc/pull/68) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 31.0.1 to 31.0.3 [#67](https://github.com/jupyter-server/jupyter_ydoc/pull/67) ([@dependabot](https://github.com/dependabot))
+
+### Other merged PRs
+
+- Add workflows to ease maintenance [#64](https://github.com/jupyter-server/jupyter_ydoc/pull/64) ([@fcollonval](https://github.com/fcollonval))
+- Test a case with plotly renderer [#63](https://github.com/jupyter-server/jupyter_ydoc/pull/63) ([@fcollonval](https://github.com/fcollonval))
+- Pin @jupyterlab/shared-models >=4.0.0-alpha.10,\<4.0.0-alpha.14 [#61](https://github.com/jupyter-server/jupyter_ydoc/pull/61) ([@davidbrochart](https://github.com/davidbrochart))
+- Cast only if number has same value [#57](https://github.com/jupyter-server/jupyter_ydoc/pull/57) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-09-26&to=2022-10-26&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-09-26..2022-10-26&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2022-09-26..2022-10-26&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2022-09-26..2022-10-26&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2022-09-26..2022-10-26&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-09-26..2022-10-26&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-09-26..2022-10-26&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.0a0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.2.0...63af4d7c91f1ba101612f0e52c24855a21eafedc))
@@ -15,8 +54,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-09-26&to=2022-09-26&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-09-26..2022-09-26&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.2.0
 
