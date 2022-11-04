@@ -72,8 +72,10 @@ module.exports = {
         allow: [
           'cell_type',
           'display_name',
+          'execution_count',
           'orig_nbformat',
-          'outputs_hidden'
+          'outputs_hidden',
+          'nbformat_minor'
         ]
       }
     ],
