@@ -1,12 +1,7 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import {
-  IMapChange,
-  NotebookChange,
-  YCodeCell,
-  YNotebook
-} from '@jupyter-notebook/ydoc';
+import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
 
 describe('@jupyter-notebook/ydoc', () => {
   describe('YNotebook', () => {

@@ -46,6 +46,7 @@ jobs:
           mamba-version: "*"
           channels: conda-forge
           python-version: "3.7"
+
       - name: Install dependencies
         run: |
           mamba install python=${{ matrix.python-version }} pip nodejs=16 yarn
@@ -57,6 +58,11 @@ jobs:
           yarn
           yarn build
           cd ../tests; npm install
+
+      - name: Linter check
+        working-directory: javascript
+        run: |
+          yarn lint:check
 
       - name: Run Python tests
         run: |
