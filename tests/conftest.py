@@ -7,7 +7,6 @@ from websockets import serve  # type: ignore
 from ypy_websocket import WebsocketServer
 
 # workaround until these PRs are merged:
-# - https://github.com/jupyterlab/jupyterlab/pull/12519
 # - https://github.com/yjs/y-websocket/pull/104
 
 
@@ -20,8 +19,7 @@ def update_json_file(path: Path, d: dict):
 
 
 here = Path(__file__).parent
-d = {"type": "module"}
-update_json_file(here / "node_modules/@jupyterlab/shared-models/package.json", d)
+d = { "type": "module" }
 update_json_file(here / "node_modules/y-websocket/package.json", d)
 
 
