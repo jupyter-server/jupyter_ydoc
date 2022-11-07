@@ -1497,7 +1497,11 @@ export class YNotebook
    * @param key Key to get from the metadata
    * @returns Notebook's metadata.
    */
-  getMetadata(key?: string): nbformat.INotebookMetadata {
+   getMetadata(): nbformat.INotebookMetadata;
+   getMetadata(key: string): PartialJSONValue | undefined;
+   getMetadata(
+     key?: string
+   ): nbformat.INotebookMetadata | PartialJSONValue | undefined {
     const meta = this.ymeta.get('metadata') ?? {};
 
     if (typeof key === 'string') {
@@ -1519,6 +1523,13 @@ export class YNotebook
    * @param metadata All Notebook's metadata or the key to set.
    * @param value New metadata value
    */
+  setMetadata(
+    metadata: nbformat.INotebookMetadata,
+  ): void;
+  setMetadata(
+    metadata: string,
+    value: PartialJSONValue
+  ): void;
   setMetadata(
     metadata: nbformat.INotebookMetadata | string,
     value?: PartialJSONValue
