@@ -197,35 +197,30 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @returns Notebook's metadata.
    */
-   getMetadata(): nbformat.INotebookMetadata;
+  getMetadata(): nbformat.INotebookMetadata;
 
-   /**
-    * Returns a metadata associated with the notebook.
-    *
-    * @param key Key to get from the metadata
-    * @returns Notebook's metadata.
-    */
-   getMetadata(key: string): PartialJSONValue | undefined;
+  /**
+   * Returns a metadata associated with the notebook.
+   *
+   * @param key Key to get from the metadata
+   * @returns Notebook's metadata.
+   */
+  getMetadata(key: string): PartialJSONValue | undefined;
 
-   /**
-    * Sets all metadata associated with the notebook.
-    *
-    * @param metadata All Notebook's metadata.
-    */
-   setMetadata(
-     metadata: nbformat.INotebookMetadata,
-   ): void;
+  /**
+   * Sets all metadata associated with the notebook.
+   *
+   * @param metadata All Notebook's metadata.
+   */
+  setMetadata(metadata: nbformat.INotebookMetadata): void;
 
-   /**
-    * Sets a metadata associated with the notebook.
-    *
-    * @param metadata The key to set.
-    * @param value New metadata value
-    */
-   setMetadata(
-     metadata: string,
-     value: PartialJSONValue
-   ): void;
+  /**
+   * Sets a metadata associated with the notebook.
+   *
+   * @param metadata The key to set.
+   * @param value New metadata value
+   */
+  setMetadata(metadata: string, value: PartialJSONValue): void;
 
   /**
    * Updates the metadata associated with the notebook.
@@ -456,9 +451,7 @@ export interface ISharedBaseCell<
    *
    * @param metadata Cell's metadata.
    */
-  setMetadata(
-    metadata: Partial<Metadata>,
-  ): void;
+  setMetadata(metadata: Partial<Metadata>): void;
 
   /**
    * Sets a cell metadata.
@@ -466,10 +459,7 @@ export interface ISharedBaseCell<
    * @param metadata Cell's metadata key.
    * @param value Metadata value
    */
-  setMetadata(
-    metadata: string,
-    value: PartialJSONValue
-  ): void;
+  setMetadata(metadata: string, value: PartialJSONValue): void;
 
   /**
    * Serialize the model to JSON.
