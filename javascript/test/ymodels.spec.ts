@@ -321,6 +321,61 @@ describe('@jupyter-notebook/ydoc', () => {
         ]);
       });
     });
+
+    describe('#fromJSON', () => {
+      it('should load a serialize notebook', () => {
+        const notebook = new YNotebook();
+        notebook.fromJSON({
+          cells: [],
+          metadata: {
+            dummy: 42
+          },
+          nbformat: 4,
+          nbformat_minor: 5
+        });
+
+        expect(notebook.cells).toHaveLength(0);
+        expect(notebook.nbformat).toEqual(4);
+        expect(notebook.nbformat_minor).toEqual(5);
+      });
+
+      it('should remove orig_nbformat', () => {
+        const notebook = new YNotebook();
+        notebook.fromJSON({
+          cells: [],
+          metadata: {
+            dummy: 42,
+            orig_nbformat: 3
+          },
+          nbformat: 4,
+          nbformat_minor: 5
+        });
+
+        expect(notebook.getMetadata('orig_nbformat')).toEqual(undefined);
+      });
+
+      it('should remove cell id for version <4.5', () => {
+        const notebook = new YNotebook();
+        notebook.fromJSON({
+          cells: [
+            {
+              cell_type: 'code',
+              id: 'first-cell',
+              source: '',
+              metadata: {}
+            }
+          ],
+          metadata: {
+            dummy: 42
+          },
+          nbformat: 4,
+          nbformat_minor: 4
+        });
+
+        expect(notebook.cells).toHaveLength(1);
+        expect(notebook.cells[0].id).not.toEqual('first-cell');
+      });
+    });
   });
 
   describe('YCell standalone', () => {

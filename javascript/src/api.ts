@@ -296,6 +296,13 @@ export interface ISharedNotebook extends ISharedDocument {
   deleteCellRange(from: number, to: number): void;
 
   /**
+   * Override the notebook with a JSON-serialized document.
+   * 
+   * @param value The notebook
+   */
+  fromJSON(value: nbformat.INotebookContent): void;
+
+  /**
    * Serialize the model to JSON.
    */
   toJSON(): nbformat.INotebookContent;

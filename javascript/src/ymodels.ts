@@ -1525,6 +1525,34 @@ export class YNotebook
   }
 
   /**
+   * Override the notebook with a JSON-serialized document.
+   * 
+   * @param value The notebook
+   */
+  fromJSON(value: nbformat.INotebookContent): void {
+    this.transact(() => {
+      this.nbformat = value.nbformat;
+      this.nbformat_minor = value.nbformat_minor;
+
+      const metadata = value.metadata;
+      if (metadata['orig_nbformat'] !== undefined) {
+        delete metadata['orig_nbformat'];
+      }
+      this.metadata = metadata;
+
+      const useId = value.nbformat === 4 && value.nbformat_minor >= 5;
+      const ycells = value.cells.map(cell => {
+        if (!useId) {
+          delete cell.id;
+        }
+        return cell;
+      });
+      this.insertCells(this.cells.length, ycells);
+      this.deleteCellRange(0, this.cells.length);
+    });
+  }
+
+  /**
    * Serialize the model to JSON.
    */
   toJSON(): nbformat.INotebookContent {
