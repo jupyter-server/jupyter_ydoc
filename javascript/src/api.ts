@@ -297,7 +297,7 @@ export interface ISharedNotebook extends ISharedDocument {
 
   /**
    * Override the notebook with a JSON-serialized document.
-   * 
+   *
    * @param value The notebook
    */
   fromJSON(value: nbformat.INotebookContent): void;

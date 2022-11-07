@@ -1526,7 +1526,7 @@ export class YNotebook
 
   /**
    * Override the notebook with a JSON-serialized document.
-   * 
+   *
    * @param value The notebook
    */
   fromJSON(value: nbformat.INotebookContent): void {
