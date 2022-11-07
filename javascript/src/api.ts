@@ -409,7 +409,7 @@ export interface ISharedBaseCell<
 
   /**
    * Cell metadata.
-   * 
+   *
    * #### Notes
    * You should prefer to access and modify the specific key of interest.
    */
@@ -441,7 +441,7 @@ export interface ISharedBaseCell<
 
   /**
    * Returns all metadata associated with the cell.
-   * 
+   *
    * @returns Cell's metadata.
    */
   getMetadata(): Partial<Metadata>;
