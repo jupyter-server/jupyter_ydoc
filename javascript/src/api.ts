@@ -206,7 +206,7 @@ export interface ISharedNotebook extends ISharedDocument {
     * @returns Notebook's metadata.
     */
    getMetadata(key: string): PartialJSONValue | undefined;
- 
+
    /**
     * Sets all metadata associated with the notebook.
     *
@@ -215,7 +215,7 @@ export interface ISharedNotebook extends ISharedDocument {
    setMetadata(
      metadata: nbformat.INotebookMetadata,
    ): void;
- 
+
    /**
     * Sets a metadata associated with the notebook.
     *
