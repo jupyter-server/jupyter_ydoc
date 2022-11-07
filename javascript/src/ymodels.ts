@@ -341,15 +341,16 @@ const createCell = (
 ): YCodeCell | YMarkdownCell | YRawCell => {
   const ymodel = new Y.Map();
   const ysource = new Y.Text();
+  const ymetadata = new Y.Map();
   ymodel.set('source', ysource);
-  ymodel.set('metadata', {});
+  ymodel.set('metadata', ymetadata);
   ymodel.set('cell_type', cell.cell_type);
   ymodel.set('id', cell.id ?? UUID.uuid4());
 
   let ycell: YCellType;
   switch (cell.cell_type) {
     case 'markdown': {
-      ycell = new YMarkdownCell(ymodel, ysource, { notebook });
+      ycell = new YMarkdownCell(ymodel, ysource, { notebook }, ymetadata);
       if (cell.attachments != null) {
         ycell.setAttachments(cell.attachments as nbformat.IAttachments);
       }
@@ -358,9 +359,15 @@ const createCell = (
     case 'code': {
       const youtputs = new Y.Array();
       ymodel.set('outputs', youtputs);
-      ycell = new YCodeCell(ymodel, ysource, youtputs, {
-        notebook
-      });
+      ycell = new YCodeCell(
+        ymodel,
+        ysource,
+        youtputs,
+        {
+          notebook
+        },
+        ymetadata
+      );
       const cCell = cell as Partial<nbformat.ICodeCell>;
       ycell.execution_count = cCell.execution_count ?? null;
       if (cCell.outputs) {
@@ -370,7 +377,7 @@ const createCell = (
     }
     default: {
       // raw
-      ycell = new YRawCell(ymodel, ysource, { notebook });
+      ycell = new YRawCell(ymodel, ysource, { notebook }, ymetadata);
       if (cell.attachments) {
         ycell.setAttachments(cell.attachments as nbformat.IAttachments);
       }
@@ -423,14 +430,17 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param ymodel Cell map
    * @param ysource Cell source
    * @param options { notebook?: The notebook the cell is attached to }
+   * @param ymetadata Cell metadata
    */
   constructor(
     ymodel: Y.Map<any>,
     ysource: Y.Text,
-    options: SharedCell.IOptions = {}
+    options: SharedCell.IOptions = {},
+    ymetadata?: Y.Map<any>
   ) {
     this.ymodel = ymodel;
     this._ysource = ysource;
+    this._ymetadata = ymetadata ?? this.ymodel.get('metadata');
     this._prevSourceLength = ysource ? ysource.length : 0;
     this._notebook = null;
     this._awareness = null;
@@ -507,6 +517,9 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
 
   /**
    * Cell metadata.
+   *
+   * #### Notes
+   * You should prefer to access and modify the specific key of interest.
    */
   get metadata(): Partial<Metadata> {
     return this.getMetadata();
@@ -708,35 +721,45 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     this.setMetadata(allMetadata);
   }
 
+
   /**
-   * Returns the metadata associated with the cell.
+   * Returns all or a single metadata associated with the cell.
    *
-   * @param key
-   * @returns Cell metadata.
+   * @param key The metadata key
+   * @returns cell's metadata.
    */
-  getMetadata(key?: string): Partial<Metadata> {
+  getMetadata(): Partial<Metadata>;
+  getMetadata(key: string): PartialJSONValue | undefined;
+  getMetadata(key?: string): Partial<Metadata> | PartialJSONValue | undefined {
+    const metadata = this._ymetadata;
+
     // Transiently the metadata can be missing - like during destruction
-    const metadata = this.ymodel.get('metadata') ?? {};
+    if (metadata === undefined) {
+      return undefined;
+    }
 
     if (typeof key === 'string') {
-      const value = metadata[key];
+      const value = metadata.get(key);
       return typeof value === 'undefined'
         ? undefined // undefined is converted to `{}` by `JSONExt.deepCopy`
-        : JSONExt.deepCopy(metadata[key]);
+        : JSONExt.deepCopy(metadata.get(key));
     } else {
-      return JSONExt.deepCopy(metadata);
+      return JSONExt.deepCopy(metadata.toJSON());
     }
   }
 
+
   /**
-   * Sets some cell metadata.
+   * Sets all or a single cell metadata.
    *
    * If only one argument is provided, it will override all cell metadata.
    * Otherwise a single key will be set to a new value.
    *
-   * @param metadata Cell's metadata or key.
+   * @param metadata Cell's metadata key or cell's metadata.
    * @param value Metadata value
    */
+  setMetadata(metadata: Partial<Metadata>): void;
+  setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: Partial<Metadata> | string,
     value?: PartialJSONValue
@@ -755,24 +778,27 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
         return;
       }
 
-      const clone = this.getMetadata() as nbformat.ICellMetadata;
-      clone[key] = value;
-      if (key === 'collapsed' && clone.jupyter?.outputs_hidden !== value) {
-        clone.jupyter = {
-          ...clone.jupyter,
-          outputs_hidden: value
-        };
-      } else if (key === 'jupyter') {
-        if (typeof (value as JSONObject)['outputs_hidden'] !== 'undefined') {
-          if (clone.collapsed !== (value as JSONObject)['outputs_hidden']) {
-            clone.collapsed = (value as JSONObject)['outputs_hidden'];
-          }
-        } else {
-          delete clone.collapsed;
-        }
-      }
       this.transact(() => {
-        this.ymodel.set('metadata', clone);
+        this._ymetadata.set(key, value);
+
+        if (key === 'collapsed') {
+          const jupyter = ((this.getMetadata('jupyter') as any) ?? {}) as any;
+          if (jupyter.outputs_hidden !== value) {
+            this.setMetadata('jupyter', {
+              ...jupyter,
+              outputs_hidden: value
+            });
+          }
+        } else if (key === 'jupyter') {
+          const isHidden = (value as JSONObject)['outputs_hidden'];
+          if (typeof isHidden !== 'undefined') {
+            if (this.getMetadata('collapsed') !== isHidden) {
+              this.setMetadata('collapsed', isHidden);
+            }
+          } else {
+            this.deleteMetadata('collapsed');
+          }
+        }
       });
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
@@ -784,7 +810,9 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       }
       if (!JSONExt.deepEqual(clone, this.getMetadata())) {
         this.transact(() => {
-          this.ymodel.set('metadata', clone);
+          for (const [key, value] of Object.entries(clone)) {
+            this._ymetadata.set(key, value);
+          }
         });
       }
     }
@@ -901,6 +929,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   private _isDisposed = false;
   private _prevSourceLength: number;
   private _undoManager: Y.UndoManager | null = null;
+  private _ymetadata: Y.Map<any>;
   private _ysource: Y.Text;
 }
 
@@ -940,9 +969,10 @@ export class YCodeCell
     ymodel: Y.Map<any>,
     ysource: Y.Text,
     youtputs: Y.Array<any>,
-    options: SharedCell.IOptions = {}
+    options: SharedCell.IOptions = {},
+    ymetadata?: Y.Map<any>
   ) {
-    super(ymodel, ysource, options);
+    super(ymodel, ysource, options, ymetadata);
     this._youtputs = youtputs;
   }
 
