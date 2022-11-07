@@ -60,6 +60,7 @@ jobs:
           cd ../tests; npm install
 
       - name: Linter check
+        if: ${{ !contains(matrix.os, 'windows') }}
         working-directory: javascript
         run: |
           yarn lint:check
