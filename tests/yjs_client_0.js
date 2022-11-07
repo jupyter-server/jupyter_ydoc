@@ -1,7 +1,7 @@
-import { YNotebook } from '@jupyterlab/shared-models'
+import { YNotebook } from '@jupyter-notebook/ydoc'
 import { WebsocketProvider } from 'y-websocket'
 
-const notebook = YNotebook.create(false)
+const notebook = new YNotebook()
 const ytest = notebook.ydoc.getMap('_test')
 import ws from 'ws'
 

@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [main]
+    branches: [0.2.x]
   pull_request:
-    branches: [main]
+    branches: [0.2.x]
 
 jobs:
   pre-commit:
@@ -46,11 +46,31 @@ jobs:
           mamba-version: "*"
           channels: conda-forge
           python-version: "3.7"
+
       - name: Install dependencies
         run: |
-          mamba install python=${{ matrix.python-version }} pip nodejs
+          mamba install python=${{ matrix.python-version }} pip nodejs=16 yarn
           pip install .[test]
-          cd tests; npm install
-      - name: Run tests
+
+      - name: Build JavaScript assets
+        working-directory: javascript
+        run: |
+          yarn
+          yarn build
+          cd ../tests; npm install
+
+      - name: Linter check
+        if: ${{ !contains(matrix.os, 'windows') }}
+        working-directory: javascript
+        run: |
+          yarn lint:check
+
+      - name: Run Python tests
         run: |
           pytest -v
+
+      - name: Run JS tests
+        working-directory: javascript
+        run: |
+          yarn build:test
+          yarn test:cov
