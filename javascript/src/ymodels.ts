@@ -33,7 +33,7 @@ import type {
   NotebookChange,
   SharedCell,
   StateChange
-} from './api';
+} from './api.js';
 
 /**
  * Abstract interface to define Shared Models that can be bound to a text editor using any existing
@@ -709,12 +709,14 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
-   * Returns the metadata associated with the cell.
+   * Returns all or a single metadata associated with the cell.
    *
-   * @param key
-   * @returns Cell metadata.
+   * @param key The metadata key
+   * @returns cell's metadata.
    */
-  getMetadata(key?: string): Partial<Metadata> {
+  getMetadata(): Partial<Metadata>;
+  getMetadata(key: string): PartialJSONValue | undefined;
+  getMetadata(key?: string): Partial<Metadata> | PartialJSONValue | undefined {
     // Transiently the metadata can be missing - like during destruction
     const metadata = this.ymodel.get('metadata') ?? {};
 
@@ -729,14 +731,16 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
-   * Sets some cell metadata.
+   * Sets all or a single cell metadata.
    *
    * If only one argument is provided, it will override all cell metadata.
    * Otherwise a single key will be set to a new value.
    *
-   * @param metadata Cell's metadata or key.
+   * @param metadata Cell's metadata key or cell's metadata.
    * @param value Metadata value
    */
+  setMetadata(metadata: Partial<Metadata>): void;
+  setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: Partial<Metadata> | string,
     value?: PartialJSONValue
@@ -1467,6 +1471,8 @@ export class YNotebook
    * @param key Key to get from the metadata
    * @returns Notebook's metadata.
    */
+  getMetadata(): nbformat.INotebookMetadata;
+  getMetadata(key: string): PartialJSONValue | undefined;
   getMetadata(key?: string): nbformat.INotebookMetadata {
     const meta = this.ymeta.get('metadata') ?? {};
 
@@ -1489,6 +1495,8 @@ export class YNotebook
    * @param metadata All Notebook's metadata or the key to set.
    * @param value New metadata value
    */
+  setMetadata(metadata: nbformat.INotebookMetadata): void;
+  setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: nbformat.INotebookMetadata | string,
     value?: PartialJSONValue

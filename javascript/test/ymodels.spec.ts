@@ -6,14 +6,15 @@ import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
 describe('@jupyter-notebook/ydoc', () => {
   describe('YNotebook', () => {
     describe('#constructor', () => {
-      it('should create a notebook without arguments', () => {
+      test('should create a notebook without arguments', () => {
         const notebook = new YNotebook();
         expect(notebook.cells.length).toBe(0);
+        notebook.dispose();
       });
     });
 
     describe('metadata', () => {
-      it('should get metadata', () => {
+      test('should get metadata', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -26,9 +27,10 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.setMetadata(metadata);
 
         expect(notebook.metadata).toEqual(metadata);
+        notebook.dispose();
       });
 
-      it('should get all metadata', () => {
+      test('should get all metadata', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -41,9 +43,10 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.setMetadata(metadata);
 
         expect(notebook.getMetadata()).toEqual(metadata);
+        notebook.dispose();
       });
 
-      it('should get one metadata', () => {
+      test('should get one metadata', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -56,9 +59,10 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.setMetadata(metadata);
 
         expect(notebook.getMetadata('orig_nbformat')).toEqual(1);
+        notebook.dispose();
       });
 
-      it('should set one metadata', () => {
+      test('should set one metadata', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -72,6 +76,7 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.setMetadata('test', 'banana');
 
         expect(notebook.getMetadata('test')).toEqual('banana');
+        notebook.dispose();
       });
 
       it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
@@ -90,10 +95,11 @@ describe('@jupyter-notebook/ydoc', () => {
           nb.setMetadata(metadata);
 
           expect(nb.getMetadata('test')).toEqual(value);
+          nb.dispose();
         }
       );
 
-      it('should update metadata', () => {
+      test('should update metadata', () => {
         const notebook = new YNotebook();
         const metadata = notebook.getMetadata();
         expect(metadata).toBeTruthy();
@@ -116,9 +122,10 @@ describe('@jupyter-notebook/ydoc', () => {
           expect(metadata.kernelspec!.name).toBe('python');
           expect(metadata.orig_nbformat).toBe(2);
         }
+        notebook.dispose();
       });
 
-      it('should emit all metadata changes', () => {
+      test('should emit all metadata changes', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -153,7 +160,7 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.dispose();
       });
 
-      it('should emit a add metadata change', () => {
+      test('should emit a add metadata change', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -178,7 +185,7 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.dispose();
       });
 
-      it('should emit a delete metadata change', () => {
+      test('should emit a delete metadata change', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -210,7 +217,7 @@ describe('@jupyter-notebook/ydoc', () => {
         notebook.dispose();
       });
 
-      it('should emit an update metadata change', () => {
+      test('should emit an update metadata change', () => {
         const notebook = new YNotebook();
         const metadata = {
           orig_nbformat: 1,
@@ -244,26 +251,29 @@ describe('@jupyter-notebook/ydoc', () => {
     });
 
     describe('#insertCell', () => {
-      it('should insert a cell', () => {
+      test('should insert a cell', () => {
         const notebook = new YNotebook();
         notebook.insertCell(0, { cell_type: 'code' });
         expect(notebook.cells.length).toBe(1);
+        notebook.dispose();
       });
-      it('should set cell source', () => {
+      test('should set cell source', () => {
         const notebook = new YNotebook();
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
         codeCell.setSource('test');
         expect(notebook.cells[0].getSource()).toBe('test');
+        notebook.dispose();
       });
-      it('should update source', () => {
+      test('should update source', () => {
         const notebook = new YNotebook();
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
         codeCell.setSource('test');
         codeCell.updateSource(0, 0, 'hello');
         expect(codeCell.getSource()).toBe('hellotest');
+        notebook.dispose();
       });
 
-      it('should emit a add cells change', () => {
+      test('should emit a add cells change', () => {
         const notebook = new YNotebook();
         const changes: NotebookChange[] = [];
         notebook.changed.connect((_, c) => {
@@ -277,11 +287,12 @@ describe('@jupyter-notebook/ydoc', () => {
             insert: [codeCell]
           }
         ]);
+        notebook.dispose();
       });
     });
 
     describe('#deleteCell', () => {
-      it('should emit a delete cells change', () => {
+      test('should emit a delete cells change', () => {
         const notebook = new YNotebook();
         const changes: NotebookChange[] = [];
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
@@ -294,11 +305,12 @@ describe('@jupyter-notebook/ydoc', () => {
         expect(changes).toHaveLength(1);
         expect(codeCell.isDisposed).toEqual(true);
         expect(changes[0].cellsChange).toEqual([{ delete: 1 }]);
+        notebook.dispose();
       });
     });
 
     describe('#moveCell', () => {
-      it('should emit add and delete cells changes when moving a cell', () => {
+      test('should emit add and delete cells changes when moving a cell', () => {
         const notebook = new YNotebook();
         const changes: NotebookChange[] = [];
         const codeCell = notebook.addCell({ cell_type: 'code' });
@@ -319,11 +331,12 @@ describe('@jupyter-notebook/ydoc', () => {
             insert: [notebook.getCell(1)]
           }
         ]);
+        notebook.dispose();
       });
     });
 
     describe('#fromJSON', () => {
-      it('should load a serialize notebook', () => {
+      test('should load a serialize notebook', () => {
         const notebook = new YNotebook();
         notebook.fromJSON({
           cells: [],
@@ -337,9 +350,10 @@ describe('@jupyter-notebook/ydoc', () => {
         expect(notebook.cells).toHaveLength(0);
         expect(notebook.nbformat).toEqual(4);
         expect(notebook.nbformat_minor).toEqual(5);
+        notebook.dispose();
       });
 
-      it('should remove orig_nbformat', () => {
+      test('should remove orig_nbformat', () => {
         const notebook = new YNotebook();
         notebook.fromJSON({
           cells: [],
@@ -352,9 +366,10 @@ describe('@jupyter-notebook/ydoc', () => {
         });
 
         expect(notebook.getMetadata('orig_nbformat')).toEqual(undefined);
+        notebook.dispose();
       });
 
-      it('should remove cell id for version <4.5', () => {
+      test('should remove cell id for version <4.5', () => {
         const notebook = new YNotebook();
         notebook.fromJSON({
           cells: [
@@ -374,25 +389,28 @@ describe('@jupyter-notebook/ydoc', () => {
 
         expect(notebook.cells).toHaveLength(1);
         expect(notebook.cells[0].id).not.toEqual('first-cell');
+        notebook.dispose();
       });
     });
   });
 
   describe('YCell standalone', () => {
-    it('should set source', () => {
+    test('should set source', () => {
       const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       expect(codeCell.getSource()).toBe('test');
+      codeCell.dispose();
     });
 
-    it('should update source', () => {
+    test('should update source', () => {
       const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.updateSource(0, 0, 'hello');
       expect(codeCell.getSource()).toBe('hellotest');
+      codeCell.dispose();
     });
 
-    it('should get metadata', () => {
+    test('should get metadata', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
@@ -406,9 +424,10 @@ describe('@jupyter-notebook/ydoc', () => {
         ...metadata,
         jupyter: { outputs_hidden: true }
       });
+      cell.dispose();
     });
 
-    it('should get all metadata', () => {
+    test('should get all metadata', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         jupyter: { outputs_hidden: true },
@@ -419,9 +438,10 @@ describe('@jupyter-notebook/ydoc', () => {
       cell.setMetadata(metadata);
 
       expect(cell.getMetadata()).toEqual({ ...metadata, collapsed: true });
+      cell.dispose();
     });
 
-    it('should get one metadata', () => {
+    test('should get one metadata', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
@@ -432,6 +452,7 @@ describe('@jupyter-notebook/ydoc', () => {
       cell.setMetadata(metadata);
 
       expect(cell.getMetadata('editable')).toEqual(metadata.editable);
+      cell.dispose();
     });
 
     it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
@@ -448,10 +469,11 @@ describe('@jupyter-notebook/ydoc', () => {
         cell.setMetadata(metadata);
 
         expect(cell.getMetadata('test')).toEqual(value);
+        cell.dispose();
       }
     );
 
-    it('should set one metadata', () => {
+    test('should set one metadata', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
@@ -463,9 +485,10 @@ describe('@jupyter-notebook/ydoc', () => {
       cell.setMetadata('test', 'banana');
 
       expect(cell.getMetadata('test')).toEqual('banana');
+      cell.dispose();
     });
 
-    it('should emit all metadata changes', () => {
+    test('should emit all metadata changes', () => {
       const notebook = new YNotebook();
       const metadata = {
         collapsed: true,
@@ -504,7 +527,7 @@ describe('@jupyter-notebook/ydoc', () => {
       notebook.dispose();
     });
 
-    it('should emit a add metadata change', () => {
+    test('should emit a add metadata change', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
@@ -527,7 +550,7 @@ describe('@jupyter-notebook/ydoc', () => {
       cell.dispose();
     });
 
-    it('should emit a delete metadata change', () => {
+    test('should emit a delete metadata change', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
@@ -557,7 +580,7 @@ describe('@jupyter-notebook/ydoc', () => {
       cell.dispose();
     });
 
-    it('should emit an update metadata change', () => {
+    test('should emit an update metadata change', () => {
       const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,

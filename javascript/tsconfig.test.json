@@ -10,7 +10,6 @@
     "outDir": "lib",
     "lib": ["DOM", "DOM.iterable"],
     "types": ["jest", "node"],
-    "jsx": "react",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "strictNullChecks": true,
