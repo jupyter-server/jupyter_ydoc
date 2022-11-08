@@ -721,7 +721,6 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     this.setMetadata(allMetadata);
   }
 
-
   /**
    * Returns all or a single metadata associated with the cell.
    *
@@ -747,7 +746,6 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       return JSONExt.deepCopy(metadata.toJSON());
     }
   }
-
 
   /**
    * Sets all or a single cell metadata.
@@ -1497,11 +1495,11 @@ export class YNotebook
    * @param key Key to get from the metadata
    * @returns Notebook's metadata.
    */
-   getMetadata(): nbformat.INotebookMetadata;
-   getMetadata(key: string): PartialJSONValue | undefined;
-   getMetadata(
-     key?: string
-   ): nbformat.INotebookMetadata | PartialJSONValue | undefined {
+  getMetadata(): nbformat.INotebookMetadata;
+  getMetadata(key: string): PartialJSONValue | undefined;
+  getMetadata(
+    key?: string
+  ): nbformat.INotebookMetadata | PartialJSONValue | undefined {
     const meta = this.ymeta.get('metadata') ?? {};
 
     if (typeof key === 'string') {
@@ -1523,13 +1521,8 @@ export class YNotebook
    * @param metadata All Notebook's metadata or the key to set.
    * @param value New metadata value
    */
-  setMetadata(
-    metadata: nbformat.INotebookMetadata,
-  ): void;
-  setMetadata(
-    metadata: string,
-    value: PartialJSONValue
-  ): void;
+  setMetadata(metadata: nbformat.INotebookMetadata): void;
+  setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: nbformat.INotebookMetadata | string,
     value?: PartialJSONValue
