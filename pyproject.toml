@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling>=1.10.0"]
+requires = ["hatchling>=1.10.0", "hatch-nodejs-version"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jupyter-ydoc"
-version = "0.2.2"
+dynamic = ["version"]
 description = "Document structures for collaborative editing using Ypy"
 requires-python = ">=3.7"
 keywords = ["jupyter", "ypy"]
@@ -45,29 +45,35 @@ text = "BSD 3-Clause License"
 [project.urls]
 Homepage = "https://jupyter.org"
 
+[tool.hatch.version]
+source = "nodejs"
+
 [tool.hatch.build]
 exclude = ["javascript"]
 
-[tool.tbump.version]
-current = "0.2.2"
-regex = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<channel>a|b|rc|.dev)(?P<release>\\d+))?"
+[tool.hatch.build.hooks.version]
+path = "jupyter_ydoc/_version.py"
 
-[[tool.tbump.file]]
-src = "pyproject.toml"
-[[tool.tbump.file]]
-src = "jupyter_ydoc/_version.py"
+#[tool.tbump.version]
+#current = "0.2.2"
+#regex = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<channel>a|b|rc|.dev)(?P<release>\\d+))?"
 
-[[tool.tbump.field]]
-name = "channel"
-default = ""
+#[[tool.tbump.file]]
+#src = "pyproject.toml"
+#[[tool.tbump.file]]
+#src = "jupyter_ydoc/_version.py"
 
-[[tool.tbump.field]]
-name = "release"
-default = ""
+#[[tool.tbump.field]]
+#name = "channel"
+#default = ""
 
-[tool.tbump.git]
-message_template = "Bump to {new_version}"
-tag_template = "v{new_version}"
+#[[tool.tbump.field]]
+#name = "release"
+#default = ""
+
+#[tool.tbump.git]
+#message_template = "Bump to {new_version}"
+#tag_template = "v{new_version}"
 
 [tool.check-manifest]
 ignore = [".*"]
@@ -83,7 +89,8 @@ before-build-npm = ["cd javascript && yarn && yarn build"]
 before-bump-version = ["pip install -e .[dev]"]
 
 [tool.jupyter-releaser.options]
-version_cmd = "python scripts/bump-version.py"
+#version_cmd = "python scripts/bump-version.py"
+version_cmd = "hatch version"
 
 [tool.flake8]
 max-line-length = 100
