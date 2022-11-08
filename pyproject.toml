@@ -45,6 +45,9 @@ text = "BSD 3-Clause License"
 [project.urls]
 Homepage = "https://jupyter.org"
 
+[tool.hatch.build]
+exclude = ["javascript"]
+
 [tool.tbump.version]
 current = "0.2.2"
 regex = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)((?P<channel>a|b|rc|.dev)(?P<release>\\d+))?"
@@ -74,6 +77,10 @@ skip = [
     "check-links",
     "check-manifest",
 ]
+
+[tool.jupyter-releaser.hooks]
+before-build-npm = ["cd javascript"]
+before-bump-version = ["pip install -e .[dev]"]
 
 [tool.jupyter-releaser.options]
 version_cmd = "python scripts/bump-version.py"

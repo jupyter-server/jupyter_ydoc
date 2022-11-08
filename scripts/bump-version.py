@@ -1,5 +1,5 @@
 #############################################################################
-# Copyright (c), Jupyter Development Team                                   #                                         #
+# Copyright (c), Jupyter Development Team                                   #
 #                                                                           #
 # Distributed under the terms of the BSD 3-Clause License.                  #
 #                                                                           #
@@ -16,7 +16,9 @@ from pkg_resources import parse_version
 
 TBUMP_CMD = "tbump --non-interactive --only-patch"
 
-JS_VERSION_PATTERN = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(-(?P<channel>alpha|beta|rc)\\.(?P<release>\\d+))?"
+JS_VERSION_PATTERN = """
+(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)(-(?P<channel>alpha|beta|rc)\\.(?P<release>\\d+))?
+"""
 
 
 @click.command()
