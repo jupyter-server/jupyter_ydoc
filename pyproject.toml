@@ -79,7 +79,7 @@ skip = [
 ]
 
 [tool.jupyter-releaser.hooks]
-before-build-npm = ["cd javascript"]
+before-build-npm = ["cd javascript && yarn && yarn build"]
 before-bump-version = ["pip install -e .[dev]"]
 
 [tool.jupyter-releaser.options]
