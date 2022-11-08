@@ -1070,9 +1070,7 @@ export class YCodeCell
    * @param events YJS events
    * @returns Cell changes
    */
-  protected getChanges(
-    events: Y.YEvent<any>[]
-  ): Partial<CellChange> {
+  protected getChanges(events: Y.YEvent<any>[]): Partial<CellChange> {
     const changes = super.getChanges(events);
 
     const outputEvent = events.find(
@@ -1144,9 +1142,7 @@ class YAttachmentCell
    * @param events YJS events
    * @returns Cell changes
    */
-  protected getChanges(
-    events: Y.YEvent<any>[]
-  ): Partial<CellChange> {
+  protected getChanges(events: Y.YEvent<any>[]): Partial<CellChange> {
     const changes = super.getChanges(events);
 
     const modelEvent = events.find(event => event.target === this.ymodel) as
