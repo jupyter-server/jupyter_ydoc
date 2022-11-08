@@ -31,6 +31,17 @@ import type { ISignal } from '@lumino/signaling';
 export type Delta<T> = Array<{ insert?: T; delete?: number; retain?: number }>;
 
 /**
+ * Changes on a map-like data.
+ */
+export type MapChanges = Map<
+  string,
+  {
+    action: 'add' | 'update' | 'delete';
+    oldValue: any;
+  }
+>;
+
+/**
  * ISharedBase defines common operations that can be performed on any shared object.
  */
 export interface ISharedBase extends IDisposable {
@@ -386,7 +397,7 @@ export interface ISharedBaseCell<
   /**
    * The changed signal.
    */
-  readonly changed: ISignal<this, CellChange<Metadata>>;
+  readonly changed: ISignal<this, CellChange>;
 
   /**
    * Cell id.
@@ -706,9 +717,7 @@ export type FileChange = DocumentChange & SourceChange;
 /**
  * Definition of the shared Cell changes.
  */
-export type CellChange<
-  MetadataType extends nbformat.IBaseCellMetadata = nbformat.IBaseCellMetadata
-> = SourceChange & {
+export type CellChange = SourceChange & {
   /**
    * Cell attachment change
    */
@@ -730,8 +739,5 @@ export type CellChange<
   /**
    * Cell metadata change
    */
-  metadataChange?: {
-    oldValue?: Partial<MetadataType>;
-    newValue?: Partial<MetadataType>;
-  };
+  metadataChange?: MapChanges;
 };

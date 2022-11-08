@@ -542,12 +542,14 @@ describe('@jupyter-notebook/ydoc', () => {
       });
       cell.setMetadata('test', 'banana');
 
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        { type: 'add', key: 'test', newValue: 'banana', oldValue: undefined }
-      ]);
-
-      cell.dispose();
+      try {
+        expect(changes).toHaveLength(1);
+        expect(changes).toEqual([
+          { type: 'add', key: 'test', newValue: 'banana', oldValue: undefined }
+        ]);
+      } finally {
+        cell.dispose();
+      }
     });
 
     test('should emit a delete metadata change', () => {
@@ -567,17 +569,19 @@ describe('@jupyter-notebook/ydoc', () => {
       });
       cell.deleteMetadata('test');
 
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        {
-          type: 'remove',
-          key: 'test',
-          newValue: undefined,
-          oldValue: 'banana'
-        }
-      ]);
-
-      cell.dispose();
+      try {
+        expect(changes).toHaveLength(1);
+        expect(changes).toEqual([
+          {
+            type: 'remove',
+            key: 'test',
+            newValue: undefined,
+            oldValue: 'banana'
+          }
+        ]);
+      } finally {
+        cell.dispose();
+      }
     });
 
     test('should emit an update metadata change', () => {
@@ -597,17 +601,19 @@ describe('@jupyter-notebook/ydoc', () => {
       });
       cell.setMetadata('test', 'orange');
 
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        {
-          type: 'change',
-          key: 'test',
-          newValue: 'orange',
-          oldValue: 'banana'
-        }
-      ]);
-
-      cell.dispose();
+      try {
+        expect(changes).toHaveLength(1);
+        expect(changes).toEqual([
+          {
+            type: 'change',
+            key: 'test',
+            newValue: 'orange',
+            oldValue: 'banana'
+          }
+        ]);
+      } finally {
+        cell.dispose();
+      }
     });
   });
 });

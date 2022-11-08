@@ -479,7 +479,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * The changed signal.
    */
-  get changed(): ISignal<this, CellChange<Metadata>> {
+  get changed(): ISignal<this, CellChange> {
     return this._changed;
   }
 
@@ -708,17 +708,21 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       return;
     }
 
-    const allMetadata = JSONExt.deepCopy(this.ymodel.get('metadata'));
-    delete allMetadata[key];
-    if (key === 'collapsed' && allMetadata.jupyter) {
-      delete allMetadata.jupyter.outputs_hidden;
-      if (Object.keys(allMetadata.jupyter).length === 0) {
-        delete allMetadata.jupyter;
+    this._ymetadata.delete(key);
+
+    const jupyter = this.getMetadata('jupyter') as any;
+    if (key === 'collapsed' && jupyter) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { outputs_hidden, ...others } = jupyter;
+
+      if (Object.keys(others).length === 0) {
+        this._ymetadata.delete('jupyter');
+      } else {
+        this._ymetadata.set('jupyter', others);
       }
     } else if (key === 'jupyter') {
-      delete allMetadata.collapsed;
+      this._ymetadata.delete('collapsed');
     }
-    this.setMetadata(allMetadata);
   }
 
   /**
@@ -846,8 +850,8 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param events YJS events
    * @returns Cell changes
    */
-  protected getChanges(events: Y.YEvent<any>[]): Partial<CellChange<Metadata>> {
-    const changes: CellChange<Metadata> = {};
+  protected getChanges(events: Y.YEvent<any>[]): Partial<CellChange> {
+    const changes: CellChange = {};
 
     const sourceEvent = events.find(
       event => event.target === this.ymodel.get('source')
@@ -856,44 +860,45 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       changes.sourceChange = sourceEvent.changes.delta as any;
     }
 
+    const metadataEvents = events.find(
+      event => event.target === this._ymetadata
+    );
+    if (metadataEvents) {
+      changes.metadataChange = metadataEvents.changes.keys;
+
+      metadataEvents.changes.keys.forEach((change, key) => {
+        switch (change.action) {
+          case 'add':
+            this._metadataChanged.emit({
+              key,
+              newValue: this._ymetadata.get(key),
+              type: 'add'
+            });
+            break;
+          case 'delete':
+            this._metadataChanged.emit({
+              key,
+              oldValue: change.oldValue,
+              type: 'remove'
+            });
+            break;
+          case 'update':
+            if (!JSONExt.deepEqual(change.oldValue, this._ymetadata.get(key))) {
+              this._metadataChanged.emit({
+                key,
+                newValue: this._ymetadata.get(key),
+                oldValue: change.oldValue,
+                type: 'change'
+              });
+            }
+            break;
+        }
+      });
+    }
+
     const modelEvent = events.find(event => event.target === this.ymodel) as
       | undefined
       | Y.YMapEvent<any>;
-    if (modelEvent && modelEvent.keysChanged.has('metadata')) {
-      const change = modelEvent.changes.keys.get('metadata');
-      const metadataChange = (changes.metadataChange = {
-        oldValue: change?.oldValue ? change!.oldValue : undefined,
-        newValue: this.getMetadata()
-      });
-
-      const oldValue = metadataChange.oldValue ?? {};
-      const oldKeys = Object.keys(oldValue);
-      const newKeys = Object.keys(metadataChange.newValue);
-      for (let key of new Set(oldKeys.concat(newKeys))) {
-        if (!oldKeys.includes(key)) {
-          this._metadataChanged.emit({
-            key,
-            newValue: metadataChange.newValue[key],
-            type: 'add'
-          });
-        } else if (!newKeys.includes(key)) {
-          this._metadataChanged.emit({
-            key,
-            oldValue: metadataChange.oldValue[key],
-            type: 'remove'
-          });
-        } else if (
-          !JSONExt.deepEqual(oldValue[key], metadataChange.newValue[key]!)
-        ) {
-          this._metadataChanged.emit({
-            key,
-            newValue: metadataChange.newValue[key],
-            oldValue: metadataChange.oldValue[key],
-            type: 'change'
-          });
-        }
-      }
-    }
 
     // The model allows us to replace the complete source with a new string. We express this in the Delta format
     // as a replace of the complete string.
@@ -922,7 +927,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    */
   protected _notebook: YNotebook | null = null;
   private _awareness: Awareness | null;
-  private _changed = new Signal<this, CellChange<Metadata>>(this);
+  private _changed = new Signal<this, CellChange>(this);
   private _disposed = new Signal<this, void>(this);
   private _isDisposed = false;
   private _prevSourceLength: number;
@@ -1067,7 +1072,7 @@ export class YCodeCell
    */
   protected getChanges(
     events: Y.YEvent<any>[]
-  ): Partial<CellChange<nbformat.IBaseCellMetadata>> {
+  ): Partial<CellChange> {
     const changes = super.getChanges(events);
 
     const outputEvent = events.find(
@@ -1141,7 +1146,7 @@ class YAttachmentCell
    */
   protected getChanges(
     events: Y.YEvent<any>[]
-  ): Partial<CellChange<nbformat.IBaseCellMetadata>> {
+  ): Partial<CellChange> {
     const changes = super.getChanges(events);
 
     const modelEvent = events.find(event => event.target === this.ymodel) as
