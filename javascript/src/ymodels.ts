@@ -33,7 +33,7 @@ import type {
   NotebookChange,
   SharedCell,
   StateChange
-} from './api';
+} from './api.js';
 
 /**
  * Abstract interface to define Shared Models that can be bound to a text editor using any existing
