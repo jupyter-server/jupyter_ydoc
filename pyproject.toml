@@ -49,9 +49,6 @@ Source = "https://github.com/jupyter-server/jupyter_ydoc"
 source = "nodejs"
 path = "javascript/package.json"
 
-[tool.hatch.build]
-exclude = ["javascript"]
-
 [tool.hatch.build.hooks.version]
 path = "jupyter_ydoc/_version.py"
 
