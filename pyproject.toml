@@ -27,8 +27,7 @@ test = [
 ]
 dev = [
     "click",
-    "jupyter_releaser",
-    "tbump"
+    "jupyter_releaser"
 ]
 
 [project.entry-points.jupyter_ydoc]
@@ -44,9 +43,11 @@ text = "BSD 3-Clause License"
 
 [project.urls]
 Homepage = "https://jupyter.org"
+Source = "https://github.com/jupyter-server/jupyter_ydoc"
 
 [tool.hatch.version]
 source = "nodejs"
+path = "javascript/package.json"
 
 [tool.hatch.build]
 exclude = ["javascript"]

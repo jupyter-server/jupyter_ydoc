@@ -132,4 +132,8 @@ node_modules/
 tests/package-lock.json
 javascript/tsconfig.tsbuildinfo
 javascript/.eslintcache
+<<<<<<< HEAD
 javascript/coverage/
+=======
+jupyter_ydoc/_version.py
+>>>>>>> 75949b2 (Review)
