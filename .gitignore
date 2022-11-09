@@ -130,3 +130,7 @@ dmypy.json
 
 node_modules/
 package-lock.json
+tests/package-lock.json
+javascript/tsconfig.tsbuildinfo
+javascript/.eslintcache
+javascript/coverage/
