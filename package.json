@@ -6,6 +6,6 @@
   "workspaces": {
     "packages": [
       "javascript"
-		]
+    ]
   }
 }
