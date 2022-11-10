@@ -50,7 +50,7 @@ source = "nodejs"
 path = "javascript/package.json"
 
 [tool.hatch.build]
-exclude = ["javascript"]
+exclude = ["javascript", "!javascript/package.json"]
 
 [tool.hatch.build.hooks.version]
 path = "jupyter_ydoc/_version.py"
