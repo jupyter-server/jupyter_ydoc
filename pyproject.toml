@@ -1,20 +1,13 @@
 [build-system]
-requires = [
-    "hatchling>=1.10.0",
-]
+requires = ["hatchling>=1.10.0", "hatch-nodejs-version"]
 build-backend = "hatchling.build"
 
 [project]
 name = "jupyter-ydoc"
-dynamic = [
-    "version",
-]
+dynamic = ["version"]
 description = "Document structures for collaborative editing using Ypy"
 requires-python = ">=3.7"
-keywords = [
-    "jupyter",
-    "ypy",
-]
+keywords = ["jupyter", "ypy"]
 dependencies = [
     "importlib_metadata >=3.6; python_version<\"3.10\"",
     "y-py >=0.5.3,<0.6.0",
@@ -32,6 +25,10 @@ test = [
     "websockets >=10.0",
     "ypy-websocket >=0.3.1,<0.4.0",
 ]
+dev = [
+    "click",
+    "jupyter_releaser"
+]
 
 [project.entry-points.jupyter_ydoc]
 file = "jupyter_ydoc.ydoc:YFile"
@@ -46,20 +43,33 @@ text = "BSD 3-Clause License"
 
 [project.urls]
 Homepage = "https://jupyter.org"
+Source = "https://github.com/jupyter-server/jupyter_ydoc"
 
 [tool.hatch.version]
-path = "jupyter_ydoc/__init__.py"
+source = "nodejs"
+path = "javascript/package.json"
+
+[tool.hatch.build]
+exclude = ["javascript", "!javascript/package.json"]
+
+[tool.hatch.build.hooks.version]
+path = "jupyter_ydoc/_version.py"
 
 [tool.check-manifest]
-ignore = [
-    ".*",
-]
+ignore = [".*"]
 
 [tool.jupyter-releaser]
 skip = [
     "check-links",
     "check-manifest",
 ]
+
+[tool.jupyter-releaser.hooks]
+before-build-npm = ["cd javascript && yarn && yarn build"]
+before-bump-version = ["pip install -e .[dev]"]
+
+[tool.jupyter-releaser.options]
+version_cmd = "hatch version"
 
 [tool.flake8]
 max-line-length = 100

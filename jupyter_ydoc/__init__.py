@@ -1,5 +1,6 @@
 import sys
 
+from ._version import __version__  # noqa
 from .ydoc import YFile, YNotebook  # noqa
 
 # See compatibility note on `group` keyword in
@@ -10,5 +11,3 @@ else:
     from importlib.metadata import entry_points
 
 ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
-
-__version__ = "0.2.2"
