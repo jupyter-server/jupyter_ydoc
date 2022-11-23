@@ -9,6 +9,9 @@ from .utils import cast_all
 
 
 class YBaseDoc(ABC):
+    """
+    Base class
+    """
     def __init__(self, ydoc: Y.YDoc):
         self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
@@ -67,14 +70,26 @@ class YBaseDoc(ABC):
 
 
 class YFile(YBaseDoc):
+    """
+    YFile class
+    """
     def __init__(self, *args, **kwargs):
+        """
+        Constructor
+        """
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
 
     def get(self):
+        """
+        get source
+        """
         return str(self._ysource)
 
     def set(self, value):
+        """
+        set source
+        """
         with self._ydoc.begin_transaction() as t:
             # clear document
             source_len = len(self._ysource)
@@ -85,6 +100,9 @@ class YFile(YBaseDoc):
                 self._ysource.extend(t, value)
 
     def observe(self, callback):
+        """
+        observe changes
+        """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
         self._subscriptions[self._ysource] = self._ysource.observe(callback)

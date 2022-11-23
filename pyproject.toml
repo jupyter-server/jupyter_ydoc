@@ -32,6 +32,11 @@ test = [
     "websockets >=10.0",
     "ypy-websocket >=0.3.1,<0.4.0",
 ]
+docs = [
+    "sphinx",
+    "myst-parser",
+    "pydata-sphinx-theme"
+]
 
 [project.entry-points.jupyter_ydoc]
 file = "jupyter_ydoc.ydoc:YFile"
