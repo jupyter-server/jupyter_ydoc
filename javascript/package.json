@@ -1,6 +1,6 @@
 {
   "name": "@jupyter-notebook/ydoc",
-  "version": "0.2.0",
+  "version": "0.3.0-alpha.1",
   "type": "module",
   "description": "Jupyter document structures for collaborative editing using YJS",
   "homepage": "https://github.com/jupyter-server/jupyter_ydoc",
@@ -59,8 +59,8 @@
     "rimraf": "^3.0.0",
     "typedoc": "^0.23.21",
     "typescript": "^4.8.0"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+	},
+	"publishConfig": {
+		"access": "public"
+	}
 }
