@@ -26,7 +26,7 @@ jobs:
           pip install -e .
       - name: Check Links
         if: ${{ matrix.group == 'link_check' }}
-        uses: jupyter-server/jupyter_releaser/.github/actions/check-links@v1
+        uses: jupyter-server/jupyter_releaser/.github/actions/check-links@v2
       - name: Check Release
         if: ${{ matrix.group == 'check_release' }}
         uses: jupyter-server/jupyter_releaser/.github/actions/check-release@v2
