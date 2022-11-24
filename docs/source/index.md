@@ -14,6 +14,7 @@ contain the root `toctree` directive.
 overview
 schema
 custom
-api
+javascript_api
+python_api
 changelog
 ```
