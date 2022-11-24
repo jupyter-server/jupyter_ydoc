@@ -25,12 +25,20 @@ name = "Jupyter Development Team"
 email = "jupyter@googlegroups.com"
 
 [project.optional-dependencies]
+dev = [
+    "pre-commit"
+]
 test = [
     "pre-commit",
     "pytest",
     "pytest-asyncio",
     "websockets >=10.0",
     "ypy-websocket >=0.3.1,<0.4.0",
+]
+docs = [
+    "sphinx",
+    "myst-parser",
+    "pydata-sphinx-theme"
 ]
 
 [project.entry-points.jupyter_ydoc]
