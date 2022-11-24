@@ -25,6 +25,9 @@ name = "Jupyter Development Team"
 email = "jupyter@googlegroups.com"
 
 [project.optional-dependencies]
+dev = [
+    "pre-commit"
+]
 test = [
     "pre-commit",
     "pytest",
