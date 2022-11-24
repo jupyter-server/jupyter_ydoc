@@ -91,8 +91,8 @@ def setup(app):
     else:
         print("Building jupyterlab API docs")
         check_call(["npm", "install"], cwd=str(js))
-        check_call(["yarn", "run", "build"], cwd=str(js))
-        check_call(["yarn", "run", "docs"], cwd=str(js))
+        check_call(["npm", "run", "build"], cwd=str(js))
+        check_call(["npm", "run", "docs"], cwd=str(js))
 
     # Copy JavaScript Docs
     print(f"Copying {js_docs!s} -> {dest_dir!s}")
