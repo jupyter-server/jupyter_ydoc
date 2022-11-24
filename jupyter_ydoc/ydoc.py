@@ -12,6 +12,7 @@ class YBaseDoc(ABC):
     """
     Base class
     """
+
     def __init__(self, ydoc: Y.YDoc):
         self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
@@ -73,6 +74,7 @@ class YFile(YBaseDoc):
     """
     YFile class
     """
+
     def __init__(self, *args, **kwargs):
         """
         Constructor

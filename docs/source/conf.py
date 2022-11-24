@@ -12,30 +12,27 @@ HERE = Path(__file__).parent.resolve()
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'jupyter-ydoc'
-copyright = '2022, Jupyter Development Team'
-author = 'Jupyter Development Team'
-release = '0.3.0'
+project = "jupyter-ydoc"
+copyright = "2022, Jupyter Development Team"
+author = "Jupyter Development Team"
+release = "0.3.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = [
-    'myst_parser',
-    'sphinx.ext.autodoc'
-]
+extensions = ["myst_parser", "sphinx.ext.autodoc"]
 
-templates_path = ['_templates']
-exclude_patterns = ['_static/api/**']
+templates_path = ["_templates"]
+exclude_patterns = ["_static/api/**"]
 source_suffix = {
-	'.rst': 'restructuredtext',
-	'.md': 'markdown',
+    ".rst": "restructuredtext",
+    ".md": "markdown",
 }
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 html_theme = "pydata_sphinx_theme"
 html_logo = "_static/jupyter_logo.svg"
@@ -81,7 +78,7 @@ def setup(app):
     # Copy changelog.md file
     dest = HERE / "changelog.md"
     shutil.copy(str(HERE.parent.parent / "CHANGELOG.md"), str(dest))
-    
+
     # Build JavaScript Docs
     js = HERE.parent.parent / "javascript"
     js_docs = js / "docs"
