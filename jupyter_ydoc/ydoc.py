@@ -1,6 +1,6 @@
 import copy
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from uuid import uuid4
 
 import y_py as Y
@@ -10,61 +10,141 @@ from .utils import cast_all
 
 class YBaseDoc(ABC):
     """
-    Base class
+    Base YDoc class.
+    This class, defines the minimum API that any documents must provide
+    for the :class:`YDocWebSocketHandler` to be able to get and set the
+    content of the document as well as subscribe to changes in the document.
     """
 
     def __init__(self, ydoc: Y.YDoc):
+        """
+        Construct a YBaseDoc.
+
+        :param ydoc: The :class:`y_py.YDoc` that contains the data of the document.
+        :type ydoc: :class:`y_py.YDoc`
+        """
         self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
         self._subscriptions = {}
 
     @property
-    def ystate(self):
+    def ystate(self) -> Y.YMap:
+        """
+        A :class:`y_py.YMap` containing the state of the document.
+
+        :return: That contains document's state.
+        :rtype: :class:`y_py.YMap`
+        """
         return self._ystate
 
     @property
-    def ydoc(self):
+    def ydoc(self) -> Y.YDoc:
+        """
+        The underlying :class:`y_py.YDoc` that contains the data.
+
+        :return: That contains document's data.
+        :rtype: :class:`y_py.YDoc`
+        """
         return self._ydoc
 
     @property
     def source(self):
+        """
+        Returns the content of the document.
+
+        :return: The content of the document.
+        :rtype: Any
+        """
         return self.get()
 
     @source.setter
     def source(self, value):
+        """
+        Sets the content of the document.
+
+        :param value: The content of the document.
+        :type value: Any
+        """
         return self.set(value)
 
     @property
-    def dirty(self) -> None:
+    def dirty(self) -> Optional[bool]:
+        """
+        Returns whether the document in memory has changes that are not on disk.
+
+        :return: Whether the document in memory has changes that are not on disk.
+        :rtype: bool | None
+        """
         return self._ystate["dirty"]
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
+        """
+        Sets whether the document in memory has changes that are not on disk.
+
+        :param value: Whether the document in memory has changes that are not on disk.
+        :type value: bool
+        """
         with self._ydoc.begin_transaction() as t:
             self._ystate.set(t, "dirty", value)
 
     @property
-    def path(self) -> None:
+    def path(self) -> Optional[str]:
+        """
+        Returns document's path.
+
+        :return: Document's path.
+        :rtype: str | None
+        """
         return self._ystate.get("path")
 
     @path.setter
     def path(self, value: str) -> None:
+        """
+        Sets document's path.
+
+        :param value: Document's path.
+        :type value: str
+        """
         with self._ydoc.begin_transaction() as t:
             self._ystate.set(t, "path", value)
 
     @abstractmethod
     def get(self):
+        """
+        Returns the content of the document.
+
+        :return: Document's content.
+        :rtype: Any
+        """
         pass
 
     @abstractmethod
     def set(self, value):
+        """
+        Sets the content of the document.
+
+        :param value: The content of the document.
+        :type value: Any
+        """
         pass
 
     @abstractmethod
     def observe(self, callback):
+        """
+        Subscribe to document changes.
+
+        :param callback: Callback that will be called when the document changes.
+        :type callback: function
+        """
         pass
 
     def unobserve(self):
+        """
+        Unsubscribe to document changes.
+
+        This method removes all the callbacks.
+        """
         for k, v in self._subscriptions.items():
             k.unobserve(v)
         self._subscriptions = {}
