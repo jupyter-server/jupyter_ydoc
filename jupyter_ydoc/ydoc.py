@@ -20,7 +20,7 @@ class YBaseDoc(ABC):
         """
         Construct a YBaseDoc.
 
-        :param ydoc: The :class:`y_py.YDoc` that contains the data of the document.
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
         """
         self._ydoc = ydoc
@@ -152,25 +152,43 @@ class YBaseDoc(ABC):
 
 class YFile(YBaseDoc):
     """
-    YFile class
+    Extends :class:`YBaseDoc`, and represents a plain text document.
+
+    Schema:
+
+    .. code-block:: json
+
+        {
+            "state": YMap,
+            "source": YText
+        }
     """
 
     def __init__(self, *args, **kwargs):
         """
-        Constructor
+        Construct a YFile.
+
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
+        :type ydoc: :class:`y_py.YDoc`
         """
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
 
     def get(self):
         """
-        get source
+        Returns the content of the document.
+
+        :return: Document's content.
+        :rtype: str
         """
         return str(self._ysource)
 
     def set(self, value):
         """
-        set source
+        Sets the content of the document.
+
+        :param value: The content of the document.
+        :type value: str
         """
         with self._ydoc.begin_transaction() as t:
             # clear document
@@ -183,7 +201,10 @@ class YFile(YBaseDoc):
 
     def observe(self, callback):
         """
-        observe changes
+        Subscribe to document changes.
+
+        :param callback: Callback that will be called when the document changes.
+        :type callback: function(event: YEvent)
         """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
@@ -191,12 +212,51 @@ class YFile(YBaseDoc):
 
 
 class YNotebook(YBaseDoc):
+    """
+    Extends :class:`YBaseDoc`, and represents a Notebook document.
+
+    Schema:
+
+    .. code-block:: json
+
+        {
+            "state": YMap,
+            "meta": YText,
+            "cells": YArray[
+                YMap[
+                    "id": str,
+                    "cell_type": str,
+                    "source": YText,
+                    "metadata": YMap,
+                    "execution_count": Int | None,
+                    "outputs": [] | None,
+                    "attachments": {} | None
+                ]
+            ]
+        }
+    """
+
     def __init__(self, *args, **kwargs):
+        """
+        Construct a YNotebook.
+
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
+        :type ydoc: :class:`y_py.YDoc`
+        """
         super().__init__(*args, **kwargs)
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
     def get_cell(self, index: int) -> Dict[str, Any]:
+        """
+        Returns a cell from `self._ycells`.
+
+        :param index: The index of the cell.
+        :type index: int
+
+        :return: A cell.
+        :rtype: Dict[str, Any]
+        """
         meta = self._ymeta.to_json()
         cell = self._ycells[index].to_json()
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
@@ -212,6 +272,15 @@ class YNotebook(YBaseDoc):
         return cell
 
     def append_cell(self, value: Dict[str, Any], txn=None) -> None:
+        """
+        Adds a cell to `self._ycells`.
+
+        :param value: A cell.
+        :type value: Dict[str, Any]
+
+        :param txn: A YTransaction, defaults to None
+        :type txn: :class:`YTransaction`, optional.
+        """
         ycell = self.create_ycell(value)
         if txn is None:
             with self._ydoc.begin_transaction() as txn:
@@ -220,10 +289,31 @@ class YNotebook(YBaseDoc):
             self._ycells.append(txn, ycell)
 
     def set_cell(self, index: int, value: Dict[str, Any], txn=None) -> None:
+        """
+        Sets a cell into `self._ycells`.
+
+        :param index: The index of the cell.
+        :type index: int
+
+        :param value: A cell.
+        :type value: Dict[str, Any]
+
+        :param txn: A YTransaction, defaults to None
+        :type txn: :class:`YTransaction`, optional.
+        """
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell, txn)
 
-    def create_ycell(self, value: Dict[str, Any]) -> None:
+    def create_ycell(self, value: Dict[str, Any]) -> Y.YMap:
+        """
+        Creates YMap with the content of the cell.
+
+        :param value: A cell.
+        :type value: Dict[str, Any]
+
+        :return: A new cell.
+        :rtype: :class:`YMap`
+        """
         cell = copy.deepcopy(value)
         if "id" not in cell:
             cell["id"] = str(uuid4())
@@ -239,7 +329,19 @@ class YNotebook(YBaseDoc):
 
         return Y.YMap(cell)
 
-    def set_ycell(self, index: int, ycell: Y.YMap, txn=None):
+    def set_ycell(self, index: int, ycell: Y.YMap, txn=None) -> None:
+        """
+        Sets a cell into the `self._ycells`.
+
+        :param index: The index of the cell.
+        :type index: int
+
+        :param ycell: A YMap with the content of a cell.
+        :type ycell: :class:`YMap`
+
+        :param txn: A YTransaction, defaults to None
+        :type txn: :class:`YTransaction`, optional.
+        """
         if txn is None:
             with self._ydoc.begin_transaction() as txn:
                 self._ycells.delete(txn, index)
@@ -249,6 +351,12 @@ class YNotebook(YBaseDoc):
             self._ycells.insert(txn, index, ycell)
 
     def get(self):
+        """
+        Returns the content of the document.
+
+        :return: Document's content.
+        :rtype: Dic
+        """
         meta = self._ymeta.to_json()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
@@ -273,6 +381,12 @@ class YNotebook(YBaseDoc):
         )
 
     def set(self, value):
+        """
+        Sets the content of the document.
+
+        :param value: The content of the document.
+        :type value: Dic
+        """
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
@@ -304,6 +418,12 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
     def observe(self, callback):
+        """
+        Subscribe to document changes.
+
+        :param callback: Callback that will be called when the document changes.
+        :type callback: function(event: YEvent)
+        """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
         self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
