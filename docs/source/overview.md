@@ -8,18 +8,23 @@ This repository holds a javascript package and its python counterpart. In the Ju
 
 
 ## `@jupyter/ydoc`
-Build using [Yjs](https://github.com/yjs/yjs). `@jupyter/ydoc` is a JavaScipt package that includes the models used in the JupyterLab front-end for real-time collaboration. This package contains two main classes, `YFile` used for plain text documents and `YNotebook` used for the Notebook format.
+Build using [Yjs](https://github.com/yjs/yjs). `@jupyter/ydoc` is a JavaScript package that includes the models used in the JupyterLab front-end for real-time collaboration. This package contains two main classes, `YFile` used for plain text documents and `YNotebook` used for the Notebook format. In the JupyterLab context, we call the models exported by this package, shared models. In addition, this package contains the `IShared` interfaces used to abstract the implementation of the shared models in JupyterLab to make it easier to replace the CRDT implementation (Yjs) for something else if needed.
 
-<!--
-	Extend the documentation
+**Source Code:** [GitHub](https://github.com/jupyter-server/jupyter_ydoc/tree/main/javascript)
 
-- IShared interfaces
--
--->
+**Package:** [NPM](https://www.npmjs.com/package/@jupyter/ydoc)
+
+**API documentation:**: [JavaScript API](javascript_api.rst)
+
+> Note: It could be that we still use the old name for the NPM package [@jupyter-notebook/ydoc](https://www.npmjs.com/package/@jupyter-notebook/ydoc)
 
 
 
 ## `jupyter-ydoc`
 Build using [YPy](https://github.com/y-crdt/ypy). `jupyter-ydoc` is a Python package that includes the models used in the JupyterLab back-end for loading the documents from disk in real-time collaboration.
 
-<!-- Extend the documentation -->
+**Source Code:** [GitHub](https://github.com/jupyter-server/jupyter_ydoc/tree/main/jupyter_ydoc)
+
+**Package:** [PyPi](https://pypi.org/project/jupyter-ydoc)
+
+**API documentation:**: [Python API](python_api.rst)
