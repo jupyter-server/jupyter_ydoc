@@ -66,3 +66,10 @@ def test_plotly_renderer():
     nb = stringify_source(json.loads((files_dir / "plotly_renderer.ipynb").read_text()))
     ynotebook.source = nb
     assert ynotebook.source == nb
+
+
+def test_shortcut():
+    from jupyter_ydoc import ydocs
+    assert ydocs
+    assert ydocs['file']
+    assert ydocs['notebook']
