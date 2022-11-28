@@ -1,6 +1,6 @@
 import copy
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional
+from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
 
 import y_py as Y
@@ -12,13 +12,13 @@ class YBaseDoc(ABC):
     """
     Base YDoc class.
     This class, defines the minimum API that any documents must provide
-    for the :class:`YDocWebSocketHandler` to be able to get and set the
-    content of the document as well as subscribe to changes in the document.
+    to be able to get and set the content of the document as well as
+    subscribe to changes in the document.
     """
 
     def __init__(self, ydoc: Y.YDoc):
         """
-        Construct a YBaseDoc.
+        Constructs a YBaseDoc.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
@@ -32,7 +32,7 @@ class YBaseDoc(ABC):
         """
         A :class:`y_py.YMap` containing the state of the document.
 
-        :return: That contains document's state.
+        :return: The document's state.
         :rtype: :class:`y_py.YMap`
         """
         return self._ystate
@@ -42,13 +42,13 @@ class YBaseDoc(ABC):
         """
         The underlying :class:`y_py.YDoc` that contains the data.
 
-        :return: That contains document's data.
+        :return: The document's ydoc.
         :rtype: :class:`y_py.YDoc`
         """
         return self._ydoc
 
     @property
-    def source(self):
+    def source(self) -> Any:
         """
         Returns the content of the document.
 
@@ -58,7 +58,7 @@ class YBaseDoc(ABC):
         return self.get()
 
     @source.setter
-    def source(self, value):
+    def source(self, value: Any):
         """
         Sets the content of the document.
 
@@ -110,7 +110,7 @@ class YBaseDoc(ABC):
             self._ystate.set(t, "path", value)
 
     @abstractmethod
-    def get(self):
+    def get(self) -> Any:
         """
         Returns the content of the document.
 
@@ -120,7 +120,7 @@ class YBaseDoc(ABC):
         pass
 
     @abstractmethod
-    def set(self, value):
+    def set(self, value: Any) -> None:
         """
         Sets the content of the document.
 
@@ -130,18 +130,18 @@ class YBaseDoc(ABC):
         pass
 
     @abstractmethod
-    def observe(self, callback):
+    def observe(self, callback: Callable[[Any], None]) -> None:
         """
-        Subscribe to document changes.
+        Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: function
+        :type callback: Callable[[Any], None]
         """
         pass
 
-    def unobserve(self):
+    def unobserve(self) -> None:
         """
-        Unsubscribe to document changes.
+        Unsubscribes to document changes.
 
         This method removes all the callbacks.
         """
@@ -166,7 +166,7 @@ class YFile(YBaseDoc):
 
     def __init__(self, *args, **kwargs):
         """
-        Construct a YFile.
+        Constructs a YFile.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
@@ -174,7 +174,7 @@ class YFile(YBaseDoc):
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
 
-    def get(self):
+    def get(self) -> str:
         """
         Returns the content of the document.
 
@@ -183,7 +183,7 @@ class YFile(YBaseDoc):
         """
         return str(self._ysource)
 
-    def set(self, value):
+    def set(self, value: str) -> None:
         """
         Sets the content of the document.
 
@@ -199,12 +199,12 @@ class YFile(YBaseDoc):
             if value:
                 self._ysource.extend(t, value)
 
-    def observe(self, callback):
+    def observe(self, callback: Callable[[Any], None]) -> None:
         """
-        Subscribe to document changes.
+        Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: function(event: YEvent)
+        :type callback: Callable[[Any], None]
         """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
@@ -238,7 +238,7 @@ class YNotebook(YBaseDoc):
 
     def __init__(self, *args, **kwargs):
         """
-        Construct a YNotebook.
+        Constructs a YNotebook.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
@@ -249,7 +249,7 @@ class YNotebook(YBaseDoc):
 
     def get_cell(self, index: int) -> Dict[str, Any]:
         """
-        Returns a cell from `self._ycells`.
+        Returns a cell.
 
         :param index: The index of the cell.
         :type index: int
@@ -271,15 +271,15 @@ class YNotebook(YBaseDoc):
             del cell["attachments"]
         return cell
 
-    def append_cell(self, value: Dict[str, Any], txn=None) -> None:
+    def append_cell(self, value: Dict[str, Any], txn: Optional[Y.YTransaction] = None) -> None:
         """
-        Adds a cell to `self._ycells`.
+        Adds a cell.
 
         :param value: A cell.
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`YTransaction` | None, optional.
         """
         ycell = self.create_ycell(value)
         if txn is None:
@@ -288,9 +288,11 @@ class YNotebook(YBaseDoc):
         else:
             self._ycells.append(txn, ycell)
 
-    def set_cell(self, index: int, value: Dict[str, Any], txn=None) -> None:
+    def set_cell(
+        self, index: int, value: Dict[str, Any], txn: Optional[Y.YTransaction] = None
+    ) -> None:
         """
-        Sets a cell into `self._ycells`.
+        Sets a cell into indicated position.
 
         :param index: The index of the cell.
         :type index: int
@@ -299,7 +301,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`YTransaction` | None, optional.
         """
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell, txn)
@@ -329,9 +331,9 @@ class YNotebook(YBaseDoc):
 
         return Y.YMap(cell)
 
-    def set_ycell(self, index: int, ycell: Y.YMap, txn=None) -> None:
+    def set_ycell(self, index: int, ycell: Y.YMap, txn: Optional[Y.YTransaction] = None) -> None:
         """
-        Sets a cell into the `self._ycells`.
+        Sets a cell into the indicated position.
 
         :param index: The index of the cell.
         :type index: int
@@ -340,7 +342,7 @@ class YNotebook(YBaseDoc):
         :type ycell: :class:`YMap`
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`YTransaction` | None, optional.
         """
         if txn is None:
             with self._ydoc.begin_transaction() as txn:
@@ -350,12 +352,12 @@ class YNotebook(YBaseDoc):
             self._ycells.delete(txn, index)
             self._ycells.insert(txn, index, ycell)
 
-    def get(self):
+    def get(self) -> Dict:
         """
         Returns the content of the document.
 
         :return: Document's content.
-        :rtype: Dic
+        :rtype: Dict
         """
         meta = self._ymeta.to_json()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
@@ -380,12 +382,12 @@ class YNotebook(YBaseDoc):
             nbformat_minor=int(meta["nbformat_minor"]),
         )
 
-    def set(self, value):
+    def set(self, value: Dict) -> None:
         """
         Sets the content of the document.
 
         :param value: The content of the document.
-        :type value: Dic
+        :type value: Dict
         """
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
@@ -417,12 +419,12 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
 
-    def observe(self, callback):
+    def observe(self, callback: Callable[[Any], None]) -> None:
         """
-        Subscribe to document changes.
+        Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: function(event: YEvent)
+        :type callback: Callable[[Any], None]
         """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
