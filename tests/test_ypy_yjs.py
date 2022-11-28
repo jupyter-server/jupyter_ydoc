@@ -70,6 +70,7 @@ def test_plotly_renderer():
 
 def test_shortcut():
     from jupyter_ydoc import ydocs
+
     assert ydocs
-    assert ydocs['file']
-    assert ydocs['notebook']
+    assert ydocs["file"]
+    assert ydocs["notebook"]
