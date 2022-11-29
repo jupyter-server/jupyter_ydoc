@@ -279,7 +279,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`y_py.YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
         if txn is None:
@@ -301,7 +301,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`y_py.YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell, txn)
@@ -314,7 +314,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :return: A new cell.
-        :rtype: :class:`YMap`
+        :rtype: :class:`y_py.YMap`
         """
         cell = copy.deepcopy(value)
         if "id" not in cell:
@@ -339,10 +339,10 @@ class YNotebook(YBaseDoc):
         :type index: int
 
         :param ycell: A YMap with the content of a cell.
-        :type ycell: :class:`YMap`
+        :type ycell: :class:`y_py.YMap`
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction`, optional.
+        :type txn: :class:`y_py.YTransaction`, optional.
         """
         if txn is None:
             with self._ydoc.begin_transaction() as txn:
