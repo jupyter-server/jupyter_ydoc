@@ -1,6 +1,6 @@
 # Schemas
 
-Yjs is untyped. We must know what each attribute contains at build time and cast its values when accessing them. It is essential to ensure both models use the same schema, so we avoid errors at run time because we cast to the wrong value. For this purpose, in the following sections, we can find the description of the schema used by each model in case we want to extend them to create a custom model.
+Yjs is untyped. We must know what each attribute contains at build-time and cast its values when accessing them. It is essential to ensure both models use the same schema, to prevent errors at run-time because of a wrong cast. For this purpose, in the following sections, we can find the description of the schema used by each model in case we want to extend them to create a custom model.
 
 ## YFile
 
