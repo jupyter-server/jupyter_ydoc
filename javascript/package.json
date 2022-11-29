@@ -1,5 +1,5 @@
 {
-	"name": "@jupyter-notebook/ydoc",
+	"name": "@jupyter/ydoc",
 	"version": "0.2.2",
 	"type": "module",
 	"description": "Jupyter document structures for collaborative editing using YJS",

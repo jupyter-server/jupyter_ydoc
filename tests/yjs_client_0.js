@@ -1,4 +1,4 @@
-import { YNotebook } from '@jupyter-notebook/ydoc'
+import { YNotebook } from '@jupyter/ydoc'
 import { WebsocketProvider } from 'y-websocket'
 
 const notebook = new YNotebook()
