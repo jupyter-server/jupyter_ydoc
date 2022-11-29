@@ -11,7 +11,7 @@ from .utils import cast_all
 class YBaseDoc(ABC):
     """
     Base YDoc class.
-    This class, defines the minimum API that any documents must provide
+    This class, defines the minimum API that any document must provide
     to be able to get and set the content of the document as well as
     subscribe to changes in the document.
     """
@@ -70,19 +70,19 @@ class YBaseDoc(ABC):
     @property
     def dirty(self) -> Optional[bool]:
         """
-        Returns whether the document in memory has changes that are not on disk.
+        Returns whether the document is dirty.
 
-        :return: Whether the document in memory has changes that are not on disk.
-        :rtype: bool | None
+        :return: Whether the document is dirty.
+        :rtype: Optional[bool]
         """
         return self._ystate["dirty"]
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
         """
-        Sets whether the document in memory has changes that are not on disk.
+        Sets the document as clean (all changes committed) or dirty (uncommitted changes).
 
-        :param value: Whether the document in memory has changes that are not on disk.
+        :param value: Whether the document is clean or dirty.
         :type value: bool
         """
         with self._ydoc.begin_transaction() as t:
@@ -94,7 +94,7 @@ class YBaseDoc(ABC):
         Returns document's path.
 
         :return: Document's path.
-        :rtype: str | None
+        :rtype: Optional[str]
         """
         return self._ystate.get("path")
 
@@ -164,14 +164,14 @@ class YFile(YBaseDoc):
         }
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ydoc: Y.YDoc):
         """
         Constructs a YFile.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(ydoc)
         self._ysource = self._ydoc.get_text("source")
 
     def get(self) -> str:
@@ -236,14 +236,14 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ydoc: Y.YDoc):
         """
         Constructs a YNotebook.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
         :type ydoc: :class:`y_py.YDoc`
         """
-        super().__init__(*args, **kwargs)
+        super().__init__(ydoc)
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
@@ -273,13 +273,13 @@ class YNotebook(YBaseDoc):
 
     def append_cell(self, value: Dict[str, Any], txn: Optional[Y.YTransaction] = None) -> None:
         """
-        Adds a cell.
+        Appends a cell.
 
         :param value: A cell.
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction` | None, optional.
+        :type txn: :class:`YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
         if txn is None:
@@ -301,7 +301,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction` | None, optional.
+        :type txn: :class:`YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell, txn)
@@ -333,7 +333,7 @@ class YNotebook(YBaseDoc):
 
     def set_ycell(self, index: int, ycell: Y.YMap, txn: Optional[Y.YTransaction] = None) -> None:
         """
-        Sets a cell into the indicated position.
+        Sets a Y cell into the indicated position.
 
         :param index: The index of the cell.
         :type index: int
@@ -342,7 +342,7 @@ class YNotebook(YBaseDoc):
         :type ycell: :class:`YMap`
 
         :param txn: A YTransaction, defaults to None
-        :type txn: :class:`YTransaction` | None, optional.
+        :type txn: :class:`YTransaction`, optional.
         """
         if txn is None:
             with self._ydoc.begin_transaction() as txn:
