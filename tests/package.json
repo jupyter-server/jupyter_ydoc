@@ -1,7 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "@jupyter-notebook/ydoc": "file:../javascript",
+    "@jupyter/ydoc": "file:../javascript",
     "ws": "^8.5.0",
     "y-websocket": "^1.4.1"
   }
