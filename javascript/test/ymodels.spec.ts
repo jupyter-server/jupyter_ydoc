@@ -3,7 +3,7 @@
 
 import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
 
-describe('@jupyter-notebook/ydoc', () => {
+describe('@jupyter/ydoc', () => {
   describe('YNotebook', () => {
     describe('#constructor', () => {
       test('should create a notebook without arguments', () => {
