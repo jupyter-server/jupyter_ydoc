@@ -1,3 +1,4 @@
+import asyncio
 import copy
 from abc import ABC, abstractmethod
 from typing import Any, Dict
@@ -53,6 +54,10 @@ class YBaseDoc(ABC):
             self._ystate.set(t, "path", value)
 
     @abstractmethod
+    def initialize(self):
+        pass
+
+    @abstractmethod
     def get(self):
         pass
 
@@ -81,6 +86,9 @@ class YFile(YBaseDoc):
         """
         super().__init__(*args, **kwargs)
         self._ysource = self._ydoc.get_text("source")
+
+    def initialize(self):
+        pass
 
     def get(self):
         """
@@ -116,6 +124,14 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
+    def initialize(self):
+        """
+        Call this method after initializing the document, to listen for changes
+        in the list of cells.
+        """
+        # Listen for changes after applying the updates from the ystore
+        self._ydoc.observe_after_transaction(self._on_after_transaction)
+
     def get_cell(self, index: int) -> Dict[str, Any]:
         meta = self._ymeta.to_json()
         cell = self._ycells[index].to_json()
@@ -149,7 +165,7 @@ class YNotebook(YBaseDoc):
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
         cell["source"] = Y.YText(cell["source"])
-        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
+        cell["metadata"] = cell.get("metadata", {})
 
         if cell_type in ("raw", "markdown"):
             if "attachments" in cell and not cell["attachments"]:
@@ -196,16 +212,7 @@ class YNotebook(YBaseDoc):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
-        cells = value["cells"] or [
-            {
-                "cell_type": "code",
-                "execution_count": None,
-                "metadata": {},
-                "outputs": [],
-                "source": "",
-                "id": str(uuid4()),
-            }
-        ]
+        cells = value["cells"] or [self._get_empty_code_cell()]
 
         with self._ydoc.begin_transaction() as t:
             # clear document
@@ -222,6 +229,32 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "metadata", nb["metadata"])
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
+
+    def _get_empty_code_cell():
+        return {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": "",
+            "id": str(uuid4()),
+        }
+
+    def _on_after_transaction(self, event):
+        """
+        Handle a change in the cells list.
+
+        Parameters
+        ----------
+            event: YArrayEvent
+        """
+        if len(self._ycells) == 0:
+            asyncio.create_task(self._add_empty_cell())
+
+    async def _add_empty_cell(self):
+        ycell = self.create_ycell(self._get_empty_code_cell())
+        with self._ydoc.begin_transaction() as txn:
+            self._ycells.append(txn, ycell)
 
     def observe(self, callback):
         self.unobserve()
