@@ -6,7 +6,7 @@ Yjs is untyped. We must know what each attribute contains at build-time and cast
 
 ```typescript
 {
-	"state": YMap<sting, any>,
+	"state": YMap<string, any>,
 	"source": YText
 
 }
@@ -24,8 +24,8 @@ Yjs is untyped. We must know what each attribute contains at build-time and cast
 
 ```typescript
 {
-	"state": YMap<sting, any>,
-	"meta": YMap<sting, any>,
+	"state": YMap<string, any>,
+	"meta": YMap<string, any>,
 	"cells": YArray<YMap<string, any>>
 }
 ```
