@@ -4,7 +4,7 @@ The `jupyter_ydoc` repository includes various models that JupyterLab uses for c
 
 Jupyter YDoc was designed to centralize the data structures used for composing a document in a single class, hide the complicated edge cases of CRDTs, and prevent users from inserting invalid data or adding new attributes to the document that are not part of the schema.
 
-This repository holds a JavaScript package and its Python counterpart. In the JupyterLab context, the JavaScript package, or from now on, `@jupyter/ydoc`, contains the front-tend models used to keep the documents in the client's memory. In contrast, the Python package contains the models used in the back-end to serve documents to each client.
+This repository holds a JavaScript package and its Python counterpart. In the JupyterLab context, the JavaScript package, or from now on, `@jupyter/ydoc`, contains the front-end models used to keep the documents in the client's memory. In contrast, the Python package contains the models used in the back-end to serve documents to each client.
 
 
 ## `@jupyter/ydoc`
