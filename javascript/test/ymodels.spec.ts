@@ -13,6 +13,18 @@ describe('@jupyter/ydoc', () => {
       });
     });
 
+    describe('#disposed', () => {
+      test('should be emitted when the document is disposed', () => {
+        const notebook = new YNotebook();
+        let disposed = false;
+        notebook.disposed.connect(() => {
+          disposed = true;
+        });
+        notebook.dispose();
+        expect(disposed).toEqual(true);
+      });
+    });
+
     describe('metadata', () => {
       test('should get metadata', () => {
         const notebook = new YNotebook();
