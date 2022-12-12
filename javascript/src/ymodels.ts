@@ -93,6 +93,13 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   }
 
   /**
+   * A signal emitted when the document is disposed.
+   */
+  get disposed(): ISignal<this, void> {
+    return this._disposed;
+  }
+
+  /**
    * Whether the document is disposed or not.
    */
   get isDisposed(): boolean {
@@ -132,6 +139,7 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
     this.awareness.destroy();
     this.undoManager.destroy();
     this.ydoc.destroy();
+    this._disposed.emit();
     Signal.clearData(this);
   }
 
@@ -209,6 +217,7 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
 
   protected _changed = new Signal<this, T>(this);
   private _isDisposed = false;
+  private _disposed = new Signal<this, void>(this);
 }
 
 /**

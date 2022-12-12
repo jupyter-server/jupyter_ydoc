@@ -20,7 +20,7 @@ import type {
   JSONValue,
   PartialJSONValue
 } from '@lumino/coreutils';
-import type { IDisposable, IObservableDisposable } from '@lumino/disposable';
+import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
 
 /**
@@ -44,7 +44,7 @@ export type MapChanges = Map<
 /**
  * ISharedBase defines common operations that can be performed on any shared object.
  */
-export interface ISharedBase extends IDisposable {
+export interface ISharedBase extends IObservableDisposable {
   /**
    * Undo an operation.
    */
@@ -387,8 +387,7 @@ export namespace SharedCell {
  */
 export interface ISharedBaseCell<
   Metadata extends nbformat.IBaseCellMetadata = nbformat.IBaseCellMetadata
-> extends ISharedText,
-    IObservableDisposable {
+> extends ISharedText {
   /**
    * The type of the cell.
    */
