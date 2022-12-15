@@ -47,16 +47,30 @@ class YTest:
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
-async def test_ypy_yjs_0(yws_server, yjs_client):
+async def test_ypy_yjs_0_0(yws_server, yjs_client):
     ydoc = Y.YDoc()
     ynotebook = YNotebook(ydoc)
     websocket = await connect("ws://localhost:1234/my-roomname")
     WebsocketProvider(ydoc, websocket)
-    nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
+    nb = stringify_source(json.loads((files_dir / "nb0_0.ipynb").read_text()))
     ynotebook.source = nb
     ytest = YTest(ydoc)
     await ytest.change()
     assert ytest.source == nb
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("yjs_client", "0", indirect=True)
+async def test_ypy_yjs_0_1(yws_server, yjs_client):
+    ydoc = Y.YDoc()
+    ynotebook = YNotebook(ydoc)
+    websocket = await connect("ws://localhost:1234/my-roomname")
+    WebsocketProvider(ydoc, websocket)
+    nb = json.loads((files_dir / "nb0_1.ipynb").read_text())
+    ynotebook.source = nb
+    ytest = YTest(ydoc)
+    await ytest.change()
+    assert ytest.source == stringify_source(nb)
 
 
 def test_plotly_renderer():
