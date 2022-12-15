@@ -320,8 +320,9 @@ class YNotebook(YBaseDoc):
         if "id" not in cell:
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
+        cell_source = cell["source"]
         cell["source"] = (
-            "".join(cell["source"]) if isinstance(cell["source"], list) else cell["source"]
+            "".join(cell_source) if isinstance(cell_source, list) else cell_source
         )
         cell["source"] = Y.YText(cell["source"])
         cell["metadata"] = Y.YMap(cell.get("metadata", {}))
