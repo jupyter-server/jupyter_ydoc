@@ -321,8 +321,8 @@ class YNotebook(YBaseDoc):
             cell["id"] = str(uuid4())
         cell_type = cell["cell_type"]
         cell_source = cell["source"]
-        cell["source"] = "".join(cell_source) if isinstance(cell_source, list) else cell_source
-        cell["source"] = Y.YText(cell["source"])
+        cell_source = "".join(cell_source) if isinstance(cell_source, list) else cell_source
+        cell["source"] = Y.YText(cell_source)
         cell["metadata"] = Y.YMap(cell.get("metadata", {}))
 
         if cell_type in ("raw", "markdown"):
