@@ -4,12 +4,7 @@
 |----------------------------------------------------------------------------*/
 
 import type * as nbformat from '@jupyterlab/nbformat';
-import {
-  JSONExt,
-  JSONObject,
-  PartialJSONValue,
-  UUID
-} from '@lumino/coreutils';
+import { JSONExt, JSONObject, PartialJSONValue, UUID } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
@@ -25,7 +20,6 @@ import type {
 } from './api.js';
 import { IYText } from './ytext';
 import { YNotebook } from './ynotebook';
-
 
 /**
  * Cell type.

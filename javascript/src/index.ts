@@ -15,10 +15,10 @@ export * from './ydocument.js';
 export * from './yfile.js';
 export * from './ynotebook.js';
 export {
-	YCellType,
-	YBaseCell,
-	YRawCell,
-	YMarkdownCell,
-	YCodeCell,
-	createStandaloneCell
+  YCellType,
+  YBaseCell,
+  YRawCell,
+  YMarkdownCell,
+  YCodeCell,
+  createStandaloneCell
 } from './ycell.js';

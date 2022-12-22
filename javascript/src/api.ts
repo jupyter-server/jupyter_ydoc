@@ -694,10 +694,7 @@ export type NotebookChange = DocumentChange & {
   /**
    * Notebook metadata changes
    */
-  metadataChange?: {
-    oldValue: nbformat.INotebookMetadata;
-    newValue?: nbformat.INotebookMetadata;
-  };
+  metadataChange?: MapChanges;
   /**
    * nbformat version change
    */

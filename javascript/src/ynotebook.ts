@@ -17,7 +17,12 @@ import type {
 } from './api.js';
 
 import { YDocument } from './ydocument';
-import { YCellType, YBaseCell, createCell, createCellModelFromSharedType } from './ycell';
+import {
+  createCell,
+  createCellModelFromSharedType,
+  YBaseCell,
+  YCellType
+} from './ycell';
 
 /**
  * Shared implementation of the Shared Document types.
@@ -57,7 +62,7 @@ export class YNotebook
 
     this.undoManager.addToScope(this._ycells);
     this._ycells.observe(this._onYCellsChanged);
-    this.ymeta.observe(this._onMetaChanged);
+    this.ymeta.observeDeep(this._onMetaChanged);
   }
 
   /**
@@ -128,7 +133,7 @@ export class YNotebook
       return;
     }
     this._ycells.unobserve(this._onYCellsChanged);
-    this.ymeta.unobserve(this._onMetaChanged);
+    this.ymeta.unobserveDeep(this._onMetaChanged);
     super.dispose();
   }
 
@@ -283,15 +288,20 @@ export class YNotebook
   getMetadata(
     key?: string
   ): nbformat.INotebookMetadata | PartialJSONValue | undefined {
-    const meta = this.ymeta.get('metadata') ?? {};
+    const ymetadata: Y.Map<any> | undefined = this.ymeta.get('metadata');
+
+    // Transiently the metadata can be missing - like during destruction
+    if (ymetadata === undefined) {
+      return undefined;
+    }
 
     if (typeof key === 'string') {
-      const value = meta[key];
+      const value = ymetadata.get(key);
       return typeof value === 'undefined'
         ? undefined // undefined is converted to `{}` by `JSONExt.deepCopy`
-        : JSONExt.deepCopy(meta[key]);
+        : JSONExt.deepCopy(value);
     } else {
-      return JSONExt.deepCopy(meta);
+      return JSONExt.deepCopy(ymetadata.toJSON());
     }
   }
 
@@ -326,7 +336,14 @@ export class YNotebook
       this.updateMetadata(update);
     } else {
       if (!JSONExt.deepEqual(this.metadata, metadata)) {
-        this.ymeta.set('metadata', JSONExt.deepCopy(metadata));
+        const clone = JSONExt.deepCopy(metadata);
+        const ymetadata: Y.Map<any> = this.ymeta.get('metadata');
+
+        this.transact(() => {
+          for (const [key, value] of Object.entries(clone)) {
+            ymetadata.set(key, value);
+          }
+        });
       }
     }
   }
@@ -338,7 +355,14 @@ export class YNotebook
    */
   updateMetadata(value: Partial<nbformat.INotebookMetadata>): void {
     // TODO: Maybe modify only attributes instead of replacing the whole metadata?
-    this.ymeta.set('metadata', { ...this.getMetadata(), ...value });
+    const clone = JSONExt.deepCopy(value);
+    const ymetadata: Y.Map<any> = this.ymeta.get('metadata');
+
+    this.transact(() => {
+      for (const [key, value] of Object.entries(clone)) {
+        ymetadata.set(key, value);
+      }
+    });
   }
 
   /**
@@ -393,47 +417,57 @@ export class YNotebook
   /**
    * Handle a change to the ystate.
    */
-  private _onMetaChanged = (event: Y.YMapEvent<any>) => {
-    if (event.keysChanged.has('metadata')) {
-      const change = event.changes.keys.get('metadata');
-      const metadataChange = {
-        oldValue: change?.oldValue ? change!.oldValue : undefined,
-        newValue: this.getMetadata()
-      };
+  private _onMetaChanged = (events: Y.YEvent<any>[]) => {
+    const metadataEvents = events.find(
+      event => event.target === this.ymeta.get('metadata')
+    );
 
-      const oldValue = metadataChange.oldValue ?? {};
-      const oldKeys = Object.keys(oldValue);
-      const newKeys = Object.keys(metadataChange.newValue);
-      for (let key of new Set(oldKeys.concat(newKeys))) {
-        if (!oldKeys.includes(key)) {
-          this._metadataChanged.emit({
-            key,
-            newValue: metadataChange.newValue[key],
-            type: 'add'
-          });
-        } else if (!newKeys.includes(key)) {
-          this._metadataChanged.emit({
-            key,
-            oldValue: metadataChange.oldValue[key],
-            type: 'remove'
-          });
-        } else if (
-          !JSONExt.deepEqual(oldValue[key], metadataChange.newValue[key]!)
-        ) {
-          this._metadataChanged.emit({
-            key,
-            newValue: metadataChange.newValue[key],
-            oldValue: metadataChange.oldValue[key],
-            type: 'change'
-          });
+    if (metadataEvents) {
+      const metadataChange = metadataEvents.changes.keys;
+
+      const ymetadata = this.ymeta.get('metadata') as Y.Map<any>;
+      metadataEvents.changes.keys.forEach((change, key) => {
+        switch (change.action) {
+          case 'add':
+            this._metadataChanged.emit({
+              key,
+              type: 'add',
+              newValue: ymetadata.get(key)
+            });
+            break;
+          case 'delete':
+            this._metadataChanged.emit({
+              key,
+              type: 'remove',
+              oldValue: change.oldValue
+            });
+            break;
+          case 'update':
+            if (!JSONExt.deepEqual(change.oldValue, ymetadata.get(key))) {
+              this._metadataChanged.emit({
+                key,
+                type: 'change',
+                oldValue: change.oldValue,
+                newValue: ymetadata.get(key)
+              });
+            }
+            break;
         }
-      }
+      });
 
       this._changed.emit({ metadataChange });
     }
 
-    if (event.keysChanged.has('nbformat')) {
-      const change = event.changes.keys.get('nbformat');
+    const metaEvent = events.find(event => event.target === this.ymeta) as
+      | undefined
+      | Y.YMapEvent<any>;
+
+    if (!metaEvent) {
+      return;
+    }
+
+    if (metaEvent.keysChanged.has('nbformat')) {
+      const change = metaEvent.changes.keys.get('nbformat');
       const nbformatChanged = {
         key: 'nbformat',
         oldValue: change?.oldValue ? change!.oldValue : undefined,
@@ -442,8 +476,8 @@ export class YNotebook
       this._changed.emit({ nbformatChanged });
     }
 
-    if (event.keysChanged.has('nbformat_minor')) {
-      const change = event.changes.keys.get('nbformat_minor');
+    if (metaEvent.keysChanged.has('nbformat_minor')) {
+      const change = metaEvent.changes.keys.get('nbformat_minor');
       const nbformatChanged = {
         key: 'nbformat_minor',
         oldValue: change?.oldValue ? change!.oldValue : undefined,

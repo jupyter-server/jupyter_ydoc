@@ -221,7 +221,11 @@ class YNotebook(YBaseDoc):
 
         {
             "state": YMap,
-            "meta": YText,
+            "meta": YMap[
+                "nbformat": Int,
+                "nbformat_minor": Int,
+                "metadata": YMap
+            ],
             "cells": YArray[
                 YMap[
                     "id": str,
@@ -417,9 +421,9 @@ class YNotebook(YBaseDoc):
 
             # initialize document
             self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
-            self._ymeta.set(t, "metadata", nb["metadata"])
             self._ymeta.set(t, "nbformat", nb["nbformat"])
             self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
+            self._ymeta.set(t, "metadata", Y.YMap(nb.get("metadata", {})))
 
     def observe(self, callback: Callable[[Any], None]) -> None:
         """
@@ -430,5 +434,5 @@ class YNotebook(YBaseDoc):
         """
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ymeta] = self._ymeta.observe(callback)
+        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(callback)
         self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
