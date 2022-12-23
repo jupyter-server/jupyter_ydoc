@@ -339,6 +339,11 @@ export class YNotebook
         const clone = JSONExt.deepCopy(metadata);
         const ymetadata: Y.Map<any> = this.ymeta.get('metadata');
 
+        // Transiently the metadata can be missing - like during destruction
+        if (ymetadata === undefined) {
+          return undefined;
+        }
+
         this.transact(() => {
           for (const [key, value] of Object.entries(clone)) {
             ymetadata.set(key, value);
@@ -357,6 +362,11 @@ export class YNotebook
     // TODO: Maybe modify only attributes instead of replacing the whole metadata?
     const clone = JSONExt.deepCopy(value);
     const ymetadata: Y.Map<any> = this.ymeta.get('metadata');
+
+    // Transiently the metadata can be missing - like during destruction
+    if (ymetadata === undefined) {
+      return undefined;
+    }
 
     this.transact(() => {
       for (const [key, value] of Object.entries(clone)) {
