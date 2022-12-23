@@ -138,6 +138,16 @@ export class YNotebook
   }
 
   /**
+   * Creates the YNotebook schema
+   * 
+   * Note: This method is useful when we need to initialize
+   * the YNotebook from the JavaScript side.
+   */
+  initialize(): void {
+    this.ymeta.set('metadata', new Y.Map());
+  }
+
+  /**
    * Get a shared cell by index.
    *
    * @param index: Cell's position.
@@ -269,7 +279,7 @@ export class YNotebook
       return;
     }
 
-    const allMetadata = JSONExt.deepCopy(this.ymeta.get('metadata'));
+    const allMetadata = this.metadata;
     delete allMetadata[key];
     this.setMetadata(allMetadata);
   }
@@ -345,6 +355,7 @@ export class YNotebook
         }
 
         this.transact(() => {
+          ymetadata.clear();
           for (const [key, value] of Object.entries(clone)) {
             ymetadata.set(key, value);
           }
