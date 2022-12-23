@@ -139,7 +139,7 @@ export class YNotebook
 
   /**
    * Creates the YNotebook schema
-   * 
+   *
    * Note: This method is useful when we need to initialize
    * the YNotebook from the JavaScript side.
    */
