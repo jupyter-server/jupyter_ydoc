@@ -20,7 +20,7 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   /**
    * Creates a standalone YDocument
    */
-  static create<T extends DocumentChange>(): YDocument<T> {
+  static create(): YDocument<DocumentChange> {
     return new YDocument();
   }
 
