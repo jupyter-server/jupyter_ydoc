@@ -66,6 +66,18 @@ export class YNotebook
   }
 
   /**
+   * Creates a standalone YNotebook
+   *
+   * Note: This method is useful when we need to initialize
+   * the YNotebook from the JavaScript side.
+   */
+  static create(): YNotebook {
+    const ynotebook = new YNotebook();
+    ynotebook.ymeta.set('metadata', new Y.Map());
+    return ynotebook;
+  }
+
+  /**
    * YJS map for the notebook metadata
    */
   readonly ymeta: Y.Map<any> = this.ydoc.getMap('meta');
@@ -135,16 +147,6 @@ export class YNotebook
     this._ycells.unobserve(this._onYCellsChanged);
     this.ymeta.unobserveDeep(this._onMetaChanged);
     super.dispose();
-  }
-
-  /**
-   * Creates the YNotebook schema
-   *
-   * Note: This method is useful when we need to initialize
-   * the YNotebook from the JavaScript side.
-   */
-  initialize(): void {
-    this.ymeta.set('metadata', new Y.Map());
   }
 
   /**

@@ -18,6 +18,13 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   }
 
   /**
+   * Creates a standalone YDocument
+   */
+  static create<T extends DocumentChange>(): YDocument<T> {
+    return new YDocument();
+  }
+
+  /**
    * YJS document
    */
   readonly ydoc = new Y.Doc();

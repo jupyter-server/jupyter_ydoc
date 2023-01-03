@@ -7,8 +7,7 @@ describe('@jupyter/ydoc', () => {
   describe('YNotebook', () => {
     describe('#constructor', () => {
       test('should create a notebook without arguments', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         expect(notebook.cells.length).toBe(0);
         notebook.dispose();
       });
@@ -16,8 +15,7 @@ describe('@jupyter/ydoc', () => {
 
     describe('#disposed', () => {
       test('should be emitted when the document is disposed', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         let disposed = false;
         notebook.disposed.connect(() => {
           disposed = true;
@@ -29,8 +27,7 @@ describe('@jupyter/ydoc', () => {
 
     describe('metadata', () => {
       test('should get metadata', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -46,8 +43,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should get all metadata', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -63,8 +59,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should get one metadata', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -80,8 +75,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should set one metadata', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -100,8 +94,7 @@ describe('@jupyter/ydoc', () => {
       it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
         'should get single metadata %s',
         value => {
-          const nb = new YNotebook();
-          nb.initialize();
+          const nb = YNotebook.create();
           const metadata = {
             orig_nbformat: 1,
             kernelspec: {
@@ -119,8 +112,7 @@ describe('@jupyter/ydoc', () => {
       );
 
       test('should update metadata', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = notebook.getMetadata();
         expect(metadata).toBeTruthy();
         metadata.orig_nbformat = 1;
@@ -146,8 +138,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit all metadata changes', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -182,8 +173,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit a add metadata change', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -208,8 +198,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit a delete metadata change', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -241,8 +230,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit an update metadata change', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -276,23 +264,20 @@ describe('@jupyter/ydoc', () => {
 
     describe('#insertCell', () => {
       test('should insert a cell', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         notebook.insertCell(0, { cell_type: 'code' });
         expect(notebook.cells.length).toBe(1);
         notebook.dispose();
       });
       test('should set cell source', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
         codeCell.setSource('test');
         expect(notebook.cells[0].getSource()).toBe('test');
         notebook.dispose();
       });
       test('should update source', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
         codeCell.setSource('test');
         codeCell.updateSource(0, 0, 'hello');
@@ -301,8 +286,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit a add cells change', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const changes: NotebookChange[] = [];
         notebook.changed.connect((_, c) => {
           changes.push(c);
@@ -321,8 +305,7 @@ describe('@jupyter/ydoc', () => {
 
     describe('#deleteCell', () => {
       test('should emit a delete cells change', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const changes: NotebookChange[] = [];
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
 
@@ -340,8 +323,7 @@ describe('@jupyter/ydoc', () => {
 
     describe('#moveCell', () => {
       test('should emit add and delete cells changes when moving a cell', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         const changes: NotebookChange[] = [];
         const codeCell = notebook.addCell({ cell_type: 'code' });
         notebook.addCell({ cell_type: 'markdown' });
@@ -367,8 +349,7 @@ describe('@jupyter/ydoc', () => {
 
     describe('#fromJSON', () => {
       test('should load a serialize notebook', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         notebook.fromJSON({
           cells: [],
           metadata: {
@@ -385,8 +366,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should remove orig_nbformat', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         notebook.fromJSON({
           cells: [],
           metadata: {
@@ -402,8 +382,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should remove cell id for version <4.5', () => {
-        const notebook = new YNotebook();
-        notebook.initialize();
+        const notebook = YNotebook.create();
         notebook.fromJSON({
           cells: [
             {
@@ -522,8 +501,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit all metadata changes', () => {
-      const notebook = new YNotebook();
-      notebook.initialize();
+      const notebook = YNotebook.create();
       const metadata = {
         collapsed: true,
         editable: false,

@@ -28,6 +28,13 @@ export class YFile
   }
 
   /**
+   * Creates a standalone YFile
+   */
+  static create(): YFile {
+    return new YFile();
+  }
+
+  /**
    * YJS file text.
    */
   readonly ysource = this.ydoc.getText('source');
