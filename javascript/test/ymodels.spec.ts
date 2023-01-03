@@ -408,14 +408,14 @@ describe('@jupyter/ydoc', () => {
 
   describe('YCell standalone', () => {
     test('should set source', () => {
-      const codeCell = YCodeCell.createStandalone();
+      const codeCell = YCodeCell.create();
       codeCell.setSource('test');
       expect(codeCell.getSource()).toBe('test');
       codeCell.dispose();
     });
 
     test('should update source', () => {
-      const codeCell = YCodeCell.createStandalone();
+      const codeCell = YCodeCell.create();
       codeCell.setSource('test');
       codeCell.updateSource(0, 0, 'hello');
       expect(codeCell.getSource()).toBe('hellotest');
@@ -423,7 +423,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get metadata', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -440,7 +440,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get all metadata', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         jupyter: { outputs_hidden: true },
         editable: false,
@@ -454,7 +454,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get one metadata', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -470,7 +470,7 @@ describe('@jupyter/ydoc', () => {
     it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
       'should get single metadata %s',
       value => {
-        const cell = YCodeCell.createStandalone();
+        const cell = YCodeCell.create();
         const metadata = {
           collapsed: true,
           editable: false,
@@ -486,7 +486,7 @@ describe('@jupyter/ydoc', () => {
     );
 
     test('should set one metadata', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -540,7 +540,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit a add metadata change', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -565,7 +565,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit a delete metadata change', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -597,7 +597,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit an update metadata change', () => {
-      const cell = YCodeCell.createStandalone();
+      const cell = YCodeCell.create();
       const metadata = {
         collapsed: true,
         editable: false,
