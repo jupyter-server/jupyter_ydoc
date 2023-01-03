@@ -135,7 +135,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * inserted into a YNotebook because the Yjs model is already
    * attached to an anonymous Y.Doc instance.
    */
-  static createStandalone(id?: string): YBaseCell<any> {
+  static create(id?: string): YBaseCell<any> {
     return createCell({ id, cell_type: this.prototype.cell_type });
   }
 
@@ -671,8 +671,8 @@ export class YCodeCell
    * inserted into a YNotebook because the Yjs model is already
    * attached to an anonymous Y.Doc instance.
    */
-  static createStandalone(id?: string): YCodeCell {
-    return super.createStandalone(id) as YCodeCell;
+  static create(id?: string): YCodeCell {
+    return super.create(id) as YCodeCell;
   }
 
   /**
@@ -893,8 +893,8 @@ export class YRawCell extends YAttachmentCell implements ISharedRawCell {
    * inserted into a YNotebook because the Yjs model is already
    * attached to an anonymous Y.Doc instance.
    */
-  static createStandalone(id?: string): YRawCell {
-    return super.createStandalone(id) as YRawCell;
+  static create(id?: string): YRawCell {
+    return super.create(id) as YRawCell;
   }
 
   /**
@@ -930,8 +930,8 @@ export class YMarkdownCell
    * inserted into a YNotebook because the Yjs model is already
    * attached to an anonymous Y.Doc instance.
    */
-  static createStandalone(id?: string): YMarkdownCell {
-    return super.createStandalone(id) as YMarkdownCell;
+  static create(id?: string): YMarkdownCell {
+    return super.create(id) as YMarkdownCell;
   }
 
   /**
