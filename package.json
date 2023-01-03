@@ -5,7 +5,8 @@
   "files": [],
   "workspaces": {
     "packages": [
-      "javascript"
+      "javascript",
+      "test"
     ]
   }
 }
