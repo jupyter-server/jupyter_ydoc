@@ -23,7 +23,7 @@ def update_json_file(path: Path, d: dict):
 
 here = Path(__file__).parent
 d = {"type": "module"}
-update_json_file(here / "node_modules/y-websocket/package.json", d)
+update_json_file(here.parent / "node_modules/y-websocket/package.json", d)
 
 
 @pytest.fixture
