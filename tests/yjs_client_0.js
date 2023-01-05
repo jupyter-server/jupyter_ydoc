@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) Jupyter Development Team.
+ * Distributed under the terms of the Modified BSD License.
+ */
+
 import { YNotebook } from '@jupyter/ydoc'
 import { WebsocketProvider } from 'y-websocket'
 
