@@ -3,10 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "files": [],
-  "workspaces": {
-    "packages": [
-      "javascript",
-      "test"
-    ]
+  "workspaces": [
+    "javascript",
+    "tests"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "test": "lerna run build:test && lerna run test"
+  },
+  "devDependencies": {
+    "lerna": "^6.3.0"
   }
 }

@@ -76,6 +76,7 @@ before-bump-version = ["pip install -e .[dev]"]
 
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"
+npm_cmd = "npm publish --tag next"
 
 [tool.flake8]
 max-line-length = 100
