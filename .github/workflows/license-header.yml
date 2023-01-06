@@ -3,6 +3,10 @@ name: Fix License Headers
 on:
   pull_request_target:
 
+header:
+  paths-ignore:
+    - 'yarn.lock'
+
 jobs:
   header-license-fix:
     runs-on: ubuntu-20.04
