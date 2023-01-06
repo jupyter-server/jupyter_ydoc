@@ -46,7 +46,7 @@ export class YNotebook
    *
    * @param options
    */
-  constructor(options: Omit<ISharedNotebook.IOptions, 'notebook'> = {}) {
+  constructor(options: ISharedNotebook.IOptions = {}) {
     super();
     this._disableDocumentWideUndoRedo =
       options.disableDocumentWideUndoRedo ?? false;
