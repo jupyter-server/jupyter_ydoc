@@ -72,7 +72,9 @@ export class YNotebook
    * the YNotebook from the JavaScript side.
    */
   static create(options: ISharedNotebook.IOptions = {}): YNotebook {
-    const ynotebook = new YNotebook({ disableDocumentWideUndoRedo: options.disableDocumentWideUndoRedo ?? false });
+    const ynotebook = new YNotebook({
+      disableDocumentWideUndoRedo: options.disableDocumentWideUndoRedo ?? false
+    });
     ynotebook.ymeta.set('metadata', new Y.Map());
     return ynotebook;
   }
