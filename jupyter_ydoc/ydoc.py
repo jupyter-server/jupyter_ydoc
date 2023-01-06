@@ -1,3 +1,6 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 import copy
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional
