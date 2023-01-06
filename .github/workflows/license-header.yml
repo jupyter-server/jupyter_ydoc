@@ -4,6 +4,10 @@ on:
   pull_request_target:
 
 header:
+  license:
+    spdx-id: BSD 3-Clause License
+    copyright-owner: Jupyter Development Team
+
   paths-ignore:
     - 'yarn.lock'
 
