@@ -259,6 +259,17 @@ class YNotebook(YBaseDoc):
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
 
+    @property
+    def cell_number(self) -> int:
+        """
+        Returns the number of cells in the notebook.
+
+        :return: The cell number.
+        :rtype: int
+        """
+        return len(self._ycells)
+
+
     def get_cell(self, index: int) -> Dict[str, Any]:
         """
         Returns a cell.
