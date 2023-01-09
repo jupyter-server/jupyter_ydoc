@@ -269,7 +269,6 @@ class YNotebook(YBaseDoc):
         """
         return len(self._ycells)
 
-
     def get_cell(self, index: int) -> Dict[str, Any]:
         """
         Returns a cell.
