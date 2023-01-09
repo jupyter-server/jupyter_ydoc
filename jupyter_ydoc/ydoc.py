@@ -139,7 +139,7 @@ class YBaseDoc(ABC):
         pass
 
     @abstractmethod
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
