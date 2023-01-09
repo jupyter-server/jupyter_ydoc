@@ -3,6 +3,7 @@
 
 import copy
 from abc import ABC, abstractmethod
+from functools import partial
 from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
 
@@ -207,16 +208,16 @@ class YFile(YBaseDoc):
             if value:
                 self._ysource.extend(t, value)
 
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ysource] = self._ysource.observe(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
 
 
 class YNotebook(YBaseDoc):
@@ -448,14 +449,14 @@ class YNotebook(YBaseDoc):
 
             self._ymeta.set(t, "metadata", Y.YMap(metadata))
 
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(callback)
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
