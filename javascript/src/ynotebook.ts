@@ -71,8 +71,10 @@ export class YNotebook
    * Note: This method is useful when we need to initialize
    * the YNotebook from the JavaScript side.
    */
-  static create(): YNotebook {
-    const ynotebook = new YNotebook();
+  static create(options: ISharedNotebook.IOptions = {}): YNotebook {
+    const ynotebook = new YNotebook({
+      disableDocumentWideUndoRedo: options.disableDocumentWideUndoRedo ?? false
+    });
     ynotebook.ymeta.set('metadata', new Y.Map());
     return ynotebook;
   }
@@ -347,7 +349,7 @@ export class YNotebook
       update[metadata] = value;
       this.updateMetadata(update);
     } else {
-      if (!JSONExt.deepEqual(this.metadata, metadata)) {
+      if (!this.metadata || !JSONExt.deepEqual(this.metadata, metadata)) {
         const clone = JSONExt.deepCopy(metadata);
         const ymetadata: Y.Map<any> = this.ymeta.get('metadata');
 

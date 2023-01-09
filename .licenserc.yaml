@@ -21,5 +21,6 @@ header:
     - '*.bundle.js'
     - '**/.*'
     - 'LICENSE'
+    - 'yarn.lock'
 
   comment: on-failure
