@@ -126,7 +126,6 @@ class YBaseDoc(ABC):
         :return: Document's content.
         :rtype: Any
         """
-        pass
 
     @abstractmethod
     def set(self, value: Any) -> None:
@@ -136,7 +135,6 @@ class YBaseDoc(ABC):
         :param value: The content of the document.
         :type value: Any
         """
-        pass
 
     @abstractmethod
     def observe(self, callback: Callable[[str, Any], None]) -> None:
@@ -146,7 +144,6 @@ class YBaseDoc(ABC):
         :param callback: Callback that will be called when the document changes.
         :type callback: Callable[[Any], None]
         """
-        pass
 
     def unobserve(self) -> None:
         """
