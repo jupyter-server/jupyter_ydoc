@@ -434,11 +434,8 @@ class YNotebook(YBaseDoc):
             self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MAJOR_VERSION))
 
             metadata = nb.get("metadata", {})
-            if "language_info" not in metadata:
-                metadata["language_info"] = {"name": ""}
-
-            if "kernelspec" not in metadata:
-                metadata["kernelspec"] = {"name": "", "display_name": ""}
+            metadata.setdefault("language_info", {"name": ""})
+            metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
 
             self._ymeta.set(t, "metadata", Y.YMap(metadata))
 
