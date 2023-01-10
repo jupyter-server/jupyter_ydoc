@@ -10,6 +10,12 @@ import y_py as Y
 
 from .utils import cast_all
 
+# The earliest major version of the notebook format we support.
+NBFORMAT_MAJOR_VERSION = 4
+
+# The earliest minor version of the notebook format we support.
+NBFORMAT_MINOR_VERSION = 4
+
 
 class YBaseDoc(ABC):
     """
@@ -424,9 +430,17 @@ class YNotebook(YBaseDoc):
 
             # initialize document
             self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
-            self._ymeta.set(t, "nbformat", nb["nbformat"])
-            self._ymeta.set(t, "nbformat_minor", nb["nbformat_minor"])
-            self._ymeta.set(t, "metadata", Y.YMap(nb.get("metadata", {})))
+            self._ymeta.set(t, "nbformat", nb.get("nbformat", NBFORMAT_MAJOR_VERSION))
+            self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MAJOR_VERSION))
+
+            metadata = nb.get("metadata", {})
+            if "language_info" not in metadata:
+                metadata["language_info"] = {"name": ""}
+
+            if "kernelspec" not in metadata:
+                metadata["kernelspec"] = {"name": "", "display_name": ""}
+
+            self._ymeta.set(t, "metadata", Y.YMap(metadata))
 
     def observe(self, callback: Callable[[Any], None]) -> None:
         """

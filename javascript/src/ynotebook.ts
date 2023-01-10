@@ -75,7 +75,14 @@ export class YNotebook
     const ynotebook = new YNotebook({
       disableDocumentWideUndoRedo: options.disableDocumentWideUndoRedo ?? false
     });
-    ynotebook.ymeta.set('metadata', new Y.Map());
+    const ymetadata = new Y.Map();
+    ymetadata.set('language_info', { name: options.languagePreference ?? '' });
+    ymetadata.set('kernelspec', {
+      name: '',
+      display_name: ''
+    });
+    ynotebook.ymeta.set('metadata', ymetadata);
+
     return ynotebook;
   }
 
@@ -404,7 +411,16 @@ export class YNotebook
       if (metadata['orig_nbformat'] !== undefined) {
         delete metadata['orig_nbformat'];
       }
-      this.metadata = metadata;
+
+      if (!this.metadata) {
+        const ymetadata = new Y.Map();
+        for (const [key, value] of Object.entries(metadata)) {
+          ymetadata.set(key, value);
+        }
+        this.ymeta.set('metadata', ymetadata);
+      } else {
+        this.metadata = metadata;
+      }
 
       const useId = value.nbformat === 4 && value.nbformat_minor >= 5;
       const ycells = value.cells.map(cell => {
@@ -449,7 +465,6 @@ export class YNotebook
 
     if (metadataEvents) {
       const metadataChange = metadataEvents.changes.keys;
-
       const ymetadata = this.ymeta.get('metadata') as Y.Map<any>;
       metadataEvents.changes.keys.forEach((change, key) => {
         switch (change.action) {
