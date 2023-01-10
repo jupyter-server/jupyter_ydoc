@@ -10,10 +10,10 @@ import y_py as Y
 
 from .utils import cast_all
 
-# The earliest major version of the notebook format we support.
+# The minimum major version of the notebook format we support.
 NBFORMAT_MAJOR_VERSION = 4
 
-# The earliest minor version of the notebook format we support.
+# The minimum minor version of the notebook format we support.
 NBFORMAT_MINOR_VERSION = 4
 
 
