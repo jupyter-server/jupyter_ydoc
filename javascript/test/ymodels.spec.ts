@@ -1,6 +1,8 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+import * as Y from 'yjs';
+
 import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
@@ -138,7 +140,9 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit all metadata changes', () => {
-        const notebook = YNotebook.create();
+        const notebook = new YNotebook();
+        notebook.ymeta.set('metadata', new Y.Map());
+
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -501,7 +505,8 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit all metadata changes', () => {
-      const notebook = YNotebook.create();
+      const notebook = new YNotebook();
+      notebook.ymeta.set('metadata', new Y.Map());
       const metadata = {
         collapsed: true,
         editable: false,
