@@ -25,14 +25,17 @@ class YBaseDoc(ABC):
     subscribe to changes in the document.
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
         Constructs a YBaseDoc.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
-        self._ydoc = ydoc
+        if ydoc is None:
+            self._ydoc = Y.YDoc()
+        else:
+            self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
         self._subscriptions = {}
 
@@ -142,7 +145,7 @@ class YBaseDoc(ABC):
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
 
     def unobserve(self) -> None:
@@ -170,12 +173,12 @@ class YFile(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
         Constructs a YFile.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
         super().__init__(ydoc)
         self._ysource = self._ydoc.get_text("source")
@@ -246,12 +249,12 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
         Constructs a YNotebook.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
         super().__init__(ydoc)
         self._ymeta = self._ydoc.get_map("meta")
