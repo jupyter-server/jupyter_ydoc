@@ -40,9 +40,9 @@ docs = [
 ]
 
 [project.entry-points.jupyter_ydoc]
-utf8 = "jupyter_ydoc.ydoc:YUTF8"
-bytes = "jupyter_ydoc.ydoc:YBytes"
+blob = "jupyter_ydoc.ydoc:YBlob"
 file = "jupyter_ydoc.ydoc:YFile"
+text = "jupyter_ydoc.ydoc:YText"
 notebook = "jupyter_ydoc.ydoc:YNotebook"
 
 [project.readme]

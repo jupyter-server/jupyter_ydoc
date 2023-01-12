@@ -160,7 +160,7 @@ class YBaseDoc(ABC):
         self._subscriptions = {}
 
 
-class YUTF8(YBaseDoc):
+class YText(YBaseDoc):
     """
     Extends :class:`YBaseDoc`, and represents a plain text document, encoded as UTF-8.
 
@@ -176,7 +176,7 @@ class YUTF8(YBaseDoc):
 
     def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
-        Constructs a YUTF8.
+        Constructs a YText.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
         :type ydoc: :class:`y_py.YDoc`, optional.
@@ -221,12 +221,13 @@ class YUTF8(YBaseDoc):
         self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
 
 
-YFile = YUTF8  # for backwards-compatibility
+class YFile(YText):  # for backwards-compatibility
+    pass
 
 
-class YBytes(YBaseDoc):
+class YBlob(YBaseDoc):
     """
-    Extends :class:`YBaseDoc`, and represents a binary document.
+    Extends :class:`YBaseDoc`, and represents a blob document.
     It is currently encoded as base64 because of:
     https://github.com/y-crdt/ypy/issues/108#issuecomment-1377055465
     The Y document can be set from bytes or from str, in which case it is assumed to be encoded as
@@ -244,7 +245,7 @@ class YBytes(YBaseDoc):
 
     def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
-        Constructs a YBytes.
+        Constructs a YBlob.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
         :type ydoc: :class:`y_py.YDoc`, optional.
