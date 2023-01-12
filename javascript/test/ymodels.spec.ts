@@ -1,8 +1,6 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import * as Y from 'yjs';
-
 import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
@@ -140,8 +138,7 @@ describe('@jupyter/ydoc', () => {
       });
 
       test('should emit all metadata changes', () => {
-        const notebook = new YNotebook();
-        notebook.ymeta.set('metadata', new Y.Map());
+        const notebook = YNotebook.create();
 
         const metadata = {
           orig_nbformat: 1,
@@ -157,19 +154,23 @@ describe('@jupyter/ydoc', () => {
         });
         notebook.metadata = metadata;
 
-        expect(changes).toHaveLength(2);
+        expect(changes).toHaveLength(3);
         expect(changes).toEqual([
           {
-            type: 'add',
-            key: 'orig_nbformat',
-            newValue: metadata.orig_nbformat,
-            oldValue: undefined
+            type: 'remove',
+            key: 'language_info',
+            oldValue: { name: ""}
+          },
+          {
+            type: 'change',
+            key: 'kernelspec',
+            newValue: metadata.kernelspec,
+            oldValue: { display_name: "", name: "" }
           },
           {
             type: 'add',
-            key: 'kernelspec',
-            newValue: metadata.kernelspec,
-            oldValue: undefined
+            key: 'orig_nbformat',
+            newValue: metadata.orig_nbformat
           }
         ]);
 
@@ -505,8 +506,8 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit all metadata changes', () => {
-      const notebook = new YNotebook();
-      notebook.ymeta.set('metadata', new Y.Map());
+      const notebook = YNotebook.create();
+
       const metadata = {
         collapsed: true,
         editable: false,
@@ -519,8 +520,20 @@ describe('@jupyter/ydoc', () => {
       });
       notebook.metadata = metadata;
 
-      expect(changes).toHaveLength(3);
+      expect(changes).toHaveLength(5);
       expect(changes).toEqual([
+        {
+          type: 'remove',
+          key: 'language_info',
+          newValue: undefined,
+          oldValue: { name: "" }
+        },
+        {
+          type: 'remove',
+          key: 'kernelspec',
+          newValue: undefined,
+          oldValue: { display_name: "", name: "" }
+        },
         {
           type: 'add',
           key: 'collapsed',
