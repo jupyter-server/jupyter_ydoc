@@ -159,13 +159,13 @@ describe('@jupyter/ydoc', () => {
           {
             type: 'remove',
             key: 'language_info',
-            oldValue: { name: ""}
+            oldValue: { name: '' }
           },
           {
             type: 'change',
             key: 'kernelspec',
             newValue: metadata.kernelspec,
-            oldValue: { display_name: "", name: "" }
+            oldValue: { display_name: '', name: '' }
           },
           {
             type: 'add',
@@ -205,7 +205,7 @@ describe('@jupyter/ydoc', () => {
             type: 'change',
             key: 'kernelspec',
             newValue: metadata.kernelspec,
-            oldValue: { display_name: "", name: "" }
+            oldValue: { display_name: '', name: '' }
           }
         ]);
 
@@ -561,13 +561,13 @@ describe('@jupyter/ydoc', () => {
           type: 'remove',
           key: 'language_info',
           newValue: undefined,
-          oldValue: { name: "" }
+          oldValue: { name: '' }
         },
         {
           type: 'remove',
           key: 'kernelspec',
           newValue: undefined,
-          oldValue: { display_name: "", name: "" }
+          oldValue: { display_name: '', name: '' }
         },
         {
           type: 'add',
