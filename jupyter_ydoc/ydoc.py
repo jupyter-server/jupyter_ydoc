@@ -10,11 +10,10 @@ import y_py as Y
 
 from .utils import cast_all
 
-# The minimum major version of the notebook format we support.
+# The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
-
-# The minimum minor version of the notebook format we support.
-NBFORMAT_MINOR_VERSION = 4
+# The default minor version of the notebook format.
+NBFORMAT_MINOR_VERSION = 5
 
 
 class YBaseDoc(ABC):
@@ -431,7 +430,7 @@ class YNotebook(YBaseDoc):
             # initialize document
             self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
             self._ymeta.set(t, "nbformat", nb.get("nbformat", NBFORMAT_MAJOR_VERSION))
-            self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MAJOR_VERSION))
+            self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION))
 
             metadata = nb.get("metadata", {})
             metadata.setdefault("language_info", {"name": ""})
