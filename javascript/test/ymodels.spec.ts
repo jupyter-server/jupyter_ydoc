@@ -177,6 +177,41 @@ describe('@jupyter/ydoc', () => {
         notebook.dispose();
       });
 
+      test('should emit all metadata changes on update', () => {
+        const notebook = YNotebook.create();
+
+        const metadata = {
+          orig_nbformat: 1,
+          kernelspec: {
+            display_name: 'python',
+            name: 'python'
+          }
+        };
+
+        const changes: IMapChange[] = [];
+        notebook.metadataChanged.connect((_, c) => {
+          changes.push(c);
+        });
+        notebook.updateMetadata(metadata);
+
+        expect(changes).toHaveLength(2);
+        expect(changes).toEqual([
+          {
+            type: 'add',
+            key: 'orig_nbformat',
+            newValue: metadata.orig_nbformat
+          },
+          {
+            type: 'change',
+            key: 'kernelspec',
+            newValue: metadata.kernelspec,
+            oldValue: { display_name: "", name: "" }
+          }
+        ]);
+
+        notebook.dispose();
+      });
+
       test('should emit a add metadata change', () => {
         const notebook = YNotebook.create();
         const metadata = {
