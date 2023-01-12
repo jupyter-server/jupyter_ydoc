@@ -139,6 +139,7 @@ describe('@jupyter/ydoc', () => {
 
       test('should emit all metadata changes', () => {
         const notebook = YNotebook.create();
+
         const metadata = {
           orig_nbformat: 1,
           kernelspec: {
@@ -153,19 +154,58 @@ describe('@jupyter/ydoc', () => {
         });
         notebook.metadata = metadata;
 
+        expect(changes).toHaveLength(3);
+        expect(changes).toEqual([
+          {
+            type: 'remove',
+            key: 'language_info',
+            oldValue: { name: '' }
+          },
+          {
+            type: 'change',
+            key: 'kernelspec',
+            newValue: metadata.kernelspec,
+            oldValue: { display_name: '', name: '' }
+          },
+          {
+            type: 'add',
+            key: 'orig_nbformat',
+            newValue: metadata.orig_nbformat
+          }
+        ]);
+
+        notebook.dispose();
+      });
+
+      test('should emit all metadata changes on update', () => {
+        const notebook = YNotebook.create();
+
+        const metadata = {
+          orig_nbformat: 1,
+          kernelspec: {
+            display_name: 'python',
+            name: 'python'
+          }
+        };
+
+        const changes: IMapChange[] = [];
+        notebook.metadataChanged.connect((_, c) => {
+          changes.push(c);
+        });
+        notebook.updateMetadata(metadata);
+
         expect(changes).toHaveLength(2);
         expect(changes).toEqual([
           {
             type: 'add',
             key: 'orig_nbformat',
-            newValue: metadata.orig_nbformat,
-            oldValue: undefined
+            newValue: metadata.orig_nbformat
           },
           {
-            type: 'add',
+            type: 'change',
             key: 'kernelspec',
             newValue: metadata.kernelspec,
-            oldValue: undefined
+            oldValue: { display_name: '', name: '' }
           }
         ]);
 
@@ -502,6 +542,7 @@ describe('@jupyter/ydoc', () => {
 
     test('should emit all metadata changes', () => {
       const notebook = YNotebook.create();
+
       const metadata = {
         collapsed: true,
         editable: false,
@@ -514,8 +555,20 @@ describe('@jupyter/ydoc', () => {
       });
       notebook.metadata = metadata;
 
-      expect(changes).toHaveLength(3);
+      expect(changes).toHaveLength(5);
       expect(changes).toEqual([
+        {
+          type: 'remove',
+          key: 'language_info',
+          newValue: undefined,
+          oldValue: { name: '' }
+        },
+        {
+          type: 'remove',
+          key: 'kernelspec',
+          newValue: undefined,
+          oldValue: { display_name: '', name: '' }
+        },
         {
           type: 'add',
           key: 'collapsed',

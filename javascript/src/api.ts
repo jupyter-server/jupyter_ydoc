@@ -345,6 +345,11 @@ export namespace ISharedNotebook {
      * considered on the full document across all cells.
      */
     disableDocumentWideUndoRedo?: boolean;
+
+    /**
+     * The language preference for the model.
+     */
+    languagePreference?: string;
   }
 }
 
