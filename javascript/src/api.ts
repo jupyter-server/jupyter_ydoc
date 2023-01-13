@@ -73,6 +73,8 @@ export namespace IFactory {
     contentType: string;
     /**
      * Wether the document is collaborative or not.
+     * 
+     *  The default value is `true`.
      */
     collaborative?: boolean;
   }
