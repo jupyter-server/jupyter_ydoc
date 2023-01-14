@@ -7,17 +7,23 @@
 
 `jupyter_ydoc` provides [Ypy](https://github.com/y-crdt/ypy)-based data structures for various
 documents used in the Jupyter ecosystem. Built-in documents include:
-- `YFile`: a generic text document.
+- `YBlob`: a generic immutable binary document.
+- `YUnicode`: a generic UTF8-encoded text document (`YFile` is an alias to `YUnicode`).
 - `YNotebook`: a Jupyter notebook document.
 
-These documents are registered via an entry point under the `"jupyter_ydoc"` group as `"file"` and
-`"notebook"`, respectively. You can access them as follows:
+These documents are registered via an entry point under the `"jupyter_ydoc"` group as `"blob"`,
+`"unicode"` (or `"file"`), and `"notebook"`, respectively. You can access them as follows:
 
 ```py
 from jupyter_ydoc import ydocs
 
 print(ydocs)
-# {'file': <class 'jupyter_ydoc.ydoc.YFile'>, 'notebook': <class 'jupyter_ydoc.ydoc.YNotebook'>}
+# {
+#     'blob': <class 'jupyter_ydoc.ydoc.YBlob'>,
+#     'file': <class 'jupyter_ydoc.ydoc.YFile'>,
+#     'notebook': <class 'jupyter_ydoc.ydoc.YNotebook'>,
+#     'unicode': <class 'jupyter_ydoc.ydoc.YUnicode'>
+# }
 ```
 
 Which is just a shortcut to:
@@ -30,14 +36,13 @@ ydocs = {ep.name: ep.load() for ep in pkg_resources.iter_entry_points(group="jup
 
 Or directly import them:
 ```py
-from jupyter_ydoc import YFile, YNotebook
+from jupyter_ydoc import YBlob, YUnicode, YNotebook
 ```
 
 The `"jupyter_ydoc"` entry point group can be populated with your own documents, e.g. by adding the
-following to your package's `setup.cfg`:
+following to your package's `pyproject.toml`:
 
 ```
-[options.entry_points]
-jupyter_ydoc =
-    my_document = my_package.my_file:MyDocumentClass
+[project.entry-points.jupyter_ydoc]
+my_dodument = "my_package.my_file:MyDocumentClass"
 ```
