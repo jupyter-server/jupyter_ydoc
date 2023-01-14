@@ -160,7 +160,7 @@ class YBaseDoc(ABC):
         self._subscriptions = {}
 
 
-class YText(YBaseDoc):
+class YUnicode(YBaseDoc):
     """
     Extends :class:`YBaseDoc`, and represents a plain text document, encoded as UTF-8.
 
@@ -176,7 +176,7 @@ class YText(YBaseDoc):
 
     def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
-        Constructs a YText.
+        Constructs a YUnicode.
 
         :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
         :type ydoc: :class:`y_py.YDoc`, optional.
@@ -221,7 +221,7 @@ class YText(YBaseDoc):
         self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
 
 
-class YFile(YText):  # for backwards-compatibility
+class YFile(YUnicode):  # for backwards-compatibility
     pass
 
 
