@@ -1,9 +1,11 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import base64
 import copy
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from functools import partial
+from typing import Any, Callable, Dict, Optional, Union
 from uuid import uuid4
 
 import y_py as Y
@@ -24,14 +26,17 @@ class YBaseDoc(ABC):
     subscribe to changes in the document.
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
         Constructs a YBaseDoc.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
-        self._ydoc = ydoc
+        if ydoc is None:
+            self._ydoc = Y.YDoc()
+        else:
+            self._ydoc = ydoc
         self._ystate = self._ydoc.get_map("state")
         self._subscriptions = {}
 
@@ -125,7 +130,6 @@ class YBaseDoc(ABC):
         :return: Document's content.
         :rtype: Any
         """
-        pass
 
     @abstractmethod
     def set(self, value: Any) -> None:
@@ -135,17 +139,15 @@ class YBaseDoc(ABC):
         :param value: The content of the document.
         :type value: Any
         """
-        pass
 
     @abstractmethod
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
-        pass
 
     def unobserve(self) -> None:
         """
@@ -158,9 +160,9 @@ class YBaseDoc(ABC):
         self._subscriptions = {}
 
 
-class YFile(YBaseDoc):
+class YUnicode(YBaseDoc):
     """
-    Extends :class:`YBaseDoc`, and represents a plain text document.
+    Extends :class:`YBaseDoc`, and represents a plain text document, encoded as UTF-8.
 
     Schema:
 
@@ -172,12 +174,12 @@ class YFile(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
-        Constructs a YFile.
+        Constructs a YUnicode.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
         super().__init__(ydoc)
         self._ysource = self._ydoc.get_text("source")
@@ -207,16 +209,81 @@ class YFile(YBaseDoc):
             if value:
                 self._ysource.extend(t, value)
 
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ysource] = self._ysource.observe(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
+
+
+class YFile(YUnicode):  # for backwards-compatibility
+    pass
+
+
+class YBlob(YBaseDoc):
+    """
+    Extends :class:`YBaseDoc`, and represents a blob document.
+    It is currently encoded as base64 because of:
+    https://github.com/y-crdt/ypy/issues/108#issuecomment-1377055465
+    The Y document can be set from bytes or from str, in which case it is assumed to be encoded as
+    base64.
+
+    Schema:
+
+    .. code-block:: json
+
+        {
+            "state": YMap,
+            "source": YMap
+        }
+    """
+
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
+        """
+        Constructs a YBlob.
+
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
+        """
+        super().__init__(ydoc)
+        self._ysource = self._ydoc.get_map("source")
+
+    def get(self) -> bytes:
+        """
+        Returns the content of the document.
+
+        :return: Document's content.
+        :rtype: bytes
+        """
+        return base64.b64decode(self._ysource.get("base64", "").encode())
+
+    def set(self, value: Union[bytes, str]) -> None:
+        """
+        Sets the content of the document.
+
+        :param value: The content of the document.
+        :type value: Union[bytes, str]
+        """
+        if isinstance(value, bytes):
+            value = base64.b64encode(value).decode()
+        with self._ydoc.begin_transaction() as t:
+            self._ysource.set(t, "base64", value)
+
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
+        """
+        Subscribes to document changes.
+
+        :param callback: Callback that will be called when the document changes.
+        :type callback: Callable[[str, Any], None]
+        """
+        self.unobserve()
+        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
 
 
 class YNotebook(YBaseDoc):
@@ -248,16 +315,26 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Y.YDoc):
+    def __init__(self, ydoc: Optional[Y.YDoc] = None):
         """
         Constructs a YNotebook.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document.
-        :type ydoc: :class:`y_py.YDoc`
+        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`y_py.YDoc`, optional.
         """
         super().__init__(ydoc)
         self._ymeta = self._ydoc.get_map("meta")
         self._ycells = self._ydoc.get_array("cells")
+
+    @property
+    def cell_number(self) -> int:
+        """
+        Returns the number of cells in the notebook.
+
+        :return: The cell number.
+        :rtype: int
+        """
+        return len(self._ycells)
 
     def get_cell(self, index: int) -> Dict[str, Any]:
         """
@@ -438,14 +515,14 @@ class YNotebook(YBaseDoc):
 
             self._ymeta.set(t, "metadata", Y.YMap(metadata))
 
-    def observe(self, callback: Callable[[Any], None]) -> None:
+    def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[Any], None]
+        :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(callback)
-        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(callback)
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
