@@ -48,7 +48,7 @@ export interface IFactory {
   /**
    * Create a new `ISharedDocument` instance.
    */
-  createNew(options: IFactory.IOptions): ISharedDocument;
+  createNew(options: IFactory.IOptions): ISharedDocument | undefined;
 }
 
 /**
