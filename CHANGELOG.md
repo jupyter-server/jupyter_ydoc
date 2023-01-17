@@ -2,6 +2,28 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.0a5
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc-test@0.0.1...55d80f00b604c9f26955617acbb044abb619b139))
+
+### Enhancements made
+
+- Improve IFactory API [#129](https://github.com/jupyter-server/jupyter_ydoc/pull/129) ([@hbcarlos](https://github.com/hbcarlos))
+- Improve Python API [#122](https://github.com/jupyter-server/jupyter_ydoc/pull/122) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Import all document types from __init__ [#127](https://github.com/jupyter-server/jupyter_ydoc/pull/127) ([@davidbrochart](https://github.com/davidbrochart))
+- docs: small README typo fix [#126](https://github.com/jupyter-server/jupyter_ydoc/pull/126) ([@agoose77](https://github.com/agoose77))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-13&to=2023-01-17&type=c))
+
+[@agoose77](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Aagoose77+updated%3A2023-01-13..2023-01-17&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-01-13..2023-01-17&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-01-13..2023-01-17&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.0a4
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc-test@0.0.1...db30bfaedcd6d09289555bf8c01359fd03c667fb))
@@ -15,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-13&to=2023-01-14&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-01-13..2023-01-14&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.0a3
 
