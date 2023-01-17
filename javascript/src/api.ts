@@ -47,6 +47,8 @@ export type MapChanges = Map<
 export interface IFactory {
   /**
    * Create a new `ISharedDocument` instance.
+   *
+   * It should return `undefined` if the factory is not able to create a `ISharedDocument`.
    */
   createNew(options: IFactory.IOptions): ISharedDocument | undefined;
 }
