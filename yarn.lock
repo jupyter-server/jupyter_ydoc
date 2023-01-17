@@ -596,7 +596,7 @@
     "@jridgewell/sourcemap-codec" "1.4.14"
 
 "@jupyter/ydoc@file:javascript":
-  version "0.3.0-a2"
+  version "0.3.0-a4"
   dependencies:
     "@jupyterlab/nbformat" "^3.0.0 || ^4.0.0-alpha.15"
     "@lumino/coreutils" "^1.11.0 || ^2.0.0-alpha.6"
