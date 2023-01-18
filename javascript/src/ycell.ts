@@ -612,7 +612,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             if (typeof oldValue == 'object' && typeof newValue == 'object') {
               equal = JSONExt.deepEqual(oldValue, newValue);
             } else {
-              equal = oldValue == newValue;
+              equal = oldValue === newValue;
             }
 
             if (!equal) {
