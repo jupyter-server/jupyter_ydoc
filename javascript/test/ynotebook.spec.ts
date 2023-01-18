@@ -38,8 +38,8 @@ describe('@jupyter/ydoc', () => {
       test('should create a notebook with metadata', () => {
         const metadata: nbformat.INotebookMetadata = {
           kernelspec: {
-            name: "xeus-python",
-            display_name: "Xeus Python"
+            name: 'xeus-python',
+            display_name: 'Xeus Python'
           }
         };
 
