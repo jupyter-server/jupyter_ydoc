@@ -154,23 +154,17 @@ describe('@jupyter/ydoc', () => {
         });
         notebook.metadata = metadata;
 
-        expect(changes).toHaveLength(3);
+        expect(changes).toHaveLength(2);
         expect(changes).toEqual([
-          {
-            type: 'remove',
-            key: 'language_info',
-            oldValue: { name: '' }
-          },
-          {
-            type: 'change',
-            key: 'kernelspec',
-            newValue: metadata.kernelspec,
-            oldValue: { display_name: '', name: '' }
-          },
           {
             type: 'add',
             key: 'orig_nbformat',
             newValue: metadata.orig_nbformat
+          },
+          {
+            type: 'add',
+            key: 'kernelspec',
+            newValue: metadata.kernelspec
           }
         ]);
 
@@ -202,10 +196,9 @@ describe('@jupyter/ydoc', () => {
             newValue: metadata.orig_nbformat
           },
           {
-            type: 'change',
+            type: 'add',
             key: 'kernelspec',
-            newValue: metadata.kernelspec,
-            oldValue: { display_name: '', name: '' }
+            newValue: metadata.kernelspec
           }
         ]);
 
@@ -555,20 +548,8 @@ describe('@jupyter/ydoc', () => {
       });
       notebook.metadata = metadata;
 
-      expect(changes).toHaveLength(5);
+      expect(changes).toHaveLength(3);
       expect(changes).toEqual([
-        {
-          type: 'remove',
-          key: 'language_info',
-          newValue: undefined,
-          oldValue: { name: '' }
-        },
-        {
-          type: 'remove',
-          key: 'kernelspec',
-          newValue: undefined,
-          oldValue: { display_name: '', name: '' }
-        },
         {
           type: 'add',
           key: 'collapsed',
