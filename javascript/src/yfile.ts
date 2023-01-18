@@ -5,8 +5,8 @@
 
 import * as Y from 'yjs';
 import type { Delta, FileChange, ISharedFile, ISharedText } from './api.js';
-import { IYText } from './ytext';
-import { YDocument } from './ydocument';
+import { IYText } from './ytext.js';
+import { YDocument } from './ydocument.js';
 
 /**
  * Shareable text file.
