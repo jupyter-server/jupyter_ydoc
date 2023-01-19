@@ -28,7 +28,7 @@
         "docs": "typedoc --out ./docs src",
         "eslint": "eslint --ext .js,.jsx,.ts,.tsx --cache --fix .",
         "eslint:check": "eslint --ext .js,.jsx,.ts,.tsx --cache .",
-        "lint": "yarn prettier && yarn eslint",
+        "lint": "yarn integrity && yarn prettier && yarn eslint",
         "lint:check": "yarn prettier:check && yarn eslint:check",
         "prettier": "prettier --write \"**/*{.ts,.tsx,.js,.jsx,.css,.json}\"",
         "prettier:check": "prettier --check \"**/*{.ts,.tsx,.js,.jsx,.css,.json}\"",
