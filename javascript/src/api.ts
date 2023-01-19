@@ -388,9 +388,9 @@ export namespace ISharedNotebook {
     disableDocumentWideUndoRedo?: boolean;
 
     /**
-     * The language preference for the model.
+     * The content of the notebook.
      */
-    languagePreference?: string;
+    data?: Partial<nbformat.INotebookContent>;
   }
 }
 

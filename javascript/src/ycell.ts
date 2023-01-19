@@ -18,8 +18,8 @@ import type {
   ISharedRawCell,
   SharedCell
 } from './api.js';
-import { IYText } from './ytext';
-import { YNotebook } from './ynotebook';
+import { IYText } from './ytext.js';
+import { YNotebook } from './ynotebook.js';
 
 /**
  * Cell type.
@@ -606,12 +606,21 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             });
             break;
           case 'update':
-            if (!JSONExt.deepEqual(change.oldValue, this._ymetadata.get(key))) {
+            const newValue = this._ymetadata.get(key);
+            const oldValue = change.oldValue;
+            let equal = true;
+            if (typeof oldValue == 'object' && typeof newValue == 'object') {
+              equal = JSONExt.deepEqual(oldValue, newValue);
+            } else {
+              equal = oldValue === newValue;
+            }
+
+            if (!equal) {
               this._metadataChanged.emit({
                 key,
-                newValue: this._ymetadata.get(key),
-                oldValue: change.oldValue,
-                type: 'change'
+                type: 'change',
+                oldValue,
+                newValue
               });
             }
             break;

@@ -16,13 +16,13 @@ import type {
   SharedCell
 } from './api.js';
 
-import { YDocument } from './ydocument';
+import { YDocument } from './ydocument.js';
 import {
   createCell,
   createCellModelFromSharedType,
   YBaseCell,
   YCellType
-} from './ycell';
+} from './ycell.js';
 
 /**
  * Shared implementation of the Shared Document types.
@@ -46,7 +46,7 @@ export class YNotebook
    *
    * @param options
    */
-  constructor(options: ISharedNotebook.IOptions = {}) {
+  constructor(options: Omit<ISharedNotebook.IOptions, 'data'> = {}) {
     super();
     this._disableDocumentWideUndoRedo =
       options.disableDocumentWideUndoRedo ?? false;
@@ -75,14 +75,15 @@ export class YNotebook
     const ynotebook = new YNotebook({
       disableDocumentWideUndoRedo: options.disableDocumentWideUndoRedo ?? false
     });
-    const ymetadata = new Y.Map();
-    ymetadata.set('language_info', { name: options.languagePreference ?? '' });
-    ymetadata.set('kernelspec', {
-      name: '',
-      display_name: ''
-    });
-    ynotebook.ymeta.set('metadata', ymetadata);
 
+    const data: nbformat.INotebookContent = {
+      cells: options.data?.cells ?? [],
+      nbformat: options.data?.nbformat ?? 4,
+      nbformat_minor: options.data?.nbformat_minor ?? 5,
+      metadata: options.data?.metadata ?? {}
+    };
+
+    ynotebook.fromJSON(data);
     return ynotebook;
   }
 
@@ -483,12 +484,21 @@ export class YNotebook
             });
             break;
           case 'update':
-            if (!JSONExt.deepEqual(change.oldValue, ymetadata.get(key))) {
+            const newValue = ymetadata.get(key);
+            const oldValue = change.oldValue;
+            let equal = true;
+            if (typeof oldValue == 'object' && typeof newValue == 'object') {
+              equal = JSONExt.deepEqual(oldValue, newValue);
+            } else {
+              equal = oldValue === newValue;
+            }
+
+            if (!equal) {
               this._metadataChanged.emit({
                 key,
                 type: 'change',
-                oldValue: change.oldValue,
-                newValue: ymetadata.get(key)
+                oldValue,
+                newValue
               });
             }
             break;
