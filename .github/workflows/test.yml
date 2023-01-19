@@ -73,7 +73,7 @@ jobs:
           yarn integrity
           if [[ $(git ls-files --exclude-standard -m | wc -l) > 0 ]]
           then
-            echo "Integrity test failed; please run locally `yarn integrity` and commit the changes"
+            echo "Integrity test failed; please run locally 'yarn integrity' and commit the changes"
             exit 1
           fi
 
