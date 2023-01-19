@@ -2,6 +2,30 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.0a6
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/930ac19c5bd65d239e56662d460eddd9398c72e1...7b6af75283a7f6f6272de23530eb7a7d7dc122c2))
+
+### Bugs fixed
+
+- Fixes multiple bugs [#131](https://github.com/jupyter-server/jupyter_ydoc/pull/131) ([@hbcarlos](https://github.com/hbcarlos))
+
+### Maintenance and upkeep improvements
+
+- Integrity check [#132](https://github.com/jupyter-server/jupyter_ydoc/pull/132) ([@hbcarlos](https://github.com/hbcarlos))
+
+### API and Breaking Changes
+
+- Fixes multiple bugs [#131](https://github.com/jupyter-server/jupyter_ydoc/pull/131) ([@hbcarlos](https://github.com/hbcarlos))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-17&to=2023-01-19&type=c))
+
+[@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-01-17..2023-01-19&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.0a5
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc-test@0.0.1...55d80f00b604c9f26955617acbb044abb619b139))
@@ -21,8 +45,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-13&to=2023-01-17&type=c))
 
 [@agoose77](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Aagoose77+updated%3A2023-01-13..2023-01-17&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-01-13..2023-01-17&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-01-13..2023-01-17&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.0a4
 
