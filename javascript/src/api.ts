@@ -42,47 +42,6 @@ export type MapChanges = Map<
 >;
 
 /**
- * A factory interface for creating `ISharedDocument` objects.
- */
-export interface IFactory {
-  /**
-   * Create a new `ISharedDocument` instance.
-   *
-   * It should return `undefined` if the factory is not able to create a `ISharedDocument`.
-   */
-  createNew(options: IFactory.IOptions): ISharedDocument | undefined;
-}
-
-/**
- * The namespace for `IFactory`.
- */
-export namespace IFactory {
-  /**
-   * The options used to instantiate a ISharedDocument
-   */
-  export interface IOptions {
-    /**
-     * The path of the file.
-     */
-    path: string;
-    /**
-     * The format of the document.
-     */
-    format: string;
-    /**
-     * The content type of the document.
-     */
-    contentType: string;
-    /**
-     * Wether the document is collaborative or not.
-     *
-     *  The default value is `true`.
-     */
-    collaborative?: boolean;
-  }
-}
-
-/**
  * ISharedBase defines common operations that can be performed on any shared object.
  */
 export interface ISharedBase extends IObservableDisposable {
