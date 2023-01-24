@@ -2,6 +2,87 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/234334f70cc763f05f4e9185e6d957d96e8f5a24...e8510e0196e959f40863cdb92ec358c1257526dc))
+
+### Enhancements made
+
+- Improves the initialization [#124](https://github.com/jupyter-server/jupyter_ydoc/pull/124) ([@hbcarlos](https://github.com/hbcarlos))
+- Improve Python API [#122](https://github.com/jupyter-server/jupyter_ydoc/pull/122) ([@davidbrochart](https://github.com/davidbrochart))
+- Notebook metadata [#115](https://github.com/jupyter-server/jupyter_ydoc/pull/115) ([@hbcarlos](https://github.com/hbcarlos))
+- Make `YDocument` a `IObservableDisposable` [#108](https://github.com/jupyter-server/jupyter_ydoc/pull/108) ([@fcollonval](https://github.com/fcollonval))
+- Add readme to javascript package [#106](https://github.com/jupyter-server/jupyter_ydoc/pull/106) ([@fcollonval](https://github.com/fcollonval))
+- Adds docstring to the python package [#101](https://github.com/jupyter-server/jupyter_ydoc/pull/101) ([@hbcarlos](https://github.com/hbcarlos))
+- Import shared model [#86](https://github.com/jupyter-server/jupyter_ydoc/pull/86) ([@fcollonval](https://github.com/fcollonval))
+- Add path document attribute [#81](https://github.com/jupyter-server/jupyter_ydoc/pull/81) ([@davidbrochart](https://github.com/davidbrochart))
+- Make YBaseDoc an abstract base class [#74](https://github.com/jupyter-server/jupyter_ydoc/pull/74) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Bugs fixed
+
+- Fixes multiple bugs [#131](https://github.com/jupyter-server/jupyter_ydoc/pull/131) ([@hbcarlos](https://github.com/hbcarlos))
+- Fixes metadata [#120](https://github.com/jupyter-server/jupyter_ydoc/pull/120) ([@hbcarlos](https://github.com/hbcarlos))
+- Support cell.source is \[list, of, string\] [#112](https://github.com/jupyter-server/jupyter_ydoc/pull/112) ([@Wh1isper](https://github.com/Wh1isper))
+- Removes YMap for attachements [#77](https://github.com/jupyter-server/jupyter_ydoc/pull/77) ([@fcollonval](https://github.com/fcollonval))
+- Drop `pkg_resources` [#59](https://github.com/jupyter-server/jupyter_ydoc/pull/59) ([@jtpio](https://github.com/jtpio))
+
+### Maintenance and upkeep improvements
+
+- Integrity check [#132](https://github.com/jupyter-server/jupyter_ydoc/pull/132) ([@hbcarlos](https://github.com/hbcarlos))
+- Import all document types from __init__ [#127](https://github.com/jupyter-server/jupyter_ydoc/pull/127) ([@davidbrochart](https://github.com/davidbrochart))
+- docs: small README typo fix [#126](https://github.com/jupyter-server/jupyter_ydoc/pull/126) ([@agoose77](https://github.com/agoose77))
+- Bump toshimaru/auto-author-assign from 1.6.1 to 1.6.2 [#121](https://github.com/jupyter-server/jupyter_ydoc/pull/121) ([@dependabot](https://github.com/dependabot))
+- Set up lerna [#119](https://github.com/jupyter-server/jupyter_ydoc/pull/119) ([@fcollonval](https://github.com/fcollonval))
+- Bump tj-actions/changed-files from 35.1.0 to 35.2.1 [#118](https://github.com/jupyter-server/jupyter_ydoc/pull/118) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 35.0.0 to 35.1.0 [#116](https://github.com/jupyter-server/jupyter_ydoc/pull/116) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 34.5.3 to 35.0.0 [#113](https://github.com/jupyter-server/jupyter_ydoc/pull/113) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 34.5.0 to 34.5.3 [#109](https://github.com/jupyter-server/jupyter_ydoc/pull/109) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 34.4.4 to 34.5.0 [#100](https://github.com/jupyter-server/jupyter_ydoc/pull/100) ([@dependabot](https://github.com/dependabot))
+- Bump actions/upload-artifact from 2 to 3 [#99](https://github.com/jupyter-server/jupyter_ydoc/pull/99) ([@dependabot](https://github.com/dependabot))
+- Rename JS package to `@jupyter/ydoc` [#97](https://github.com/jupyter-server/jupyter_ydoc/pull/97) ([@jtpio](https://github.com/jtpio))
+- Bump tj-actions/changed-files from 34.4.0 to 34.4.4 [#94](https://github.com/jupyter-server/jupyter_ydoc/pull/94) ([@dependabot](https://github.com/dependabot))
+- Backport #90 on branch main (Releaser) [#92](https://github.com/jupyter-server/jupyter_ydoc/pull/92) ([@fcollonval](https://github.com/fcollonval))
+- Bump tj-actions/changed-files from 34.2.2 to 34.4.0 [#91](https://github.com/jupyter-server/jupyter_ydoc/pull/91) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 34.0.2 to 34.2.2 [#87](https://github.com/jupyter-server/jupyter_ydoc/pull/87) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 33.0.0 to 34.0.2 [#84](https://github.com/jupyter-server/jupyter_ydoc/pull/84) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 31.0.3 to 33.0.0 [#80](https://github.com/jupyter-server/jupyter_ydoc/pull/80) ([@dependabot](https://github.com/dependabot))
+- Bump pre-commit/action from 2.0.0 to 3.0.0 [#72](https://github.com/jupyter-server/jupyter_ydoc/pull/72) ([@dependabot](https://github.com/dependabot))
+- Bump actions/checkout from 2 to 3 [#71](https://github.com/jupyter-server/jupyter_ydoc/pull/71) ([@dependabot](https://github.com/dependabot))
+- Bump actions/setup-python from 2 to 4 [#70](https://github.com/jupyter-server/jupyter_ydoc/pull/70) ([@dependabot](https://github.com/dependabot))
+- Bump actions/cache from 1 to 3 [#69](https://github.com/jupyter-server/jupyter_ydoc/pull/69) ([@dependabot](https://github.com/dependabot))
+- Bump actions/setup-node from 2 to 3 [#68](https://github.com/jupyter-server/jupyter_ydoc/pull/68) ([@dependabot](https://github.com/dependabot))
+- Bump tj-actions/changed-files from 31.0.1 to 31.0.3 [#67](https://github.com/jupyter-server/jupyter_ydoc/pull/67) ([@dependabot](https://github.com/dependabot))
+
+### Documentation improvements
+
+- Add badges [#105](https://github.com/jupyter-server/jupyter_ydoc/pull/105) ([@fcollonval](https://github.com/fcollonval))
+- Docs [#102](https://github.com/jupyter-server/jupyter_ydoc/pull/102) ([@hbcarlos](https://github.com/hbcarlos))
+- Adds docstring to the python package [#101](https://github.com/jupyter-server/jupyter_ydoc/pull/101) ([@hbcarlos](https://github.com/hbcarlos))
+- Documentation [#95](https://github.com/jupyter-server/jupyter_ydoc/pull/95) ([@hbcarlos](https://github.com/hbcarlos))
+
+### API and Breaking Changes
+
+- Remove factory API [#133](https://github.com/jupyter-server/jupyter_ydoc/pull/133) ([@hbcarlos](https://github.com/hbcarlos))
+- Fixes multiple bugs [#131](https://github.com/jupyter-server/jupyter_ydoc/pull/131) ([@hbcarlos](https://github.com/hbcarlos))
+- Import shared model [#86](https://github.com/jupyter-server/jupyter_ydoc/pull/86) ([@fcollonval](https://github.com/fcollonval))
+
+### Other merged PRs
+
+- Fixes build js docs [#96](https://github.com/jupyter-server/jupyter_ydoc/pull/96) ([@hbcarlos](https://github.com/hbcarlos))
+- Add workflows to ease maintenance [#64](https://github.com/jupyter-server/jupyter_ydoc/pull/64) ([@fcollonval](https://github.com/fcollonval))
+- Test a case with plotly renderer [#63](https://github.com/jupyter-server/jupyter_ydoc/pull/63) ([@fcollonval](https://github.com/fcollonval))
+- Pin @jupyterlab/shared-models >=4.0.0-alpha.10,\<4.0.0-alpha.14 [#61](https://github.com/jupyter-server/jupyter_ydoc/pull/61) ([@davidbrochart](https://github.com/davidbrochart))
+- Cast only if number has same value [#57](https://github.com/jupyter-server/jupyter_ydoc/pull/57) ([@davidbrochart](https://github.com/davidbrochart))
+- Add back YMap for cell metadata [#53](https://github.com/jupyter-server/jupyter_ydoc/pull/53) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-09-26&to=2023-01-24&type=c))
+
+[@agoose77](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Aagoose77+updated%3A2022-09-26..2023-01-24&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-09-26..2023-01-24&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2022-09-26..2023-01-24&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2022-09-26..2023-01-24&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2022-09-26..2023-01-24&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2022-09-26..2023-01-24&type=Issues) | [@meeseeksdev](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ameeseeksdev+updated%3A2022-09-26..2023-01-24&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2022-09-26..2023-01-24&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-09-26..2023-01-24&type=Issues) | [@Wh1isper](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AWh1isper+updated%3A2022-09-26..2023-01-24&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.0a6
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/930ac19c5bd65d239e56662d460eddd9398c72e1...7b6af75283a7f6f6272de23530eb7a7d7dc122c2))
@@ -23,8 +104,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-17&to=2023-01-19&type=c))
 
 [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-01-17..2023-01-19&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.0a5
 
