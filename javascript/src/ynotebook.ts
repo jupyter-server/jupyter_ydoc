@@ -12,6 +12,7 @@ import type {
   IMapChange,
   ISharedCell,
   ISharedNotebook,
+  MapChanges,
   NotebookChange,
   SharedCell
 } from './api.js';
@@ -514,6 +515,26 @@ export class YNotebook
 
     if (!metaEvent) {
       return;
+    }
+
+    if (metaEvent.keysChanged.has('metadata')) {
+      // Handle metadata change when adding/removing the YMap
+      const change = metaEvent.changes.keys.get('metadata');
+      if (change?.action === 'add' && !change.oldValue) {
+        const metadataChange: MapChanges = new Map<string, any>();
+        for (const key of Object.keys(this.metadata)) {
+          metadataChange.set(key, {
+            action: 'add',
+            oldValue: undefined
+          });
+          this._metadataChanged.emit({
+            key,
+            type: 'add',
+            newValue: this.getMetadata(key)
+          });
+        }
+        this._changed.emit({ metadataChange });
+      }
     }
 
     if (metaEvent.keysChanged.has('nbformat')) {
