@@ -4,7 +4,10 @@
 import sys
 
 from ._version import __version__  # noqa
-from .ydoc import YBlob, YFile, YNotebook, YUnicode  # noqa
+from .yblob import YBlob  # noqa
+from .yfile import YFile  # noqa
+from .ynotebook import YNotebook  # noqa
+from .yunicode import YUnicode  # noqa
 
 # See compatibility note on `group` keyword in
 # https://docs.python.org/3/library/importlib.metadata.html#entry-points
