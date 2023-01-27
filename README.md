@@ -19,10 +19,10 @@ from jupyter_ydoc import ydocs
 
 print(ydocs)
 # {
-#     'blob': <class 'jupyter_ydoc.ydoc.YBlob'>,
-#     'file': <class 'jupyter_ydoc.ydoc.YFile'>,
-#     'notebook': <class 'jupyter_ydoc.ydoc.YNotebook'>,
-#     'unicode': <class 'jupyter_ydoc.ydoc.YUnicode'>
+#     'blob': <class 'jupyter_ydoc.yblob.YBlob'>,
+#     'file': <class 'jupyter_ydoc.yfile.YFile'>,
+#     'notebook': <class 'jupyter_ydoc.ynotebook.YNotebook'>,
+#     'unicode': <class 'jupyter_ydoc.yunicode.YUnicode'>
 # }
 ```
 
