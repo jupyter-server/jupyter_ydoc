@@ -58,6 +58,16 @@ class YNotebook(YBaseDoc):
         self._ycells = self._ydoc.get_array("cells")
 
     @property
+    def ycells(self):
+        """
+        Returns the Y-cells.
+
+        :return: The Y-cells.
+        :rtype: :class:`y_py.YArray`
+        """
+        return self._ycells
+
+    @property
     def cell_number(self) -> int:
         """
         Returns the number of cells in the notebook.
