@@ -33,6 +33,16 @@ class YUnicode(YBaseDoc):
         super().__init__(ydoc)
         self._ysource = self._ydoc.get_text("source")
 
+    @property
+    def version(self) -> str:
+        """
+        Returns the version of the document.
+
+        :return: Document's version.
+        :rtype: str
+        """
+        return "1.0.0"
+
     def get(self) -> str:
         """
         Returns the content of the document.

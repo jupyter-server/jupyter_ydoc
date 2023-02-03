@@ -86,6 +86,11 @@ export interface ISharedBase extends IObservableDisposable {
  */
 export interface ISharedDocument extends ISharedBase {
   /**
+   * Document version
+   */
+  readonly version: string;
+
+  /**
    * Document state
    */
   readonly state: JSONObject;

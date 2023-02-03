@@ -67,6 +67,11 @@ export class YNotebook
   }
 
   /**
+   * Document version
+   */
+  readonly version: string = '1.0.0';
+
+  /**
    * Creates a standalone YNotebook
    *
    * Note: This method is useful when we need to initialize
