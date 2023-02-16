@@ -431,21 +431,23 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       return;
     }
 
-    this._ymetadata.delete(key);
+    this.transact(() => {
+      this._ymetadata.delete(key);
 
-    const jupyter = this.getMetadata('jupyter') as any;
-    if (key === 'collapsed' && jupyter) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { outputs_hidden, ...others } = jupyter;
+      const jupyter = this.getMetadata('jupyter') as any;
+      if (key === 'collapsed' && jupyter) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { outputs_hidden, ...others } = jupyter;
 
-      if (Object.keys(others).length === 0) {
-        this._ymetadata.delete('jupyter');
-      } else {
-        this._ymetadata.set('jupyter', others);
+        if (Object.keys(others).length === 0) {
+          this._ymetadata.delete('jupyter');
+        } else {
+          this._ymetadata.set('jupyter', others);
+        }
+      } else if (key === 'jupyter') {
+        this._ymetadata.delete('collapsed');
       }
-    } else if (key === 'jupyter') {
-      this._ymetadata.delete('collapsed');
-    }
+    }, false);
   }
 
   /**
@@ -524,7 +526,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             this.deleteMetadata('collapsed');
           }
         }
-      });
+      }, false);
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
       if (clone.collapsed != null) {
@@ -538,7 +540,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
           for (const [key, value] of Object.entries(clone)) {
             this._ymetadata.set(key, value);
           }
-        });
+        }, false);
       }
     }
   }
@@ -558,13 +560,16 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Perform a transaction. While the function f is called, all changes to the shared
    * document are bundled into a single event.
+   *
+   * @param f Transaction to execute
+   * @param undoable Whether to track the change in the action history or not (default `true`)
    */
   transact(f: () => void, undoable = true): void {
-    this.notebook && undoable
-      ? this.notebook.transact(f)
-      : this.ymodel.doc == null
-      ? f()
-      : this.ymodel.doc.transact(f, this);
+    !this.notebook || this.notebook.disableDocumentWideUndoRedo
+      ? this.ymodel.doc == null
+        ? f()
+        : this.ymodel.doc.transact(f, undoable ? this : null)
+      : this.notebook.transact(f, undoable);
   }
 
   /**
@@ -606,22 +611,24 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             });
             break;
           case 'update':
-            const newValue = this._ymetadata.get(key);
-            const oldValue = change.oldValue;
-            let equal = true;
-            if (typeof oldValue == 'object' && typeof newValue == 'object') {
-              equal = JSONExt.deepEqual(oldValue, newValue);
-            } else {
-              equal = oldValue === newValue;
-            }
+            {
+              const newValue = this._ymetadata.get(key);
+              const oldValue = change.oldValue;
+              let equal = true;
+              if (typeof oldValue == 'object' && typeof newValue == 'object') {
+                equal = JSONExt.deepEqual(oldValue, newValue);
+              } else {
+                equal = oldValue === newValue;
+              }
 
-            if (!equal) {
-              this._metadataChanged.emit({
-                key,
-                type: 'change',
-                oldValue,
-                newValue
-              });
+              if (!equal) {
+                this._metadataChanged.emit({
+                  key,
+                  type: 'change',
+                  oldValue,
+                  newValue
+                });
+              }
             }
             break;
         }
@@ -732,7 +739,7 @@ export class YCodeCell
     if (this.ymodel.get('execution_count') !== count) {
       this.transact(() => {
         this.ymodel.set('execution_count', count);
-      });
+      }, false);
     }
   }
 
@@ -865,7 +872,7 @@ class YAttachmentCell
       } else {
         this.ymodel.set('attachments', attachments);
       }
-    });
+    }, false);
   }
 
   /**

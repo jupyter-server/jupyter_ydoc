@@ -73,8 +73,11 @@ export interface ISharedBase extends IObservableDisposable {
   /**
    * Perform a transaction. While the function f is called, all changes to the shared
    * document are bundled into a single event.
+   * 
+   * @param f Transaction to execute
+   * @param undoable Whether to track the change in the action history or not (default `true`)
    */
-  transact(f: () => void): void;
+  transact(f: () => void, undoable?: boolean): void;
 }
 
 /**
