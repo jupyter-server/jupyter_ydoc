@@ -13,8 +13,19 @@ import type { DocumentChange, ISharedDocument, StateChange } from './api.js';
  * Generic shareable document.
  */
 export class YDocument<T extends DocumentChange> implements ISharedDocument {
-  constructor() {
-    this.ystate.observe(this.onStateChanged);
+  constructor(options?: YDocument.IOptions) {
+    this._ydoc = options?.ydoc ?? new Y.Doc();
+
+    this._ystate = this._ydoc.getMap('state');
+
+    this._undoManager = new Y.UndoManager([], {
+      trackedOrigins: new Set([this]),
+      doc: this._ydoc
+    });
+
+    this._awareness = new Awareness(this._ydoc);
+
+    this._ystate.observe(this.onStateChanged);
   }
 
   /**
@@ -25,27 +36,32 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   }
 
   /**
-   * YJS document
+   * YJS document.
    */
-  readonly ydoc = new Y.Doc();
+  get ydoc(): Y.Doc {
+    return this._ydoc;
+  }
 
   /**
    * Shared state
    */
-  readonly ystate: Y.Map<any> = this.ydoc.getMap('state');
+  get ystate(): Y.Map<any> {
+    return this._ystate;
+  }
 
   /**
    * YJS document undo manager
    */
-  readonly undoManager = new Y.UndoManager([], {
-    trackedOrigins: new Set([this]),
-    doc: this.ydoc
-  });
+  get undoManager(): Y.UndoManager {
+    return this._undoManager;
+  }
 
   /**
    * Shared awareness
    */
-  readonly awareness = new Awareness(this.ydoc);
+  get awareness(): Awareness {
+    return this._awareness;
+  }
 
   /**
    * The changed signal.
@@ -178,6 +194,19 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   };
 
   protected _changed = new Signal<this, T>(this);
+  private _ydoc: Y.Doc;
+  private _ystate: Y.Map<any>;
+  private _undoManager: Y.UndoManager;
+  private _awareness: Awareness;
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
+}
+
+namespace YDocument {
+  export interface IOptions {
+    /**
+     * The optional YJS document for YDocument.
+     */
+    ydoc?: Y.Doc;
+  }
 }
