@@ -2,6 +2,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.2
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@0.3.1...544b1dc696635b3e6a81250e411a5f5de84a0aff))
+
+### Enhancements made
+
+- Update `YDocument` constructor [#142](https://github.com/jupyter-server/jupyter_ydoc/pull/142) ([@trungleduc](https://github.com/trungleduc))
+- Add ycells getter [#136](https://github.com/jupyter-server/jupyter_ydoc/pull/136) ([@davidbrochart](https://github.com/davidbrochart))
+- Split documents into separate files [#135](https://github.com/jupyter-server/jupyter_ydoc/pull/135) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Update with ypy v0.6.0 [#145](https://github.com/jupyter-server/jupyter_ydoc/pull/145) ([@davidbrochart](https://github.com/davidbrochart))
+- Update `YDocument` constructor [#142](https://github.com/jupyter-server/jupyter_ydoc/pull/142) ([@trungleduc](https://github.com/trungleduc))
+- Add ycells getter [#136](https://github.com/jupyter-server/jupyter_ydoc/pull/136) ([@davidbrochart](https://github.com/davidbrochart))
+- Split documents into separate files [#135](https://github.com/jupyter-server/jupyter_ydoc/pull/135) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-26&to=2023-02-20&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-01-26..2023-02-20&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-01-26..2023-02-20&type=Issues) | [@trungleduc](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Atrungleduc+updated%3A2023-01-26..2023-02-20&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2023-01-26..2023-02-20&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@0.3.0...f130d4b26f4039309d27edba7213ae5d73a0a2bf))
@@ -15,8 +40,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-24&to=2023-01-26&type=c))
 
 [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-01-24..2023-01-26&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.0
 
