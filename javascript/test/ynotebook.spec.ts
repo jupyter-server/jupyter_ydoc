@@ -482,5 +482,103 @@ describe('@jupyter/ydoc', () => {
         notebook.dispose();
       });
     });
+
+    describe('#undo', () => {
+      describe('globally', () => {
+        test('should undo cell addition', () => {
+          const notebook = YNotebook.create();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
+
+          expect(notebook.cells.length).toEqual(2);
+
+          notebook.undo();
+
+          expect(notebook.cells.length).toEqual(1);
+        });
+
+        test('should undo cell source update', () => {
+          const notebook = YNotebook.create();
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
+          notebook.undoManager.stopCapturing();
+          codeCell.updateSource(0, 0, 'print(hello);');
+
+          notebook.undo();
+
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('');
+        });
+
+        test('should undo at global level when called locally', () => {
+          const notebook = YNotebook.create();
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          const markdownCell = notebook.addCell({ cell_type: 'markdown' });
+          notebook.undoManager.stopCapturing();
+          codeCell.updateSource(0, 0, 'print(hello);');
+          notebook.undoManager.stopCapturing();
+          markdownCell.updateSource(0, 0, '# Title');
+
+          codeCell.undo();
+
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('print(hello);');
+          expect(notebook.getCell(1).getSource()).toEqual('');
+        });
+      });
+
+      describe('per cells', () => {
+        test('should undo cell addition', () => {
+          const notebook = YNotebook.create({
+            disableDocumentWideUndoRedo: true
+          });
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
+
+          expect(notebook.cells.length).toEqual(2);
+
+          notebook.undo();
+
+          expect(notebook.cells.length).toEqual(1);
+        });
+
+        test('should not undo cell source update', () => {
+          const notebook = YNotebook.create({
+            disableDocumentWideUndoRedo: true
+          });
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
+
+          codeCell.updateSource(0, 0, 'print(hello);');
+
+          notebook.undo();
+
+          expect(notebook.cells.length).toEqual(1);
+          expect(notebook.getCell(0).getSource()).toEqual('print(hello);');
+        });
+
+        test('should only undo cell source update', () => {
+          const notebook = YNotebook.create({
+            disableDocumentWideUndoRedo: true
+          });
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          const markdownCell = notebook.addCell({ cell_type: 'markdown' });
+          codeCell.updateSource(0, 0, 'print(hello);');
+          markdownCell.updateSource(0, 0, '# Title');
+
+          codeCell.undo();
+
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('');
+          expect(notebook.getCell(1).getSource()).toEqual('# Title');
+        });
+      });
+    });
   });
 });

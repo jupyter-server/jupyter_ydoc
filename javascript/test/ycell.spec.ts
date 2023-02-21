@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
@@ -225,6 +226,91 @@ describe('@jupyter/ydoc', () => {
       } finally {
         cell.dispose();
       }
+    });
+  });
+
+  describe('#undo', () => {
+    test('should undo source change', () => {
+      const codeCell = YCodeCell.create();
+      codeCell.setSource('test');
+      codeCell.undoManager?.stopCapturing();
+      codeCell.updateSource(0, 0, 'hello');
+
+      codeCell.undo();
+
+      expect(codeCell.getSource()).toEqual('test');
+    });
+
+    test('should not undo execution count change', () => {
+      const codeCell = YCodeCell.create();
+      codeCell.setSource('test');
+      codeCell.undoManager?.stopCapturing();
+      codeCell.execution_count = 22;
+      codeCell.undoManager?.stopCapturing();
+      codeCell.execution_count = 42;
+
+      codeCell.undo();
+
+      expect(codeCell.execution_count).toEqual(42);
+    });
+
+    test('should not undo output change', () => {
+      const codeCell = YCodeCell.create();
+      codeCell.setSource('test');
+      codeCell.undoManager?.stopCapturing();
+      const outputs = [
+        {
+          data: {
+            'application/geo+json': {
+              geometry: {
+                coordinates: [-118.4563712, 34.0163116],
+                type: 'Point'
+              },
+              type: 'Feature'
+            },
+            'text/plain': ['<IPython.display.GeoJSON object>']
+          },
+          metadata: {
+            'application/geo+json': {
+              expanded: false
+            }
+          },
+          output_type: 'display_data'
+        },
+        {
+          data: {
+            'application/vnd.jupyter.widget-view+json': {
+              model_id: '4619c172d65e496baa5d1230894b535a',
+              version_major: 2,
+              version_minor: 0
+            },
+            'text/plain': [
+              "HBox(children=(Text(value='text input', layout=Layout(border='1px dashed red', width='80px')), Button(descript…"
+            ]
+          },
+          metadata: {},
+          output_type: 'display_data'
+        }
+      ];
+      codeCell.setOutputs(outputs);
+      codeCell.undoManager?.stopCapturing();
+
+      codeCell.undo();
+
+      expect(codeCell.getOutputs()).toEqual(outputs);
+    });
+
+    test('should not undo metadata change', () => {
+      const codeCell = YCodeCell.create();
+      codeCell.setSource('test');
+      codeCell.undoManager?.stopCapturing();
+      codeCell.setMetadata({ collapsed: false });
+      codeCell.undoManager?.stopCapturing();
+      codeCell.setMetadata({ collapsed: true });
+
+      codeCell.undo();
+
+      expect(codeCell.getMetadata('collapsed')).toEqual(true);
     });
   });
 });
