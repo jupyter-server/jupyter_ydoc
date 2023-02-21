@@ -247,7 +247,10 @@ class YNotebook(YBaseDoc):
                 self._ystate.pop(t, key)
 
             # initialize document
-            self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
+            # workaround for https://github.com/y-crdt/ypy/issues/126:
+            # self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
+            for cell in cells:
+                self._ycells.append(t, self.create_ycell(cell))
             self._ymeta.set(t, "nbformat", nb.get("nbformat", NBFORMAT_MAJOR_VERSION))
             self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION))
 
