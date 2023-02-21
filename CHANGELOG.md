@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.3.3
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@0.3.2...c7b05c187afcf7e0c27bd42dbc5038f53250ca8c))
+
+### Bugs fixed
+
+- Workaround for ypy 0.6.0 [#147](https://github.com/jupyter-server/jupyter_ydoc/pull/147) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-02-20&to=2023-02-21&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-02-20..2023-02-21&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.2
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@0.3.1...544b1dc696635b3e6a81250e411a5f5de84a0aff))
@@ -24,8 +40,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-01-26&to=2023-02-20&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-01-26..2023-02-20&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-01-26..2023-02-20&type=Issues) | [@trungleduc](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Atrungleduc+updated%3A2023-01-26..2023-02-20&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2023-01-26..2023-02-20&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.1
 
