@@ -442,7 +442,7 @@ describe('@jupyter/ydoc', () => {
 
       describe('per cells', () => {
         test('should undo cell addition', () => {
-          const notebook = YNotebook({
+          const notebook = new YNotebook({
             disableDocumentWideUndoRedo: true
           });
           notebook.addCell({ cell_type: 'code' });
@@ -457,7 +457,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should not undo cell source update', () => {
-          const notebook = YNotebook({
+          const notebook = new YNotebook({
             disableDocumentWideUndoRedo: true
           });
           const codeCell = notebook.addCell({ cell_type: 'code' });
@@ -473,7 +473,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should only undo cell source update', () => {
-          const notebook = YNotebook({
+          const notebook = new YNotebook({
             disableDocumentWideUndoRedo: true
           });
           const codeCell = notebook.addCell({ cell_type: 'code' });
