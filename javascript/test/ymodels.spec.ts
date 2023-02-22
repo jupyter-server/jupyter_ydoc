@@ -1,7 +1,7 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { IMapChange, NotebookChange, YCodeCell, YNotebook } from '../src';
+import { IMapChange, NotebookChange, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
   describe('YNotebook', () => {
@@ -392,222 +392,103 @@ describe('@jupyter/ydoc', () => {
         notebook.dispose();
       });
     });
-  });
 
-  describe('YCell standalone', () => {
-    test('should set source', () => {
-      const codeCell = YCodeCell.createStandalone();
-      codeCell.setSource('test');
-      expect(codeCell.getSource()).toBe('test');
-      codeCell.dispose();
-    });
+    describe('#undo', () => {
+      describe('globally', () => {
+        test('should undo cell addition', () => {
+          const notebook = new YNotebook();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
 
-    test('should update source', () => {
-      const codeCell = YCodeCell.createStandalone();
-      codeCell.setSource('test');
-      codeCell.updateSource(0, 0, 'hello');
-      expect(codeCell.getSource()).toBe('hellotest');
-      codeCell.dispose();
-    });
+          expect(notebook.cells.length).toEqual(2);
 
-    test('should get metadata', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
+          notebook.undo();
 
-      cell.setMetadata(metadata);
+          expect(notebook.cells.length).toEqual(1);
+        });
 
-      expect(cell.metadata).toEqual({
-        ...metadata,
-        jupyter: { outputs_hidden: true }
+        test('should undo cell source update', () => {
+          const notebook = new YNotebook();
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
+          notebook.undoManager.stopCapturing();
+          codeCell.updateSource(0, 0, 'print(hello);');
+
+          notebook.undo();
+
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('');
+        });
+
+        test('should undo at global level when called locally', () => {
+          const notebook = new YNotebook();
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          const markdownCell = notebook.addCell({ cell_type: 'markdown' });
+          notebook.undoManager.stopCapturing();
+          codeCell.updateSource(0, 0, 'print(hello);');
+          notebook.undoManager.stopCapturing();
+          markdownCell.updateSource(0, 0, '# Title');
+
+          codeCell.undo();
+
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('print(hello);');
+          expect(notebook.getCell(1).getSource()).toEqual('');
+        });
       });
-      cell.dispose();
-    });
 
-    test('should get all metadata', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        jupyter: { outputs_hidden: true },
-        editable: false,
-        name: 'cell-name'
-      };
+      describe('per cells', () => {
+        test('should undo cell addition', () => {
+          const notebook = new YNotebook({
+            disableDocumentWideUndoRedo: true
+          });
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
 
-      cell.setMetadata(metadata);
+          expect(notebook.cells.length).toEqual(2);
 
-      expect(cell.getMetadata()).toEqual({ ...metadata, collapsed: true });
-      cell.dispose();
-    });
+          notebook.undo();
 
-    test('should get one metadata', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
+          expect(notebook.cells.length).toEqual(1);
+        });
 
-      cell.setMetadata(metadata);
+        test('should not undo cell source update', () => {
+          const notebook = new YNotebook({
+            disableDocumentWideUndoRedo: true
+          });
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          notebook.addCell({ cell_type: 'markdown' });
 
-      expect(cell.getMetadata('editable')).toEqual(metadata.editable);
-      cell.dispose();
-    });
+          codeCell.updateSource(0, 0, 'print(hello);');
 
-    it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
-      'should get single metadata %s',
-      value => {
-        const cell = YCodeCell.createStandalone();
-        const metadata = {
-          collapsed: true,
-          editable: false,
-          name: 'cell-name',
-          test: value
-        };
+          notebook.undo();
 
-        cell.setMetadata(metadata);
+          expect(notebook.cells.length).toEqual(1);
+          expect(notebook.getCell(0).getSource()).toEqual('print(hello);');
+        });
 
-        expect(cell.getMetadata('test')).toEqual(value);
-        cell.dispose();
-      }
-    );
+        test('should only undo cell source update', () => {
+          const notebook = new YNotebook({
+            disableDocumentWideUndoRedo: true
+          });
+          const codeCell = notebook.addCell({ cell_type: 'code' });
+          notebook.undoManager.stopCapturing();
+          const markdownCell = notebook.addCell({ cell_type: 'markdown' });
+          codeCell.updateSource(0, 0, 'print(hello);');
+          markdownCell.updateSource(0, 0, '# Title');
 
-    test('should set one metadata', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
+          codeCell.undo();
 
-      cell.setMetadata(metadata);
-      cell.setMetadata('test', 'banana');
-
-      expect(cell.getMetadata('test')).toEqual('banana');
-      cell.dispose();
-    });
-
-    test('should emit all metadata changes', () => {
-      const notebook = new YNotebook();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
-
-      const changes: IMapChange[] = [];
-      notebook.metadataChanged.connect((_, c) => {
-        changes.push(c);
+          expect(notebook.cells.length).toEqual(2);
+          expect(notebook.getCell(0).getSource()).toEqual('');
+          expect(notebook.getCell(1).getSource()).toEqual('# Title');
+        });
       });
-      notebook.metadata = metadata;
-
-      expect(changes).toHaveLength(3);
-      expect(changes).toEqual([
-        {
-          type: 'add',
-          key: 'collapsed',
-          newValue: metadata.collapsed,
-          oldValue: undefined
-        },
-        {
-          type: 'add',
-          key: 'editable',
-          newValue: metadata.editable,
-          oldValue: undefined
-        },
-        {
-          type: 'add',
-          key: 'name',
-          newValue: metadata.name,
-          oldValue: undefined
-        }
-      ]);
-
-      notebook.dispose();
-    });
-
-    test('should emit a add metadata change', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
-      cell.metadata = metadata;
-
-      const changes: IMapChange[] = [];
-      cell.metadataChanged.connect((_, c) => {
-        changes.push(c);
-      });
-      cell.setMetadata('test', 'banana');
-
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        { type: 'add', key: 'test', newValue: 'banana', oldValue: undefined }
-      ]);
-
-      cell.dispose();
-    });
-
-    test('should emit a delete metadata change', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
-      cell.metadata = metadata;
-
-      const changes: IMapChange[] = [];
-      cell.setMetadata('test', 'banana');
-
-      cell.metadataChanged.connect((_, c) => {
-        changes.push(c);
-      });
-      cell.deleteMetadata('test');
-
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        {
-          type: 'remove',
-          key: 'test',
-          newValue: undefined,
-          oldValue: 'banana'
-        }
-      ]);
-
-      cell.dispose();
-    });
-
-    test('should emit an update metadata change', () => {
-      const cell = YCodeCell.createStandalone();
-      const metadata = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name'
-      };
-      cell.metadata = metadata;
-
-      const changes: IMapChange[] = [];
-      cell.setMetadata('test', 'banana');
-
-      cell.metadataChanged.connect((_, c) => {
-        changes.push(c);
-      });
-      cell.setMetadata('test', 'orange');
-
-      expect(changes).toHaveLength(1);
-      expect(changes).toEqual([
-        {
-          type: 'change',
-          key: 'test',
-          newValue: 'orange',
-          oldValue: 'banana'
-        }
-      ]);
-
-      cell.dispose();
     });
   });
 });
