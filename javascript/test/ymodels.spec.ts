@@ -396,7 +396,7 @@ describe('@jupyter/ydoc', () => {
     describe('#undo', () => {
       describe('globally', () => {
         test('should undo cell addition', () => {
-          const notebook = YNotebook();
+          const notebook = new YNotebook();
           notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           notebook.addCell({ cell_type: 'markdown' });
@@ -409,7 +409,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should undo cell source update', () => {
-          const notebook = YNotebook();
+          const notebook = new YNotebook();
           const codeCell = notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           notebook.addCell({ cell_type: 'markdown' });
@@ -423,7 +423,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should undo at global level when called locally', () => {
-          const notebook = YNotebook();
+          const notebook = new YNotebook();
           const codeCell = notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           const markdownCell = notebook.addCell({ cell_type: 'markdown' });

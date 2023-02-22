@@ -100,7 +100,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit all metadata changes', () => {
-      const notebook = YNotebook();
+      const notebook = new YNotebook();
 
       const metadata = {
         collapsed: true,
