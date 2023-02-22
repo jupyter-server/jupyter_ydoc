@@ -7,14 +7,14 @@ import { IMapChange, YCodeCell, YNotebook } from '../src';
 describe('@jupyter/ydoc', () => {
   describe('YCell standalone', () => {
     test('should set source', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       expect(codeCell.getSource()).toBe('test');
       codeCell.dispose();
     });
 
     test('should update source', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.updateSource(0, 0, 'hello');
       expect(codeCell.getSource()).toBe('hellotest');
@@ -22,7 +22,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get metadata', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -39,7 +39,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get all metadata', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         jupyter: { outputs_hidden: true },
         editable: false,
@@ -53,7 +53,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should get one metadata', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -69,7 +69,7 @@ describe('@jupyter/ydoc', () => {
     it.each([null, undefined, 1, true, 'string', { a: 1 }, [1, 2]])(
       'should get single metadata %s',
       value => {
-        const cell = YCodeCell.create();
+        const cell = YCodeCell.createStandalone();
         const metadata = {
           collapsed: true,
           editable: false,
@@ -85,7 +85,7 @@ describe('@jupyter/ydoc', () => {
     );
 
     test('should set one metadata', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -100,7 +100,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit all metadata changes', () => {
-      const notebook = YNotebook.create();
+      const notebook = YNotebook();
 
       const metadata = {
         collapsed: true,
@@ -109,7 +109,7 @@ describe('@jupyter/ydoc', () => {
       };
 
       const changes: IMapChange[] = [];
-      notebook.metadataChanged.connect((_, c) => {
+      notebook.metadataChanged.connect((_: any, c: any) => {
         changes.push(c);
       });
       notebook.metadata = metadata;
@@ -140,7 +140,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit a add metadata change', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -149,7 +149,7 @@ describe('@jupyter/ydoc', () => {
       cell.metadata = metadata;
 
       const changes: IMapChange[] = [];
-      cell.metadataChanged.connect((_, c) => {
+      cell.metadataChanged.connect((_: any, c: any) => {
         changes.push(c);
       });
       cell.setMetadata('test', 'banana');
@@ -165,7 +165,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit a delete metadata change', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -176,7 +176,7 @@ describe('@jupyter/ydoc', () => {
       const changes: IMapChange[] = [];
       cell.setMetadata('test', 'banana');
 
-      cell.metadataChanged.connect((_, c) => {
+      cell.metadataChanged.connect((_: any, c: any) => {
         changes.push(c);
       });
       cell.deleteMetadata('test');
@@ -197,7 +197,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should emit an update metadata change', () => {
-      const cell = YCodeCell.create();
+      const cell = YCodeCell.createStandalone();
       const metadata = {
         collapsed: true,
         editable: false,
@@ -208,7 +208,7 @@ describe('@jupyter/ydoc', () => {
       const changes: IMapChange[] = [];
       cell.setMetadata('test', 'banana');
 
-      cell.metadataChanged.connect((_, c) => {
+      cell.metadataChanged.connect((_: any, c: any) => {
         changes.push(c);
       });
       cell.setMetadata('test', 'orange');
@@ -231,7 +231,7 @@ describe('@jupyter/ydoc', () => {
 
   describe('#undo', () => {
     test('should undo source change', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.undoManager?.stopCapturing();
       codeCell.updateSource(0, 0, 'hello');
@@ -242,7 +242,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should not undo execution count change', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.undoManager?.stopCapturing();
       codeCell.execution_count = 22;
@@ -255,7 +255,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should not undo output change', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.undoManager?.stopCapturing();
       const outputs = [
@@ -301,7 +301,7 @@ describe('@jupyter/ydoc', () => {
     });
 
     test('should not undo metadata change', () => {
-      const codeCell = YCodeCell.create();
+      const codeCell = YCodeCell.createStandalone();
       codeCell.setSource('test');
       codeCell.undoManager?.stopCapturing();
       codeCell.setMetadata({ collapsed: false });

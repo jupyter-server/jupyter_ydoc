@@ -396,7 +396,7 @@ describe('@jupyter/ydoc', () => {
     describe('#undo', () => {
       describe('globally', () => {
         test('should undo cell addition', () => {
-          const notebook = YNotebook.create();
+          const notebook = YNotebook();
           notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           notebook.addCell({ cell_type: 'markdown' });
@@ -409,7 +409,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should undo cell source update', () => {
-          const notebook = YNotebook.create();
+          const notebook = YNotebook();
           const codeCell = notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           notebook.addCell({ cell_type: 'markdown' });
@@ -423,7 +423,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should undo at global level when called locally', () => {
-          const notebook = YNotebook.create();
+          const notebook = YNotebook();
           const codeCell = notebook.addCell({ cell_type: 'code' });
           notebook.undoManager.stopCapturing();
           const markdownCell = notebook.addCell({ cell_type: 'markdown' });
@@ -442,7 +442,7 @@ describe('@jupyter/ydoc', () => {
 
       describe('per cells', () => {
         test('should undo cell addition', () => {
-          const notebook = YNotebook.create({
+          const notebook = YNotebook({
             disableDocumentWideUndoRedo: true
           });
           notebook.addCell({ cell_type: 'code' });
@@ -457,7 +457,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should not undo cell source update', () => {
-          const notebook = YNotebook.create({
+          const notebook = YNotebook({
             disableDocumentWideUndoRedo: true
           });
           const codeCell = notebook.addCell({ cell_type: 'code' });
@@ -473,7 +473,7 @@ describe('@jupyter/ydoc', () => {
         });
 
         test('should only undo cell source update', () => {
-          const notebook = YNotebook.create({
+          const notebook = YNotebook({
             disableDocumentWideUndoRedo: true
           });
           const codeCell = notebook.addCell({ cell_type: 'code' });
