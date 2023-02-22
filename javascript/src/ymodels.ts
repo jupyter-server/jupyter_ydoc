@@ -777,7 +777,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       }
       this.transact(() => {
         this.ymodel.set('metadata', clone);
-      });
+      }, false);
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
       if (clone.collapsed != null) {
@@ -789,7 +789,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       if (!JSONExt.deepEqual(clone, this.getMetadata())) {
         this.transact(() => {
           this.ymodel.set('metadata', clone);
-        });
+        }, false);
       }
     }
   }
@@ -811,11 +811,11 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * document are bundled into a single event.
    */
   transact(f: () => void, undoable = true): void {
-    this.notebook && undoable
-      ? this.notebook.transact(f)
-      : this.ymodel.doc == null
-      ? f()
-      : this.ymodel.doc.transact(f, this);
+    !this.notebook || this.notebook.disableDocumentWideUndoRedo
+      ? this.ymodel.doc == null
+        ? f()
+        : this.ymodel.doc.transact(f, undoable ? this : null)
+      : this.notebook.transact(f, undoable);
   }
 
   /**
@@ -971,7 +971,7 @@ export class YCodeCell
     if (this.ymodel.get('execution_count') !== count) {
       this.transact(() => {
         this.ymodel.set('execution_count', count);
-      });
+      }, false);
     }
   }
 
@@ -1106,7 +1106,7 @@ class YAttachmentCell
       } else {
         this.ymodel.set('attachments', attachments);
       }
-    });
+    }, false);
   }
 
   /**

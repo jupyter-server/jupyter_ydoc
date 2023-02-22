@@ -30,6 +30,7 @@ jobs:
   test:
     name: Run tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
 
     strategy:
       matrix:
