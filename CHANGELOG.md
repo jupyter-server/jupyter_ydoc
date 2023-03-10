@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 0.2.3
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/8854a43982e623f926a2094f58819716eb16bd77...e4c4b6ca5a6731104c909ebc12eb4cf500345df5))
+
+### Bugs fixed
+
+- Fix notebook undo scope [#148](https://github.com/jupyter-server/jupyter_ydoc/pull/148) ([@fcollonval](https://github.com/fcollonval))
+
+### Maintenance and upkeep improvements
+
+- Rename JS package to `@jupyter/ydoc` [#97](https://github.com/jupyter-server/jupyter_ydoc/pull/97) ([@jtpio](https://github.com/jtpio))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-11-29&to=2023-03-10&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-11-29..2023-03-10&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2022-11-29..2023-03-10&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-11-29..2023-03-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.2.2
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.2.1...ae5e46d3e4756f80452e9416e70ac6aa9ab7475a))
@@ -19,8 +39,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2022-09-29&to=2022-10-26&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2022-09-29..2022-10-26&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2022-09-29..2022-10-26&type=Issues) | [@meeseeksmachine](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ameeseeksmachine+updated%3A2022-09-29..2022-10-26&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2022-09-29..2022-10-26&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.2.1
 
