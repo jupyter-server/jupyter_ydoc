@@ -40,10 +40,10 @@
         "watch": "tsc -b --watch"
     },
     "dependencies": {
-        "@jupyterlab/nbformat": "^3.0.0 || ^4.0.0-alpha.15",
-        "@lumino/coreutils": "^1.11.0 || ^2.0.0-alpha.6",
-        "@lumino/disposable": "^1.10.0 || ^2.0.0-alpha.6",
-        "@lumino/signaling": "^1.10.0 || ^2.0.0-alpha.6",
+        "@jupyterlab/nbformat": "^3.0.0 || ^4.0.0-alpha.21 || ^4.0.0",
+        "@lumino/coreutils": "^1.11.0 || ^2.0.0",
+        "@lumino/disposable": "^1.10.0 || ^2.0.0",
+        "@lumino/signaling": "^1.10.0 || ^2.0.0",
         "y-protocols": "^1.0.5",
         "yjs": "^13.5.40"
     },
@@ -56,11 +56,10 @@
         "eslint-plugin-jest": "^27.0.0",
         "eslint-plugin-prettier": "^4.0.0",
         "jest": "^29.0.0",
-        "prettier": "^2.6.0",
-        "process": "0.11.10",
-        "rimraf": "^3.0.0",
+        "prettier": "^2.8.4",
+        "rimraf": "^4.4.0",
         "typedoc": "^0.23.21",
-        "typescript": "^4.8.0",
+        "typescript": "^4.9.5",
         "tsc-esm-fix": "^2.20.0"
     },
     "publishConfig": {
