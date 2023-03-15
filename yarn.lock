@@ -805,7 +805,7 @@ __metadata:
 
 "@jupyter/ydoc@file:../javascript::locator=%40jupyter%2Fydoc-test%40workspace%3Atests":
   version: 0.3.4
-  resolution: "@jupyter/ydoc@file:../javascript#../javascript::hash=bf6f49&locator=%40jupyter%2Fydoc-test%40workspace%3Atests"
+  resolution: "@jupyter/ydoc@file:../javascript#../javascript::hash=8cfdb5&locator=%40jupyter%2Fydoc-test%40workspace%3Atests"
   dependencies:
     "@jupyterlab/nbformat": ^3.0.0 || ^4.0.0-alpha.21 || ^4.0.0
     "@lumino/coreutils": ^1.11.0 || ^2.0.0
@@ -813,7 +813,7 @@ __metadata:
     "@lumino/signaling": ^1.10.0 || ^2.0.0
     y-protocols: ^1.0.5
     yjs: ^13.5.40
-  checksum: f5ffa93f1ea102ae59c6103a3ff0330eab22cc58f82baffc0c704ba378627a42486e8318b55428f49c2e3c61c7a04e791fdf0ea05af51da033a1b0e6b427c5ed
+  checksum: 5958e7b4ffc44c75c5add46732c85c4c2d88d56048e735ea5969dec3a5bd102b436a1d1c7f1b6bc27953b94ee04d76629113d503f03f3fb61f659f67b88cbb60
   languageName: node
   linkType: hard
 

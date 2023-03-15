@@ -485,22 +485,24 @@ export class YNotebook
             });
             break;
           case 'update':
-            const newValue = ymetadata.get(key);
-            const oldValue = change.oldValue;
-            let equal = true;
-            if (typeof oldValue == 'object' && typeof newValue == 'object') {
-              equal = JSONExt.deepEqual(oldValue, newValue);
-            } else {
-              equal = oldValue === newValue;
-            }
+            {
+              const newValue = ymetadata.get(key);
+              const oldValue = change.oldValue;
+              let equal = true;
+              if (typeof oldValue == 'object' && typeof newValue == 'object') {
+                equal = JSONExt.deepEqual(oldValue, newValue);
+              } else {
+                equal = oldValue === newValue;
+              }
 
-            if (!equal) {
-              this._metadataChanged.emit({
-                key,
-                type: 'change',
-                oldValue,
-                newValue
-              });
+              if (!equal) {
+                this._metadataChanged.emit({
+                  key,
+                  type: 'change',
+                  oldValue,
+                  newValue
+                });
+              }
             }
             break;
         }

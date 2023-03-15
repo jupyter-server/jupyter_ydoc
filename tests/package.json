@@ -1,7 +1,7 @@
 {
   "name": "@jupyter/ydoc-test",
   "version": "0.0.1",
-  "private": "true",
+  "private": true,
   "type": "module",
   "dependencies": {
     "@jupyter/ydoc": "file:../javascript",

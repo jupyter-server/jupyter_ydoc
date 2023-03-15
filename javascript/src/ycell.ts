@@ -152,7 +152,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    *
    * @param ymodel Cell map
    * @param ysource Cell source
-   * @param options { notebook?: The notebook the cell is attached to }
+   * @param options \{ notebook?: The notebook the cell is attached to \}
    * @param ymetadata Cell metadata
    */
   constructor(
@@ -705,7 +705,8 @@ export class YCodeCell
    * @param ymodel Cell map
    * @param ysource Cell source
    * @param youtputs Code cell outputs
-   * @param options { notebook?: The notebook the cell is attached to }
+   * @param options \{ notebook?: The notebook the cell is attached to \}
+   * @param ymetadata Cell metadata
    */
   constructor(
     ymodel: Y.Map<any>,
