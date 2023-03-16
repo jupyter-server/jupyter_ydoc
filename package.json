@@ -8,11 +8,8 @@
     "tests"
   ],
   "scripts": {
-    "build": "lerna run build",
-    "test": "lerna run build:test && lerna run test"
-  },
-  "devDependencies": {
-    "lerna": "^6.5.1"
+    "build": "cd javascript && yarn run build",
+    "test": "cd javascript && yarn run build:test && yarn run test"
   },
   "packageManager": "yarn@3.4.1"
 }

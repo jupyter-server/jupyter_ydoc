@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@jupyter/ydoc": "file:../javascript",
+    "@jupyter/ydoc": "workspace:javascript",
     "ws": "^8.5.0",
     "y-websocket": "^1.4.1"
   }

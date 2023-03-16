@@ -58,7 +58,6 @@ jobs:
         run: |
           yarn
           yarn build
-          cd ../tests; npm install
 
       - name: Linter check
         if: ${{ !contains(matrix.os, 'windows') }}

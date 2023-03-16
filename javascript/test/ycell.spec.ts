@@ -5,6 +5,14 @@
 import { IMapChange, YCodeCell, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
+  // Fix awareness timeout open handle
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
   describe('YCell standalone', () => {
     test('should set source', () => {
       const codeCell = YCodeCell.create();

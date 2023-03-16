@@ -5,6 +5,14 @@ import type * as nbformat from '@jupyterlab/nbformat';
 import { IMapChange, NotebookChange, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
+  // Fix awareness timeout open handle
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
   describe('YNotebook', () => {
     describe('#constructor', () => {
       test('should create a notebook without arguments', () => {
