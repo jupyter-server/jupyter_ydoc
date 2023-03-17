@@ -50,7 +50,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          mamba install python=${{ matrix.python-version }} pip nodejs=16 yarn
+          mamba install python=${{ matrix.python-version }} pip nodejs=18
           pip install .[test]
 
       - name: Build JavaScript assets
