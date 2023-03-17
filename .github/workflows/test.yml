@@ -80,6 +80,7 @@ jobs:
       - name: Run JS tests
         working-directory: javascript
         run: |
+          yarn build:test
           yarn test:cov
 
       - name: Run Python tests
