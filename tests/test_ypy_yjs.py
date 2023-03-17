@@ -49,7 +49,6 @@ class YTest:
 
 
 @pytest.mark.asyncio
-@pytest.mark.timeout(60)
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
 async def test_ypy_yjs_0(yws_server, yjs_client):
     ydoc = Y.YDoc()
@@ -58,7 +57,7 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
     WebsocketProvider(ydoc, websocket)
     nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
     ynotebook.source = nb
-    ytest = YTest(ydoc)
+    ytest = YTest(ydoc, 60.0)
     await ytest.change()
     assert ytest.source == nb
 
