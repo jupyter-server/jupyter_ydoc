@@ -49,6 +49,7 @@ class YTest:
 
 
 @pytest.mark.asyncio
+@pytest.mark.timeout(60)
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
 async def test_ypy_yjs_0(yws_server, yjs_client):
     ydoc = Y.YDoc()
