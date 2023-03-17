@@ -46,12 +46,12 @@ jobs:
         with:
           miniforge-variant: Mambaforge
           miniforge-version: latest
-          python-version: "3.7"
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
-          mamba install python=${{ matrix.python-version }} pip nodejs=18
-          pip install .[test]
+          mamba install pip nodejs=18
+          pip install ".[test]"
 
       - name: Build JavaScript assets
         working-directory: javascript
@@ -77,12 +77,11 @@ jobs:
             exit 1
           fi
 
-      - name: Run Python tests
-        run: |
-          pytest -v
-
       - name: Run JS tests
         working-directory: javascript
         run: |
-          yarn build:test
           yarn test:cov
+
+      - name: Run Python tests
+        run: |
+          python -m pytest -v
