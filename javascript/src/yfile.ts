@@ -28,6 +28,11 @@ export class YFile
   }
 
   /**
+   * Document version
+   */
+  readonly version: string = '1.0.0';
+
+  /**
    * Creates a standalone YFile
    */
   static create(): YFile {

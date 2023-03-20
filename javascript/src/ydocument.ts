@@ -12,7 +12,9 @@ import type { DocumentChange, ISharedDocument, StateChange } from './api.js';
 /**
  * Generic shareable document.
  */
-export class YDocument<T extends DocumentChange> implements ISharedDocument {
+export abstract class YDocument<T extends DocumentChange>
+  implements ISharedDocument
+{
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
 
@@ -29,11 +31,9 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   }
 
   /**
-   * Creates a standalone YDocument
+   * Document version
    */
-  static create(): YDocument<DocumentChange> {
-    return new YDocument();
-  }
+  abstract readonly version: string;
 
   /**
    * YJS document.

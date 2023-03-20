@@ -59,6 +59,16 @@ class YNotebook(YBaseDoc):
         self._ycells = self._ydoc.get_array("cells")
 
     @property
+    def version(self) -> str:
+        """
+        Returns the version of the document.
+
+        :return: Document's version.
+        :rtype: str
+        """
+        return "1.0.0"
+
+    @property
     def ycells(self):
         """
         Returns the Y-cells.

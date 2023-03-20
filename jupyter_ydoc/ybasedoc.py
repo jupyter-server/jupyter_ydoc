@@ -30,6 +30,16 @@ class YBaseDoc(ABC):
         self._subscriptions = {}
 
     @property
+    @abstractmethod
+    def version(self) -> str:
+        """
+        Returns the version of the document.
+
+        :return: Document's version.
+        :rtype: str
+        """
+
+    @property
     def ystate(self) -> Y.YMap:
         """
         A :class:`y_py.YMap` containing the state of the document.
