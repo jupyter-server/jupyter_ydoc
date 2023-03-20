@@ -202,7 +202,13 @@ export class YDocument<T extends DocumentChange> implements ISharedDocument {
   private _disposed = new Signal<this, void>(this);
 }
 
-namespace YDocument {
+/**
+ * YDocument namespace
+ */
+export namespace YDocument {
+  /**
+   * YDocument constructor options
+   */
   export interface IOptions {
     /**
      * The optional YJS document for YDocument.

@@ -42,8 +42,8 @@ def yjs_client(request):
     client_id = request.param
     p = subprocess.Popen(
         [
+            "yarn",
             "node",
-            "--experimental-specifier-resolution=node",
             f"{here / 'yjs_client_'}{client_id}.js",
         ]
     )
