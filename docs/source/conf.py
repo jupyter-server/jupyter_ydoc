@@ -84,21 +84,14 @@ def setup(app):
 
     # Build JavaScript Docs
     js = HERE.parent.parent / "javascript"
-    js_docs = js / "docs"
     dest_dir = Path(app.outdir) / "api"
 
-    if js_docs.exists():
-        # avoid rebuilding docs because it takes forever
-        # `make clean` to force a rebuild
-        print(f"already have {js_docs!s}")
-    else:
-        print("Building jupyterlab API docs")
-        check_call(["npm", "install"], cwd=str(js))
-        check_call(["npm", "run", "build"], cwd=str(js))
-        check_call(["npm", "run", "docs"], cwd=str(js))
+    print("Building @jupyter/ydoc API docs")
+    cmd = ["yarn"] if shutil.which("yarn") is not None else ["npm"]
+    check_call(cmd + ["install"], cwd=str(js))
+    check_call(cmd + ["run", "build"], cwd=str(js))
+    check_call(cmd + ["run", "docs"], cwd=str(js))
 
-    # Copy JavaScript Docs
-    print(f"Copying {js_docs!s} -> {dest_dir!s}")
     if dest_dir.exists():
-        shutil.rmtree(str(dest_dir))
-    shutil.copytree(str(js_docs), str(dest_dir))
+        shutil.rmtree(dest_dir)
+    shutil.copytree(str(js / "docs"), str(dest_dir))
