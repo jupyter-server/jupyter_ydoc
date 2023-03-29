@@ -24,7 +24,7 @@
     },
     "@lumino/signaling": {
       "ISignal": "https://lumino.readthedocs.io/en/latest/api/interfaces/signaling.ISignal.html",
-      "Signal": "https://lumino.readthedocs.io/en/latest/api/classes/signaling.Signal-1.html",
+      "Signal": "https://lumino.readthedocs.io/en/latest/api/classes/signaling.Signal-1.html"
     },
     "y-protocols": {
       "Awareness": "https://docs.yjs.dev/api/about-awareness"
