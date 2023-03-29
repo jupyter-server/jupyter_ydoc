@@ -2,6 +2,28 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.0.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/v0.3.4...6ad2fde183a3f592d8a2ff58254b229859caba01))
+
+### Enhancements made
+
+- Add py.typed [#152](https://github.com/jupyter-server/jupyter_ydoc/pull/152) ([@davidbrochart](https://github.com/davidbrochart))
+- Add model version [#139](https://github.com/jupyter-server/jupyter_ydoc/pull/139) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Add py.typed [#152](https://github.com/jupyter-server/jupyter_ydoc/pull/152) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump dependencies and yarn [#151](https://github.com/jupyter-server/jupyter_ydoc/pull/151) ([@fcollonval](https://github.com/fcollonval))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-02-22&to=2023-03-28&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-02-22..2023-03-28&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2023-02-22..2023-03-28&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-02-22..2023-03-28&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 0.3.4
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@0.3.3...3c3aa3e0421193f391b10ae23745f235a6923cff))
@@ -19,8 +41,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-02-21&to=2023-02-22&type=c))
 
 [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2023-02-21..2023-02-22&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 0.3.3
 
