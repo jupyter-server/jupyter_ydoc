@@ -1,3 +1,51 @@
 {
-  "out": "../docs/api/shared-models"
+  "externalSymbolLinkMappings": {
+    "@jupyterlab/nbformat": {
+      "CellType": "https://jupyterlab.readthedocs.io/en/latest/api/types/nbformat.CellType.html",
+      "ExecutionCount": "https://jupyterlab.readthedocs.io/en/latest/api/types/nbformat.ExecutionCount.html",
+      "IAttachments": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IAttachments.html",
+      "IBaseCell": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IBaseCell.html",
+      "IBaseCellMetadata": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IBaseCellMetadata.html",
+      "ICodeCell": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.ICodeCell.html",
+      "IMarkdownCell": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IMarkdownCell.html",
+      "INotebookContent": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.INotebookContent.html",
+      "INotebookMetadata": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.INotebookMetadata.html",
+      "IOutput": "https://jupyterlab.readthedocs.io/en/latest/api/types/nbformat.IOutput.html",
+      "IRawCell": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IRawCell.html",
+      "IUnrecognizedCell": "https://jupyterlab.readthedocs.io/en/latest/api/interfaces/nbformat.IUnrecognizedCell.html"
+    },
+    "@lumino/coreutils": {
+      "JSONObject": "https://lumino.readthedocs.io/en/latest/api/interfaces/coreutils.JSONObject.html",
+      "JSONValue": "https://lumino.readthedocs.io/en/latest/api/types/coreutils.JSONValue.html",
+      "PartialJSONValue": "https://lumino.readthedocs.io/en/latest/api/types/coreutils.PartialJSONValue.html"
+    },
+    "@lumino/disposable": {
+      "IObservableDisposable": "https://lumino.readthedocs.io/en/latest/api/interfaces/disposable.IObservableDisposable.html"
+    },
+    "@lumino/signaling": {
+      "ISignal": "https://lumino.readthedocs.io/en/latest/api/interfaces/signaling.ISignal.html",
+      "Signal": "https://lumino.readthedocs.io/en/latest/api/classes/signaling.Signal-1.html"
+    },
+    "y-protocols": {
+      "Awareness": "https://docs.yjs.dev/api/about-awareness"
+    },
+    "yjs": {
+      "Array": "https://docs.yjs.dev/api/shared-types/y.array",
+      "Doc": "https://docs.yjs.dev/api/y.doc",
+      "Map": "https://docs.yjs.dev/api/shared-types/y.map",
+      "Text": "https://docs.yjs.dev/api/shared-types/y.text",
+      "UndoManager": "https://docs.yjs.dev/api/undo-manager",
+      "YArrayEvent": "https://docs.yjs.dev/api/shared-types/y.array#y.arrayevent-api",
+      "YEvent": "https://docs.yjs.dev/api/y.event",
+      "YMapEvent": "https://docs.yjs.dev/api/shared-types/y.map#y.mapevent-api",
+      "YTextEvent": "https://docs.yjs.dev/api/shared-types/y.text#y.textevent-api"
+    }
+  },
+  "githubPages": false,
+  "navigationLinks": {
+    "GitHub": "https://github.com/jupyter-server/jupyter_ydoc",
+    "Jupyter": "https://jupyter.org"
+  },
+  "titleLink": "https://jupyter-ydoc.readthedocs.io/en/latest",
+  "out": "./docs"
 }
