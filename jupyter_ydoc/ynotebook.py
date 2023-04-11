@@ -203,7 +203,6 @@ class YNotebook(YBaseDoc):
         :rtype: Dict
         """
         meta = json.loads(self._ymeta.to_json())
-        print("[YNotebook.get] meta:", meta)
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
