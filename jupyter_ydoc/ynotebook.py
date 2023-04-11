@@ -220,9 +220,9 @@ class YNotebook(YBaseDoc):
 
         return dict(
             cells=cells,
-            metadata=meta["metadata"],
-            nbformat=int(meta["nbformat"]),
-            nbformat_minor=int(meta["nbformat_minor"]),
+            metadata=meta.get("metadata", {}),
+            nbformat=int(meta.get("nbformat", 0)),
+            nbformat_minor=int(meta.get("nbformat_minor", 0)),
         )
 
     def set(self, value: Dict) -> None:
