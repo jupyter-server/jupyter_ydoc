@@ -239,7 +239,8 @@ class YNotebook(YBaseDoc):
             {
                 "cell_type": "code",
                 "execution_count": None,
-                "metadata": {},
+                # auto-created empty code cell without outputs ought be trusted
+                "metadata": {"trusted": True},
                 "outputs": [],
                 "source": "",
                 "id": str(uuid4()),
