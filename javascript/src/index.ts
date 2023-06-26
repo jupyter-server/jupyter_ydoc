@@ -9,6 +9,7 @@
 
 export * from './api.js';
 export * from './utils.js';
+export * from './awareness.js';
 
 export * from './ytext.js';
 export * from './ydocument.js';
