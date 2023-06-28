@@ -6,8 +6,10 @@
 import type * as nbformat from '@jupyterlab/nbformat';
 import { JSONExt, JSONObject, PartialJSONValue, UUID } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
+
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
+
 import type {
   CellChange,
   IMapChange,
@@ -18,6 +20,8 @@ import type {
   ISharedRawCell,
   SharedCell
 } from './api.js';
+import type { AnnotationsChange, IAnnotation } from './annotations.js';
+
 import { IYText } from './ytext.js';
 import { YNotebook } from './ynotebook.js';
 
@@ -128,7 +132,7 @@ export const createStandaloneCell = (cell: SharedCell.Cell): YCellType =>
   createCell(cell);
 
 export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
-  implements ISharedBaseCell<Metadata>, IYText
+  implements ISharedBaseCell<Metadata, IAnnotation>, IYText
 {
   /**
    * Create a new YCell that works standalone. It cannot be
@@ -225,6 +229,21 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    */
   get isDisposed(): boolean {
     return this._isDisposed;
+  }
+
+  /**
+   * The annotation changed signal.
+   */
+  get annotationChanged(): ISignal<this, AnnotationsChange<IAnnotation>> {
+    return this._annotationChanged;
+  }
+
+  /**
+   * Return an iterator that yields every annotation key.
+   */
+  get annotations(): Array<string> {
+    const annotation = this._ymetadata.get('annotations');
+    return Object.keys(annotation);
   }
 
   /**
@@ -368,6 +387,66 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     }
     this._disposed.emit();
     Signal.clearData(this);
+  }
+
+  /**
+   * Get the value for an annotation
+   *
+   * @param key Key to get
+   */
+  getAnnotation(key: string): IAnnotation | undefined {
+    const annotations = this._ymetadata.get('annotations');
+    if (annotations && key in annotations) {
+      return JSONExt.deepCopy(annotations[key]);
+    } else {
+      return undefined;
+    }
+  }
+
+  /**
+   * Set the value of an annotation
+   *
+   * @param key Key to set
+   * @param value New value
+   */
+  setAnnotation(key: string, value: IAnnotation): void {
+    const clone = JSONExt.deepCopy(value as any);
+    const annotations = this._ymetadata.get('annotations') ?? {};
+    annotations[key] = clone;
+    this._ymetadata.set('annotations', annotations);
+  }
+
+  /**
+   * Update the value of an existing annotation
+   *
+   * @param key Key to update
+   * @param value New value
+   */
+  updateAnnotation(key: string, value: Partial<IAnnotation>): void {
+    const annotations = this._ymetadata.get('annotations');
+    if (!annotations || !(key in annotations)) {
+      return;
+    }
+
+    const annotation = annotations[key];
+    const clone = JSONExt.deepCopy(value as any);
+    for (const [key, value] of Object.entries(clone)) {
+      annotation[key] = value;
+    }
+    this._ymetadata.set('annotations', {...annotations, key: annotation });
+  }
+
+  /**
+   * Delete an annotation
+   *
+   * @param key Key to delete
+   */
+  deleteAnnotation(key: string): void {
+    const annotations = this._ymetadata.get('annotations');
+    if (annotations && key in annotations) {
+      delete annotations[key];
+      this._ymetadata.set('annotations', annotations);
+    }
   }
 
   /**
@@ -661,18 +740,22 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   };
 
   protected _metadataChanged = new Signal<this, IMapChange>(this);
+
   /**
    * The notebook that this cell belongs to.
    */
   protected _notebook: YNotebook | null = null;
+
   private _awareness: Awareness | null;
-  private _changed = new Signal<this, CellChange>(this);
-  private _disposed = new Signal<this, void>(this);
   private _isDisposed = false;
   private _prevSourceLength: number;
   private _undoManager: Y.UndoManager | null = null;
   private _ymetadata: Y.Map<any>;
   private _ysource: Y.Text;
+
+  private _disposed = new Signal<this, void>(this);
+  private _changed = new Signal<this, CellChange>(this);
+  private _annotationChanged = new Signal<this, AnnotationsChange<IAnnotation>>(this);
 }
 
 /**

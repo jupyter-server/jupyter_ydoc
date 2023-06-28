@@ -10,6 +10,8 @@
 export * from './api.js';
 export * from './utils.js';
 
+export * from './annotations.js';
+
 export * from './ytext.js';
 export * from './ydocument.js';
 export * from './yfile.js';

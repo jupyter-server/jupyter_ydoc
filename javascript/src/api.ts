@@ -23,6 +23,8 @@ import type {
 import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
 
+import type { IAnnotation, IAnnotations } from './annotations.js';
+
 /**
  * Changes on Sequence-like data are expressed as Quill-inspired deltas.
  *
@@ -96,6 +98,11 @@ export interface ISharedDocument extends ISharedBase {
   readonly state: JSONObject;
 
   /**
+   * The changed signal.
+   */
+  readonly changed: ISignal<this, DocumentChange>;
+
+  /**
    * Get the value for a state attribute
    *
    * @param key Key to get
@@ -109,11 +116,6 @@ export interface ISharedDocument extends ISharedBase {
    * @param value New attribute value
    */
   setState(key: string, value: JSONValue): void;
-
-  /**
-   * The changed signal.
-   */
-  readonly changed: ISignal<this, DocumentChange>;
 }
 
 /**
@@ -399,8 +401,9 @@ export namespace SharedCell {
  * Implements an API for nbformat.IBaseCell.
  */
 export interface ISharedBaseCell<
-  Metadata extends nbformat.IBaseCellMetadata = nbformat.IBaseCellMetadata
-> extends ISharedText {
+  Metadata extends nbformat.IBaseCellMetadata = nbformat.IBaseCellMetadata,
+  Annotation extends IAnnotation = IAnnotation
+> extends ISharedText, IAnnotations<Annotation> {
   /**
    * The type of the cell.
    */
