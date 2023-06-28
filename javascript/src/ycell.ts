@@ -433,7 +433,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     for (const [key, value] of Object.entries(clone)) {
       annotation[key] = value;
     }
-    this._ymetadata.set('annotations', {...annotations, key: annotation });
+    this._ymetadata.set('annotations', { ...annotations, key: annotation });
   }
 
   /**
@@ -755,7 +755,9 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
 
   private _disposed = new Signal<this, void>(this);
   private _changed = new Signal<this, CellChange>(this);
-  private _annotationChanged = new Signal<this, AnnotationsChange<IAnnotation>>(this);
+  private _annotationChanged = new Signal<this, AnnotationsChange<IAnnotation>>(
+    this
+  );
 }
 
 /**

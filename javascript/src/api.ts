@@ -403,7 +403,8 @@ export namespace SharedCell {
 export interface ISharedBaseCell<
   Metadata extends nbformat.IBaseCellMetadata = nbformat.IBaseCellMetadata,
   Annotation extends IAnnotation = IAnnotation
-> extends ISharedText, IAnnotations<Annotation> {
+> extends ISharedText,
+    IAnnotations<Annotation> {
   /**
    * The type of the cell.
    */
