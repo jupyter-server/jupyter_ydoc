@@ -1,4 +1,8 @@
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
 import copy
+import json
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -93,8 +97,8 @@ class YNotebook(YBaseDoc):
         self._ycells = self._ydoc.get_array("cells")
 
     def get_cell(self, index: int) -> Dict[str, Any]:
-        meta = self._ymeta.to_json()
-        cell = self._ycells[index].to_json()
+        meta = json.loads(self._ymeta.to_json())
+        cell = json.loads(self._ycells[index].to_json())
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
@@ -145,7 +149,7 @@ class YNotebook(YBaseDoc):
             self._ycells.insert(txn, index, ycell)
 
     def get(self):
-        meta = self._ymeta.to_json()
+        meta = json.loads(self._ymeta.to_json())
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
