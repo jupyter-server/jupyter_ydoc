@@ -34,7 +34,7 @@ from jupyter_ydoc import YFile, YNotebook
 The `"jupyter_ydoc"` entry point group can be populated with your own documents, e.g. by adding the
 following to your package's `setup.cfg`:
 
-```
+```ini
 [options.entry_points]
 jupyter_ydoc =
     my_document = my_package.my_file:MyDocumentClass
