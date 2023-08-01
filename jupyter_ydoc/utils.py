@@ -12,7 +12,7 @@ def cast_all(
 ) -> Union[List, Dict]:
     if isinstance(o, list):
         for i, v in enumerate(o):
-            if type(v) == from_type:
+            if type(v) is from_type:
                 v2 = to_type(v)
                 if v == v2:
                     o[i] = v2
@@ -20,7 +20,7 @@ def cast_all(
                 cast_all(v, from_type, to_type)
     elif isinstance(o, dict):
         for k, v in o.items():
-            if type(v) == from_type:
+            if type(v) is from_type:
                 v2 = to_type(v)
                 if v == v2:
                     o[k] = v2
