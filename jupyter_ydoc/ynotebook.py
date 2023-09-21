@@ -221,8 +221,8 @@ class YNotebook(YBaseDoc):
         return dict(
             cells=cells,
             metadata=meta.get("metadata", {}),
-            nbformat=int(meta.get("nbformat", 0)),
-            nbformat_minor=int(meta.get("nbformat_minor", 0)),
+            nbformat=int(meta.get("nbformat", NBFORMAT_MAJOR_VERSION)),
+            nbformat_minor=int(meta.get("nbformat_minor", NBFORMAT_MINOR_VERSION)),
         )
 
     def set(self, value: Dict) -> None:
