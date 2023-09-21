@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 1.1.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@1.1.0-a0...3bbafabcb26f24278bf4a41b77a05f4f43f519f2))
+
+### Maintenance and upkeep improvements
+
+- Add source to dist for sourcemaps [#182](https://github.com/jupyter-server/jupyter_ydoc/pull/182) ([@vidartf](https://github.com/vidartf))
+- Bump actions/checkout from 3 to 4 [#180](https://github.com/jupyter-server/jupyter_ydoc/pull/180) ([@dependabot](https://github.com/dependabot))
+
+### Documentation improvements
+
+- Update CHANGELOG.md [#177](https://github.com/jupyter-server/jupyter_ydoc/pull/177) ([@fcollonval](https://github.com/fcollonval))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-06-29&to=2023-09-21&type=c))
+
+[@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2023-06-29..2023-09-21&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2023-06-29..2023-09-21&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-06-29..2023-09-21&type=Issues) | [@vidartf](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Avidartf+updated%3A2023-06-29..2023-09-21&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2023-06-29..2023-09-21&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 1.1.0a0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@1.0.2...b7a1dc047e9a91a831dab68fdb294d56f46ab168))
@@ -17,8 +38,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-04-14&to=2023-06-29&type=c))
 
 [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-04-14..2023-06-29&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-04-14..2023-06-29&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 1.0.2
 
