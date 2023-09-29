@@ -2,7 +2,7 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { IMapChange, YCodeCell, YNotebook } from '../src';
+import { createStandaloneCell, IMapChange, YCodeCell, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
   // Fix awareness timeout open handle
@@ -11,6 +11,17 @@ describe('@jupyter/ydoc', () => {
   });
   afterEach(() => {
     jest.clearAllTimers();
+  });
+
+  describe('createStandaloneCell', () => {
+    test('should convert a source set as a list of string to a single string', () => {
+      const cell = createStandaloneCell({
+        cell_type: 'code',
+        source: ['import this\n', 'import math']
+      });
+
+      expect(cell.source).toEqual('import this\nimport math');
+    });
   });
 
   describe('YCell standalone', () => {

@@ -113,7 +113,7 @@ export const createCell = (
   }
   if (cell.source != null) {
     ycell.setSource(
-      typeof cell.source === 'string' ? cell.source : cell.source.join('\n')
+      typeof cell.source === 'string' ? cell.source : cell.source.join('')
     );
   }
   return ycell;
