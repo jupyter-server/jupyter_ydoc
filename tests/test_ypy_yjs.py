@@ -54,7 +54,9 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
     ydoc = Y.YDoc()
     ynotebook = YNotebook(ydoc)
 
-    async with connect("ws://localhost:1234/my-roomname") as websocket, WebsocketProvider(ydoc, websocket):
+    async with connect("ws://localhost:1234/my-roomname") as websocket, WebsocketProvider(
+        ydoc, websocket
+    ):
         nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
         ynotebook.source = nb
         ytest = YTest(ydoc, 3.0)

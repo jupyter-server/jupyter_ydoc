@@ -32,7 +32,7 @@ async def yws_server(request):
         kwargs = request.param
     except Exception:
         kwargs = {}
-    
+
     websocket_server = WebsocketServer(**kwargs)
     try:
         async with websocket_server, serve(websocket_server.serve, "localhost", 1234):
