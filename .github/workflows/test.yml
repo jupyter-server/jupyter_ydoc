@@ -52,6 +52,7 @@ jobs:
         run: |
           mamba install pip nodejs=18
           pip install ".[test]"
+          pip install https://github.com/davidbrochart/ypy-websocket/archive/pycrdt.zip
 
       - name: Build JavaScript assets
         working-directory: javascript

@@ -1,12 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import asyncio
 import json
 from pathlib import Path
 
 import pytest
-import y_py as Y
+from anyio import Event, create_task_group, move_on_after
+from pycrdt import Doc, Map
 from websockets import connect  # type: ignore
 from ypy_websocket import WebsocketProvider
 
@@ -27,21 +27,32 @@ def stringify_source(nb: dict) -> dict:
 
 
 class YTest:
-    def __init__(self, ydoc: Y.YDoc, timeout: float = 1.0):
+    def __init__(self, ydoc: Doc, timeout: float = 1.0):
         self.timeout = timeout
-        self.ytest = ydoc.get_map("_test")
-        with ydoc.begin_transaction() as t:
-            self.ytest.set(t, "clock", 0)
+        self.ytest = Map()
+        ydoc["_test"] = self.ytest
+        self.clock = -1.0
 
-    async def change(self):
-        change = asyncio.Event()
+    def run_clock(self):
+        self.clock = max(self.clock, 0.0)
+        self.ytest["clock"] = self.clock
+
+    async def clock_run(self):
+        change = Event()
 
         def callback(event):
             if "clock" in event.keys:
-                change.set()
+                clk = event.keys["clock"]["newValue"]
+                if clk > self.clock:
+                    self.clock = clk + 1.0
+                    change.set()
 
-        self.ytest.observe(callback)
-        return await asyncio.wait_for(change.wait(), timeout=self.timeout)
+        subscription_id = self.ytest.observe(callback)
+        async with create_task_group():
+            with move_on_after(self.timeout):
+                await change.wait()
+
+        self.ytest.unobserve(subscription_id)
 
     @property
     def source(self):
@@ -51,20 +62,22 @@ class YTest:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
 async def test_ypy_yjs_0(yws_server, yjs_client):
-    ydoc = Y.YDoc()
+    ydoc = Doc()
     ynotebook = YNotebook(ydoc)
-    websocket = await connect("ws://localhost:1234/my-roomname")
-    WebsocketProvider(ydoc, websocket)
-    nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
-    ynotebook.source = nb
-    ytest = YTest(ydoc, 3.0)
-    await ytest.change()
-    assert ytest.source == nb
+    async with connect("ws://localhost:1234/my-roomname") as websocket, WebsocketProvider(
+        ydoc, websocket
+    ):
+        nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
+        ynotebook.source = nb
+        ytest = YTest(ydoc, 3.0)
+        ytest.run_clock()
+        await ytest.clock_run()
+        assert ytest.source == nb
 
 
 def test_plotly_renderer():
     """This test checks in particular that the type cast is not breaking the data."""
-    ydoc = Y.YDoc()
+    ydoc = Doc()
     ynotebook = YNotebook(ydoc)
     nb = stringify_source(json.loads((files_dir / "plotly_renderer.ipynb").read_text()))
     ynotebook.source = nb
