@@ -145,7 +145,7 @@ export interface ISharedText extends ISharedBase {
   setSource(value: string): void;
 
   /**
-   * Replace content from `start' to `end` with `value`.
+   * Replace content from `start` to `end` with `value`.
    *
    * @param start: The start index of the range to replace (inclusive).
    * @param end: The end index of the range to replace (exclusive).
