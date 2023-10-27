@@ -56,7 +56,7 @@ class YBlob(YBaseDoc):
         :return: Document's content.
         :rtype: bytes
         """
-        return base64.b64decode(self._ysource["base64"].encode())
+        return base64.b64decode(self._ysource.get("base64", "").encode())
 
     def set(self, value: Union[bytes, str]) -> None:
         """
