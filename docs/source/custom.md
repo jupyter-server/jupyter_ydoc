@@ -17,4 +17,4 @@ On the other side, to export a back-end model, we have to use the entry points p
 my_document = "my_module.my_file:YCustomDocument"
 ```
 
-You can find an example of a custom document in the [JupyterCAD extension](https://github.com/QuantStack/jupytercad). With an implementation of a new document model [here](https://github.com/QuantStack/jupytercad/blob/main/jupytercad/jcad_ydoc.py) and registering it [here](https://github.com/QuantStack/jupytercad/blob/main/pyproject.toml).
+You can find an example of a custom document in the [JupyterCAD extension](https://github.com/QuantStack/jupytercad). With an implementation of a new document model [here](https://github.com/jupytercad/jupytercad/blob/21e54e98fbfbc5dd0303901f30cec1619fd5a109/python/jupytercad-core/jupytercad_core/jcad_ydoc.py) and registering it [here](https://github.com/jupytercad/jupytercad/blob/21e54e98fbfbc5dd0303901f30cec1619fd5a109/python/jupytercad-core/pyproject.toml#L34).
