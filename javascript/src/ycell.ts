@@ -761,13 +761,35 @@ export class YCodeCell
     return JSONExt.deepCopy(this._youtputs.toArray());
   }
 
+  createOutputs(outputs: Array<nbformat.IOutput>): Array<any> {
+    const newOutputs: Array<any> = [];
+    for (const output of outputs) {
+      if (output.output_type === 'stream') {
+        const { text, ...outputWithoutText } = output;
+        const _newOutput: { [id: string]: any } = outputWithoutText;
+        const newText = new Y.Array();
+        newText.push(text as string[]);
+        _newOutput['text'] = newText;
+        const newOutput = new Y.Map();
+        for (const [key, value] of Object.entries(_newOutput)) {
+          newOutput.set(key, value);
+        }
+        newOutputs.push(newOutput);
+      } else {
+        newOutputs.push(output);
+      }
+    }
+    return newOutputs;
+  }
+
   /**
    * Replace all outputs.
    */
   setOutputs(outputs: Array<nbformat.IOutput>): void {
     this.transact(() => {
       this._youtputs.delete(0, this._youtputs.length);
-      this._youtputs.insert(0, outputs);
+      const newOutputs = this.createOutputs(outputs);
+      this._youtputs.insert(0, newOutputs);
     }, false);
   }
 
@@ -789,7 +811,8 @@ export class YCodeCell
       end < this._youtputs.length ? end - start : this._youtputs.length - start;
     this.transact(() => {
       this._youtputs.delete(start, fin);
-      this._youtputs.insert(start, outputs);
+      const newOutputs = this.createOutputs(outputs);
+      this._youtputs.insert(start, newOutputs);
     }, false);
   }
 
