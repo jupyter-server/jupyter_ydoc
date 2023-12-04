@@ -32,9 +32,13 @@ async def yws_server(request):
         kwargs = request.param
     except Exception:
         kwargs = {}
+
     websocket_server = WebsocketServer(**kwargs)
-    async with serve(websocket_server.serve, "localhost", 1234):
-        yield websocket_server
+    try:
+        async with websocket_server, serve(websocket_server.serve, "localhost", 1234):
+            yield websocket_server
+    except Exception:
+        pass
 
 
 @pytest.fixture
