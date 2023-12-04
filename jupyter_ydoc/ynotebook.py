@@ -254,7 +254,7 @@ class YNotebook(YBaseDoc):
                 self._ymeta.pop(t, key)
             if cells_len:
                 self._ycells.delete_range(t, 0, cells_len)
-            for key in [k for k in self._ystate if k not in ("dirty", "path")]:
+            for key in [k for k in self._ystate if k not in ("dirty", "path", "file_id")]:
                 self._ystate.pop(t, key)
 
             # initialize document
