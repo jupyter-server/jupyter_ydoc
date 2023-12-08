@@ -2,6 +2,30 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 2.0.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@1.1.1...bd998983bbf6b566bb0314faa48b8e51ba7747b6))
+
+### Maintenance and upkeep improvements
+
+- Bump conda-incubator/setup-miniconda from 2 to 3 [#202](https://github.com/jupyter-server/jupyter_ydoc/pull/202) ([@dependabot](https://github.com/dependabot))
+- Use pycrdt instead of y-py [#194](https://github.com/jupyter-server/jupyter_ydoc/pull/194) ([@davidbrochart](https://github.com/davidbrochart))
+- Switch from hub to gh CLI [#190](https://github.com/jupyter-server/jupyter_ydoc/pull/190) ([@hbcarlos](https://github.com/hbcarlos))
+- Bump toshimaru/auto-author-assign from 2.0.0 to 2.0.1 [#187](https://github.com/jupyter-server/jupyter_ydoc/pull/187) ([@dependabot](https://github.com/dependabot))
+
+### Documentation improvements
+
+- Fix JupyterCAD links [#199](https://github.com/jupyter-server/jupyter_ydoc/pull/199) ([@davidbrochart](https://github.com/davidbrochart))
+- Fix a typo in docs (wrong closing quote) [#192](https://github.com/jupyter-server/jupyter_ydoc/pull/192) ([@krassowski](https://github.com/krassowski))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-09-29&to=2023-12-08&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-09-29..2023-12-08&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2023-09-29..2023-12-08&type=Issues) | [@hbcarlos](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ahbcarlos+updated%3A2023-09-29..2023-12-08&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2023-09-29..2023-12-08&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-09-29..2023-12-08&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 1.1.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@1.1.0...9afd2c90c541d25edaa814cef70fc9b99219cf52))
@@ -19,8 +43,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-09-21&to=2023-09-29&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-09-21..2023-09-29&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2023-09-21..2023-09-29&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2023-09-21..2023-09-29&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-09-21..2023-09-29&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 1.1.0
 
