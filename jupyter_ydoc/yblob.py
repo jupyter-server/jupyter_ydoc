@@ -36,8 +36,7 @@ class YBlob(YBaseDoc):
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ysource = Map()
-        self._ydoc["source"] = self._ysource
+        self._ydoc["source"] = self._ysource = Map()
 
     @property
     def version(self) -> str:

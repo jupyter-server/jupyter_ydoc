@@ -31,8 +31,7 @@ class YUnicode(YBaseDoc):
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ysource = Text()
-        self._ydoc["source"] = self._ysource
+        self._ydoc["source"] = self._ysource = Text()
 
     @property
     def version(self) -> str:
@@ -62,7 +61,7 @@ class YUnicode(YBaseDoc):
         """
         with self._ydoc.transaction():
             # clear document
-            del self._ysource[:]
+            self._ysource.clear()
             # initialize document
             if value:
                 self._ysource += value

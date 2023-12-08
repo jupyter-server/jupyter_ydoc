@@ -26,8 +26,7 @@ class YBaseDoc(ABC):
             self._ydoc = Doc()
         else:
             self._ydoc = ydoc
-        self._ystate = Map()
-        self._ydoc["state"] = self._ystate
+        self._ydoc["state"] = self._ystate = Map()
         self._subscriptions: Dict[Any, str] = {}
 
     @property

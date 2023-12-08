@@ -8,7 +8,7 @@ import pytest
 from anyio import Event, create_task_group, move_on_after
 from pycrdt import Doc, Map
 from websockets import connect  # type: ignore
-from ypy_websocket import WebsocketProvider
+from pycrdt_websocket import WebsocketProvider
 
 from jupyter_ydoc import YNotebook
 from jupyter_ydoc.utils import cast_all
@@ -29,8 +29,7 @@ def stringify_source(nb: dict) -> dict:
 class YTest:
     def __init__(self, ydoc: Doc, timeout: float = 1.0):
         self.timeout = timeout
-        self.ytest = Map()
-        ydoc["_test"] = self.ytest
+        ydoc["_test"] = self.ytest = Map()
         self.clock = -1.0
 
     def run_clock(self):
