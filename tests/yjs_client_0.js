@@ -20,11 +20,13 @@ wsProvider.on('status', event => {
   console.log(event.status)
 })
 
+var clock = -1
+
 ytest.observe(event => {
   event.changes.keys.forEach((change, key) => {
     if (key === 'clock') {
-      const clock = ytest.get('clock')
-      if (clock === 0) {
+      const clk = ytest.get('clock')
+      if (clk > clock) {
         const cells = []
         for (let cell of notebook.cells) {
           cells.push(cell.toJSON())
@@ -39,7 +41,8 @@ ytest.observe(event => {
           nbformat_minor
         }
         ytest.set('source', source)
-        ytest.set('clock', 1)
+        clock = clk + 1
+        ytest.set('clock', clock)
       }
     }
   })

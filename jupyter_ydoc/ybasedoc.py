@@ -2,9 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
 
-import y_py as Y
+from pycrdt import Doc, Map
 
 
 class YBaseDoc(ABC):
@@ -15,19 +15,19 @@ class YBaseDoc(ABC):
     subscribe to changes in the document.
     """
 
-    def __init__(self, ydoc: Optional[Y.YDoc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None):
         """
         Constructs a YBaseDoc.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
-        :type ydoc: :class:`y_py.YDoc`, optional.
+        :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         if ydoc is None:
-            self._ydoc = Y.YDoc()
+            self._ydoc = Doc()
         else:
             self._ydoc = ydoc
-        self._ystate = self._ydoc.get_map("state")
-        self._subscriptions = {}
+        self._ydoc["state"] = self._ystate = Map()
+        self._subscriptions: Dict[Any, str] = {}
 
     @property
     @abstractmethod
@@ -40,22 +40,22 @@ class YBaseDoc(ABC):
         """
 
     @property
-    def ystate(self) -> Y.YMap:
+    def ystate(self) -> Map:
         """
-        A :class:`y_py.YMap` containing the state of the document.
+        A :class:`pycrdt.Map` containing the state of the document.
 
         :return: The document's state.
-        :rtype: :class:`y_py.YMap`
+        :rtype: :class:`pycrdt.Map`
         """
         return self._ystate
 
     @property
-    def ydoc(self) -> Y.YDoc:
+    def ydoc(self) -> Doc:
         """
-        The underlying :class:`y_py.YDoc` that contains the data.
+        The underlying :class:`pycrdt.Doc` that contains the data.
 
         :return: The document's ydoc.
-        :rtype: :class:`y_py.YDoc`
+        :rtype: :class:`pycrdt.Doc`
         """
         return self._ydoc
 
@@ -87,7 +87,7 @@ class YBaseDoc(ABC):
         :return: Whether the document is dirty.
         :rtype: Optional[bool]
         """
-        return self._ystate["dirty"]
+        return self._ystate.get("dirty")
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
@@ -97,8 +97,7 @@ class YBaseDoc(ABC):
         :param value: Whether the document is clean or dirty.
         :type value: bool
         """
-        with self._ydoc.begin_transaction() as t:
-            self._ystate.set(t, "dirty", value)
+        self._ystate["dirty"] = value
 
     @property
     def path(self) -> Optional[str]:
@@ -118,8 +117,7 @@ class YBaseDoc(ABC):
         :param value: Document's path.
         :type value: str
         """
-        with self._ydoc.begin_transaction() as t:
-            self._ystate.set(t, "path", value)
+        self._ystate["path"] = value
 
     @abstractmethod
     def get(self) -> Any:

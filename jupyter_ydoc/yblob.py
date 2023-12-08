@@ -5,7 +5,7 @@ import base64
 from functools import partial
 from typing import Any, Callable, Optional, Union
 
-import y_py as Y
+from pycrdt import Doc, Map
 
 from .ybasedoc import YBaseDoc
 
@@ -28,15 +28,15 @@ class YBlob(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Y.YDoc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None):
         """
         Constructs a YBlob.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
-        :type ydoc: :class:`y_py.YDoc`, optional.
+        :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ysource = self._ydoc.get_map("source")
+        self._ydoc["source"] = self._ysource = Map()
 
     @property
     def version(self) -> str:
@@ -66,8 +66,7 @@ class YBlob(YBaseDoc):
         """
         if isinstance(value, bytes):
             value = base64.b64encode(value).decode()
-        with self._ydoc.begin_transaction() as t:
-            self._ysource.set(t, "base64", value)
+        self._ysource["base64"] = value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """

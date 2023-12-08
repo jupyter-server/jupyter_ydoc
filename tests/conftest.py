@@ -6,8 +6,8 @@ import subprocess
 from pathlib import Path
 
 import pytest
+from pycrdt_websocket import WebsocketServer
 from websockets import serve  # type: ignore
-from ypy_websocket import WebsocketServer
 
 # workaround until these PRs are merged:
 # - https://github.com/yjs/y-websocket/pull/104
@@ -33,8 +33,11 @@ async def yws_server(request):
     except Exception:
         kwargs = {}
     websocket_server = WebsocketServer(**kwargs)
-    async with serve(websocket_server.serve, "localhost", 1234):
-        yield websocket_server
+    try:
+        async with websocket_server, serve(websocket_server.serve, "localhost", 1234):
+            yield websocket_server
+    except Exception:
+        pass
 
 
 @pytest.fixture

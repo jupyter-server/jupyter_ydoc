@@ -4,7 +4,7 @@
 from functools import partial
 from typing import Any, Callable, Optional
 
-import y_py as Y
+from pycrdt import Doc, Text
 
 from .ybasedoc import YBaseDoc
 
@@ -23,15 +23,15 @@ class YUnicode(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Y.YDoc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None):
         """
         Constructs a YUnicode.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
-        :type ydoc: :class:`y_py.YDoc`, optional.
+        :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ysource = self._ydoc.get_text("source")
+        self._ydoc["source"] = self._ysource = Text()
 
     @property
     def version(self) -> str:
@@ -59,14 +59,12 @@ class YUnicode(YBaseDoc):
         :param value: The content of the document.
         :type value: str
         """
-        with self._ydoc.begin_transaction() as t:
+        with self._ydoc.transaction():
             # clear document
-            source_len = len(self._ysource)
-            if source_len:
-                self._ysource.delete_range(t, 0, source_len)
+            self._ysource.clear()
             # initialize document
             if value:
-                self._ysource.extend(t, value)
+                self._ysource += value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """

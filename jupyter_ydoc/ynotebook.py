@@ -7,7 +7,7 @@ from functools import partial
 from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
 
-import y_py as Y
+from pycrdt import Array, Doc, Map, Text
 
 from .utils import cast_all
 from .ybasedoc import YBaseDoc
@@ -47,16 +47,16 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Y.YDoc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None):
         """
         Constructs a YNotebook.
 
-        :param ydoc: The :class:`y_py.YDoc` that will hold the data of the document, if provided.
-        :type ydoc: :class:`y_py.YDoc`, optional.
+        :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
+        :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ymeta = self._ydoc.get_map("meta")
-        self._ycells = self._ydoc.get_array("cells")
+        self._ydoc["meta"] = self._ymeta = Map()
+        self._ydoc["cells"] = self._ycells = Array()
 
     @property
     def version(self) -> str:
@@ -74,7 +74,7 @@ class YNotebook(YBaseDoc):
         Returns the Y-cells.
 
         :return: The Y-cells.
-        :rtype: :class:`y_py.YArray`
+        :rtype: :class:`pycrdt.Array`
         """
         return self._ycells
 
@@ -98,8 +98,8 @@ class YNotebook(YBaseDoc):
         :return: A cell.
         :rtype: Dict[str, Any]
         """
-        meta = json.loads(self._ymeta.to_json())
-        cell = json.loads(self._ycells[index].to_json())
+        meta = json.loads(str(self._ymeta))
+        cell = json.loads(str(self._ycells[index]))
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
@@ -112,26 +112,17 @@ class YNotebook(YBaseDoc):
             del cell["attachments"]
         return cell
 
-    def append_cell(self, value: Dict[str, Any], txn: Optional[Y.YTransaction] = None) -> None:
+    def append_cell(self, value: Dict[str, Any]) -> None:
         """
         Appends a cell.
 
         :param value: A cell.
         :type value: Dict[str, Any]
-
-        :param txn: A YTransaction, defaults to None
-        :type txn: :class:`y_py.YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
-        if txn is None:
-            with self._ydoc.begin_transaction() as txn:
-                self._ycells.append(txn, ycell)
-        else:
-            self._ycells.append(txn, ycell)
+        self._ycells.append(ycell)
 
-    def set_cell(
-        self, index: int, value: Dict[str, Any], txn: Optional[Y.YTransaction] = None
-    ) -> None:
+    def set_cell(self, index: int, value: Dict[str, Any]) -> None:
         """
         Sets a cell into indicated position.
 
@@ -140,14 +131,11 @@ class YNotebook(YBaseDoc):
 
         :param value: A cell.
         :type value: Dict[str, Any]
-
-        :param txn: A YTransaction, defaults to None
-        :type txn: :class:`y_py.YTransaction`, optional.
         """
         ycell = self.create_ycell(value)
-        self.set_ycell(index, ycell, txn)
+        self.set_ycell(index, ycell)
 
-    def create_ycell(self, value: Dict[str, Any]) -> Y.YMap:
+    def create_ycell(self, value: Dict[str, Any]) -> Map:
         """
         Creates YMap with the content of the cell.
 
@@ -155,7 +143,7 @@ class YNotebook(YBaseDoc):
         :type value: Dict[str, Any]
 
         :return: A new cell.
-        :rtype: :class:`y_py.YMap`
+        :rtype: :class:`pycrdt.Map`
         """
         cell = copy.deepcopy(value)
         if "id" not in cell:
@@ -163,18 +151,18 @@ class YNotebook(YBaseDoc):
         cell_type = cell["cell_type"]
         cell_source = cell["source"]
         cell_source = "".join(cell_source) if isinstance(cell_source, list) else cell_source
-        cell["source"] = Y.YText(cell_source)
-        cell["metadata"] = Y.YMap(cell.get("metadata", {}))
+        cell["source"] = Text(cell_source)
+        cell["metadata"] = Map(cell.get("metadata", {}))
 
         if cell_type in ("raw", "markdown"):
             if "attachments" in cell and not cell["attachments"]:
                 del cell["attachments"]
         elif cell_type == "code":
-            cell["outputs"] = Y.YArray(cell.get("outputs", []))
+            cell["outputs"] = Array(cell.get("outputs", []))
 
-        return Y.YMap(cell)
+        return Map(cell)
 
-    def set_ycell(self, index: int, ycell: Y.YMap, txn: Optional[Y.YTransaction] = None) -> None:
+    def set_ycell(self, index: int, ycell: Map) -> None:
         """
         Sets a Y cell into the indicated position.
 
@@ -182,18 +170,9 @@ class YNotebook(YBaseDoc):
         :type index: int
 
         :param ycell: A YMap with the content of a cell.
-        :type ycell: :class:`y_py.YMap`
-
-        :param txn: A YTransaction, defaults to None
-        :type txn: :class:`y_py.YTransaction`, optional.
+        :type ycell: :class:`pycrdt.Map`
         """
-        if txn is None:
-            with self._ydoc.begin_transaction() as txn:
-                self._ycells.delete(txn, index)
-                self._ycells.insert(txn, index, ycell)
-        else:
-            self._ycells.delete(txn, index)
-            self._ycells.insert(txn, index, ycell)
+        self._ycells[index] = ycell
 
     def get(self) -> Dict:
         """
@@ -202,7 +181,7 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        meta = json.loads(self._ymeta.to_json())
+        meta = json.loads(str(self._ymeta))
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
@@ -247,29 +226,23 @@ class YNotebook(YBaseDoc):
             }
         ]
 
-        with self._ydoc.begin_transaction() as t:
+        with self._ydoc.transaction():
             # clear document
-            cells_len = len(self._ycells)
-            for key in self._ymeta:
-                self._ymeta.pop(t, key)
-            if cells_len:
-                self._ycells.delete_range(t, 0, cells_len)
-            for key in [k for k in self._ystate if k not in ("dirty", "path")]:
-                self._ystate.pop(t, key)
+            self._ymeta.clear()
+            self._ycells.clear()
+            for key in [k for k in self._ystate.keys() if k not in ("dirty", "path")]:
+                del self._ystate[key]
 
             # initialize document
-            # workaround for https://github.com/y-crdt/ypy/issues/126:
-            # self._ycells.extend(t, [self.create_ycell(cell) for cell in cells])
-            for cell in cells:
-                self._ycells.append(t, self.create_ycell(cell))
-            self._ymeta.set(t, "nbformat", nb.get("nbformat", NBFORMAT_MAJOR_VERSION))
-            self._ymeta.set(t, "nbformat_minor", nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION))
+            self._ycells.extend([self.create_ycell(cell) for cell in cells])
+            self._ymeta["nbformat"] = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
+            self._ymeta["nbformat_minor"] = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
 
             metadata = nb.get("metadata", {})
             metadata.setdefault("language_info", {"name": ""})
             metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
 
-            self._ymeta.set(t, "metadata", Y.YMap(metadata))
+            self._ymeta["metadata"] = Map(metadata)
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
