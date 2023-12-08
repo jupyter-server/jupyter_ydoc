@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from anyio import Event, create_task_group, move_on_after
 from pycrdt import Doc, Map
-from websockets import connect  # type: ignore
 from pycrdt_websocket import WebsocketProvider
+from websockets import connect  # type: ignore
 
 from jupyter_ydoc import YNotebook
 from jupyter_ydoc.utils import cast_all
