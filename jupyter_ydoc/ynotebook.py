@@ -2,7 +2,6 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
-import json
 from functools import partial
 from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
@@ -98,8 +97,8 @@ class YNotebook(YBaseDoc):
         :return: A cell.
         :rtype: Dict[str, Any]
         """
-        meta = json.loads(str(self._ymeta))
-        cell = json.loads(str(self._ycells[index]))
+        meta = self._ymeta.to_py()
+        cell = self._ycells[index].to_py()
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
@@ -181,7 +180,7 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        meta = json.loads(str(self._ymeta))
+        meta = self._ymeta.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
