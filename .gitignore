@@ -147,3 +147,6 @@ jupyter_ydoc/_version.py
 !.yarn/versions
 docs/source/api
 docs/source/changelog.md
+# pixi environments
+.pixi
+
