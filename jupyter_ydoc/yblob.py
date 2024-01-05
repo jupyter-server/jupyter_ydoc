@@ -1,9 +1,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-import base64
 from functools import partial
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Optional
 
 from pycrdt import Doc, Map
 
@@ -13,10 +12,7 @@ from .ybasedoc import YBaseDoc
 class YBlob(YBaseDoc):
     """
     Extends :class:`YBaseDoc`, and represents a blob document.
-    It is currently encoded as base64 because of:
-    https://github.com/y-crdt/ypy/issues/108#issuecomment-1377055465
-    The Y document can be set from bytes or from str, in which case it is assumed to be encoded as
-    base64.
+    The Y document is set from bytes.
 
     Schema:
 
@@ -46,7 +42,7 @@ class YBlob(YBaseDoc):
         :return: Document's version.
         :rtype: str
         """
-        return "1.0.0"
+        return "2.0.0"
 
     def get(self) -> bytes:
         """
@@ -55,18 +51,16 @@ class YBlob(YBaseDoc):
         :return: Document's content.
         :rtype: bytes
         """
-        return base64.b64decode(self._ysource.get("base64", "").encode())
+        return self._ysource.get("bytes", b"")
 
-    def set(self, value: Union[bytes, str]) -> None:
+    def set(self, value: bytes) -> None:
         """
         Sets the content of the document.
 
         :param value: The content of the document.
-        :type value: Union[bytes, str]
+        :type value: bytes
         """
-        if isinstance(value, bytes):
-            value = base64.b64encode(value).decode()
-        self._ysource["base64"] = value
+        self._ysource["bytes"] = value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
