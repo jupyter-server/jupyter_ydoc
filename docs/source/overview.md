@@ -1,6 +1,6 @@
 # Overview
 
-The `jupyter_ydoc` repository includes various models that JupyterLab uses for collaborative editing. These models use a specific implementation of a CRDT, the Y-CRDTs. To be more precise, the JavaScript package uses [yjs](https://github.com/yjs/yjs), while the Python package uses [y_py](https://github.com/y-crdt/ypy).
+The `jupyter_ydoc` repository includes various models that JupyterLab uses for collaborative editing. These models use a specific implementation of a CRDT, the Y-CRDTs. To be more precise, the JavaScript package uses [yjs](https://github.com/yjs/yjs), while the Python package uses [pycrdt](https://github.com/jupyter-server/pycrdt).
 
 Jupyter YDoc was designed to centralize the data structures used for composing a document in a single class, hide the complicated edge cases of CRDTs, and prevent users from inserting invalid data or adding new attributes to the document that are not part of the schema.
 
@@ -19,7 +19,7 @@ Built on top of [yjs](https://github.com/yjs/yjs), `@jupyter/ydoc` is a JavaScri
 
 
 ## `jupyter-ydoc`
-Built on top of [y_py](https://github.com/y-crdt/ypy), `jupyter-ydoc` is a Python package that includes the models used in the JupyterLab back-end for representing collaborative documents.
+Built on top of [pycrdt](https://github.com/jupyter-server/pycrdt), `jupyter-ydoc` is a Python package that includes the models used in the JupyterLab back-end for representing collaborative documents.
 
 **Source Code:** [GitHub](https://github.com/jupyter-server/jupyter_ydoc/tree/main/jupyter_ydoc)
 
