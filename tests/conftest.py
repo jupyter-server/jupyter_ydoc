@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 from pycrdt_websocket import WebsocketServer
-from websockets import serve  # type: ignore
+from websockets import serve
 
 # workaround until these PRs are merged:
 # - https://github.com/yjs/y-websocket/pull/104

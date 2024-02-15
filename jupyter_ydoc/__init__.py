@@ -3,11 +3,11 @@
 
 import sys
 
-from ._version import __version__  # noqa
-from .yblob import YBlob  # noqa
-from .yfile import YFile  # noqa
-from .ynotebook import YNotebook  # noqa
-from .yunicode import YUnicode  # noqa
+from ._version import __version__ as __version__
+from .yblob import YBlob as YBlob
+from .yfile import YFile as YFile
+from .ynotebook import YNotebook as YNotebook
+from .yunicode import YUnicode as YUnicode
 
 # See compatibility note on `group` keyword in
 # https://docs.python.org/3/library/importlib.metadata.html#entry-points

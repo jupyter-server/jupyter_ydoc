@@ -54,8 +54,8 @@ class YNotebook(YBaseDoc):
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ydoc["meta"] = self._ymeta = Map()
-        self._ydoc["cells"] = self._ycells = Array()
+        self._ymeta = self._ydoc.get("meta", type=Map)
+        self._ycells = self._ydoc.get("cells", type=Array)
 
     @property
     def version(self) -> str:

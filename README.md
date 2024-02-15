@@ -5,7 +5,7 @@
 
 # jupyter_ydoc
 
-`jupyter_ydoc` provides [Ypy](https://github.com/y-crdt/ypy)-based data structures for various
+`jupyter_ydoc` provides [pycrdt](https://github.com/jupyter-server/pycrdt)-based data structures for various
 documents used in the Jupyter ecosystem. Built-in documents include:
 - `YBlob`: a generic immutable binary document.
 - `YUnicode`: a generic UTF8-encoded text document (`YFile` is an alias to `YUnicode`).
@@ -29,9 +29,11 @@ print(ydocs)
 Which is just a shortcut to:
 
 ```py
-import pkg_resources
+from importlib.metadata import entry_points
+# for Python < 3.10, install importlib_metadata and do:
+# from importlib_metadata import entry_points
 
-ydocs = {ep.name: ep.load() for ep in pkg_resources.iter_entry_points(group="jupyter_ydoc")}
+ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
 ```
 
 Or directly import them:

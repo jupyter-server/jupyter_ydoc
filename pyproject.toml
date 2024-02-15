@@ -9,11 +9,11 @@ build-backend = "hatchling.build"
 name = "jupyter-ydoc"
 dynamic = ["version"]
 description = "Document structures for collaborative editing using Ypy"
-requires-python = ">=3.7"
-keywords = ["jupyter", "ypy"]
+requires-python = ">=3.8"
+keywords = ["jupyter", "pycrdt", "yjs"]
 dependencies = [
     "importlib_metadata >=3.6; python_version<'3.10'",
-    "pycrdt >=0.8.3,<0.9.0",
+    "pycrdt >=0.8.11,<0.9.0",
 ]
 
 [[project.authors]]
@@ -82,5 +82,15 @@ before-bump-version = ["pip install -e .[dev]"]
 [tool.jupyter-releaser.options]
 version_cmd = "hatch version"
 
-[tool.flake8]
-max-line-length = 100
+[tool.ruff]
+line-length = 100
+lint.select = [
+    "ASYNC",        # flake8-async
+    "E", "F", "W",  # default Flake8
+    "G",            # flake8-logging-format
+    "I",            # isort
+    "ISC",          # flake8-implicit-str-concat
+    "PGH",          # pygrep-hooks
+    "RUF100",       # unused noqa (yesqa)
+    "UP",           # pyupgrade
+]
