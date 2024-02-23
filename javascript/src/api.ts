@@ -20,7 +20,7 @@ import type {
   JSONValue,
   PartialJSONValue
 } from '@lumino/coreutils';
-import type { IObservableDisposable } from '@lumino/disposable';
+import type { IDisposable, IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
 
 /**
@@ -81,6 +81,26 @@ export interface ISharedBase extends IObservableDisposable {
 }
 
 /**
+ * An interface for a document provider.
+ */
+export interface IDocumentProvider extends IDisposable {
+  /**
+   * Returns a Promise that resolves when the document provider is ready.
+   */
+  readonly ready: Promise<void>;
+
+  /**
+   * Request to fork the room in the backend, and connect the shared document to the forked room.
+   */
+  fork(): Promise<void>;
+
+  /**
+   * Connect a shared document to a forked room with forkId and return a document provider.
+   */
+  connectFork(forkId: string, sharedDocument: ISharedDocument): IDocumentProvider;
+}
+
+/**
  * Implement an API for Context information on the shared information.
  * This is used by, for example, docregistry to share the file-path of the edited content.
  */
@@ -114,6 +134,28 @@ export interface ISharedDocument extends ISharedBase {
    * The changed signal.
    */
   readonly changed: ISignal<this, DocumentChange>;
+
+  /**
+   * Get a provider with a given ID
+   *
+   * @param providerId The provider ID
+   */
+  getProvider(providerId: string, sharedModel?: ISharedDocument): IDocumentProvider;
+
+  /**
+   * Set a provider for this document
+   *
+   * @param providerId Provider ID (either 'root' or a UUID)
+   * @param provider The document provider
+   */
+  setProvider(providerId: string, provider: IDocumentProvider): void;
+
+  /**
+   * Add a fork ID to the document's ystate, as a new key 'fork_{forkId}'
+   *
+   * @param forkId The fork ID to add to the document
+   */
+  addFork(forkId: string): void;
 }
 
 /**

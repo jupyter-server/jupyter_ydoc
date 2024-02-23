@@ -7,7 +7,7 @@ import { JSONExt, JSONObject, JSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-import type { DocumentChange, ISharedDocument, StateChange } from './api.js';
+import type { DocumentChange, IDocumentProvider, ISharedDocument, StateChange } from './api';
 
 /**
  * Generic shareable document.
@@ -28,12 +28,36 @@ export abstract class YDocument<T extends DocumentChange>
     this._awareness = new Awareness(this._ydoc);
 
     this._ystate.observe(this.onStateChanged);
+
+    this._providers = {};
   }
 
   /**
    * Document version
    */
   abstract readonly version: string;
+
+  addFork(forkId: string) {
+    this.ystate.set(`fork_${forkId}`, 'new');
+  }
+
+  getProvider(providerId: string, sharedModel?: ISharedDocument): IDocumentProvider {
+    if (!(providerId in this._providers)) {
+      if (providerId === 'root') {
+        throw new Error('Cannot get a new provider for root document');
+      }
+      if (sharedModel === undefined) {
+        throw new Error('New provider needs a shared document');
+      }
+      const root_provider = this._providers['root'];
+      this._providers[providerId] = root_provider.connectFork(providerId, sharedModel!);
+    }
+    return this._providers[providerId];
+  }
+
+  setProvider(providerId: string, provider: IDocumentProvider) {
+    this._providers[providerId] = provider;
+  }
 
   /**
    * YJS document.
@@ -200,6 +224,7 @@ export abstract class YDocument<T extends DocumentChange>
   private _awareness: Awareness;
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
+  private _providers: { [key: string]: IDocumentProvider };
 }
 
 /**
