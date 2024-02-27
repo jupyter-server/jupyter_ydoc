@@ -17,6 +17,7 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
+    this.forkId = options?.forkId ?? 'root';
 
     this._ystate = this._ydoc.getMap('state');
 
@@ -257,6 +258,7 @@ export abstract class YDocument<T extends DocumentChange>
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
   private _providers: { [key: string]: IDocumentProvider };
+  public forkId: string;
 }
 
 /**
@@ -271,5 +273,10 @@ export namespace YDocument {
      * The optional YJS document for YDocument.
      */
     ydoc?: Y.Doc;
+
+    /**
+     * The document fork ID, defaults to 'root'.
+     */
+    forkId?: string;
   }
 }

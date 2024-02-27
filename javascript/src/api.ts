@@ -157,6 +157,11 @@ interface ISharedDocumentNoSource extends ISharedBase {
    * @param forkId The fork ID to add to the document
    */
   addFork(forkId: string): void;
+
+  /**
+   * The document fork ID
+   */
+  forkId: string;
 }
 
 /**
