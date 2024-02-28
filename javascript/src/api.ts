@@ -90,14 +90,14 @@ export interface IDocumentProvider extends IDisposable {
   readonly ready: Promise<void>;
 
   /**
-   * Request to fork the room in the backend, and connect the shared document to the forked room.
+   * Request to fork the room in the backend, returns the fork ID.
    */
-  fork(): Promise<void>;
+  fork(): Promise<string>;
 
   /**
-   * Connect a shared document to a forked room with forkId and return a document provider.
+   * Connect the shared document to a forked room with forkId (disconnect from previous room).
    */
-  connectFork(forkId: string, sharedDocument: ISharedDocument): IDocumentProvider;
+  connectFork(forkId: string): void;
 }
 
 /**
@@ -136,19 +136,9 @@ export interface ISharedDocument extends ISharedBase {
   readonly changed: ISignal<this, DocumentChange>;
 
   /**
-   * Get a provider with a given ID
-   *
-   * @param providerId The provider ID
+   * The document's provider.
    */
-  getProvider(providerId: string, sharedModel?: ISharedDocument): IDocumentProvider;
-
-  /**
-   * Set a provider for this document
-   *
-   * @param providerId Provider ID (either 'root' or a UUID)
-   * @param provider The document provider
-   */
-  setProvider(providerId: string, provider: IDocumentProvider): void;
+  provider: IDocumentProvider;
 
   /**
    * Add a fork ID to the document's ystate, as a new key 'fork_{forkId}'
@@ -158,9 +148,9 @@ export interface ISharedDocument extends ISharedBase {
   addFork(forkId: string): void;
 
   /**
-   * The document fork ID
+   * The document room ID
    */
-  forkId: string;
+  roomId: string;
 }
 
 /**

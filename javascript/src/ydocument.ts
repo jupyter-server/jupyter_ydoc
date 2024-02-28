@@ -17,7 +17,7 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
-    this.forkId = options?.forkId ?? 'root';
+    this.roomId = options?.roomId ?? '';
 
     this._ystate = this._ydoc.getMap('state');
 
@@ -29,8 +29,6 @@ export abstract class YDocument<T extends DocumentChange>
     this._awareness = new Awareness(this._ydoc);
 
     this._ystate.observe(this.onStateChanged);
-
-    this._providers = {};
   }
 
   /**
@@ -42,22 +40,15 @@ export abstract class YDocument<T extends DocumentChange>
     this.ystate.set(`fork_${forkId}`, 'new');
   }
 
-  getProvider(providerId: string, sharedModel?: ISharedDocument): IDocumentProvider {
-    if (!(providerId in this._providers)) {
-      if (providerId === 'root') {
-        throw new Error('Cannot get a new provider for root document');
-      }
-      if (sharedModel === undefined) {
-        throw new Error('New provider needs a shared document');
-      }
-      const root_provider = this._providers['root'];
-      this._providers[providerId] = root_provider.connectFork(providerId, sharedModel!);
+  get provider(): IDocumentProvider {
+    if (this._provider === undefined) {
+      throw new Error('YDocument has no provider');
     }
-    return this._providers[providerId];
+    return this._provider;
   }
 
-  setProvider(providerId: string, provider: IDocumentProvider) {
-    this._providers[providerId] = provider;
+  set provider(provider: IDocumentProvider) {
+    this._provider = provider;
   }
 
   /**
@@ -225,8 +216,8 @@ export abstract class YDocument<T extends DocumentChange>
   private _awareness: Awareness;
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
-  private _providers: { [key: string]: IDocumentProvider };
-  public forkId: string;
+  private _provider: IDocumentProvider;
+  public roomId: string;
 }
 
 /**
@@ -243,8 +234,8 @@ export namespace YDocument {
     ydoc?: Y.Doc;
 
     /**
-     * The document fork ID, defaults to 'root'.
+     * The document room ID, defaults to ''.
      */
-    forkId?: string;
+    roomId?: string;
   }
 }
