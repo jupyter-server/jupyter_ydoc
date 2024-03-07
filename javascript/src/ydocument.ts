@@ -17,7 +17,8 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
-    this.roomId = options?.roomId ?? '';
+    this.rootRoomId = options?.rootRoomId ?? '';
+    this.currentRoomId = options?.currentRoomId ?? ''
 
     this._ystate = this._ydoc.getMap('state');
 
@@ -217,7 +218,8 @@ export abstract class YDocument<T extends DocumentChange>
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
   private _provider: IDocumentProvider;
-  public roomId: string;
+  public rootRoomId: string;
+  public currentRoomId: string;
 }
 
 /**
@@ -234,8 +236,13 @@ export namespace YDocument {
     ydoc?: Y.Doc;
 
     /**
-     * The document room ID, defaults to ''.
+     * The document root room ID, defaults to ''.
      */
-    roomId?: string;
+    rootRoomId?: string;
+
+    /**
+     * The document current room ID, defaults to ''.
+     */
+    currentRoomId?: string;
   }
 }

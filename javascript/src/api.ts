@@ -148,9 +148,14 @@ export interface ISharedDocument extends ISharedBase {
   addFork(forkId: string): void;
 
   /**
-   * The document room ID
+   * The document root room ID
    */
-  roomId: string;
+  rootRoomId: string;
+
+  /**
+   * The document current room ID
+   */
+  currentRoomId: string;
 }
 
 /**
