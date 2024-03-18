@@ -7,7 +7,12 @@ import { JSONExt, JSONObject, JSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-import type { DocumentChange, IDocumentProvider, ISharedDocument, StateChange } from './api';
+import type {
+  DocumentChange,
+  IDocumentProvider,
+  ISharedDocument,
+  StateChange
+} from './api.js';
 
 /**
  * Generic shareable document.
@@ -18,7 +23,7 @@ export abstract class YDocument<T extends DocumentChange>
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
     this.rootRoomId = options?.rootRoomId ?? '';
-    this.currentRoomId = options?.currentRoomId ?? ''
+    this.currentRoomId = options?.currentRoomId ?? '';
 
     this._ystate = this._ydoc.getMap('state');
 
