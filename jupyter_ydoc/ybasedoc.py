@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional
 
-from pycrdt import Doc, Map
+from pycrdt import Doc, Map, Subscription
 
 
 class YBaseDoc(ABC):
@@ -27,7 +27,7 @@ class YBaseDoc(ABC):
         else:
             self._ydoc = ydoc
         self._ystate = self._ydoc.get("state", type=Map)
-        self._subscriptions: Dict[Any, str] = {}
+        self._subscriptions: Dict[Any, Subscription] = {}
 
     @property
     @abstractmethod
