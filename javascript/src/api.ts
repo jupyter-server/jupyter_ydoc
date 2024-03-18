@@ -96,9 +96,9 @@ export interface IDocumentProvider extends IDisposable {
   fork(): Promise<string>;
 
   /**
-   * Connect the shared document to a forked room with forkId (disconnect from previous room).
+   * Connect the shared document to a room with given ID (disconnect from previous room).
    */
-  connectFork(forkId: string): void;
+  connect(roomId: string): void;
 }
 
 /**
