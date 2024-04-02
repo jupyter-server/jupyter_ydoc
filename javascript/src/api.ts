@@ -97,7 +97,7 @@ export interface IDocumentProvider extends IDisposable {
   /**
    * Connect the shared document to a room with given ID (disconnect from previous room).
    */
-  connect(roomId: string): void;
+  connect(roomId: string, merge?: boolean): void;
 }
 
 /**
