@@ -38,6 +38,12 @@ class YNotebook(YBaseDoc):
                     "cell_type": str,
                     "source": YText,
                     "metadata": YMap,
+                    "pending_requests": YArray[
+                        YMap[
+                            "id": str,
+                            "type": str
+                        ]
+                    ],
                     "execution_count": Int | None,
                     "outputs": [] | None,
                     "attachments": {} | None
@@ -99,6 +105,9 @@ class YNotebook(YBaseDoc):
         """
         meta = self._ymeta.to_py()
         cell = self._ycells[index].to_py()
+        if "pending_requests" in cell:
+            # requests are not a part of notebook format, but a run-time only property
+            del cell["pending_requests"]
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
             # strip cell IDs if we have notebook format 4.0-4.4
@@ -158,6 +167,7 @@ class YNotebook(YBaseDoc):
                 del cell["attachments"]
         elif cell_type == "code":
             cell["outputs"] = Array(cell.get("outputs", []))
+            cell["pending_requests"] = Array([])
 
         return Map(cell)
 
