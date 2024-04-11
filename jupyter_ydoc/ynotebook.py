@@ -167,7 +167,7 @@ class YNotebook(YBaseDoc):
                 del cell["attachments"]
         elif cell_type == "code":
             cell["outputs"] = Array(cell.get("outputs", []))
-            cell["pending_requests"] = Array([])
+            cell["pending_requests"] = Array()
 
         return Map(cell)
 
