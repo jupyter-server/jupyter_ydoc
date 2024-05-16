@@ -7,6 +7,7 @@ from ._version import __version__ as __version__
 from .yblob import YBlob as YBlob
 from .yfile import YFile as YFile
 from .ynotebook import YNotebook as YNotebook
+from .ystdin import add_stdin as add_stdin
 from .yunicode import YUnicode as YUnicode
 
 # See compatibility note on `group` keyword in

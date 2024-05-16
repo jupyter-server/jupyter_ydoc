@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from jupyter_ydoc import YBlob
+from jupyter_ydoc import YBlob, YNotebook, add_stdin
 
 
 def test_yblob():
@@ -22,3 +22,34 @@ def test_yblob():
     assert topic == "source"
     assert event.keys["bytes"]["oldValue"] == b"012"
     assert event.keys["bytes"]["newValue"] == b"345"
+
+
+def test_stdin():
+    ynotebook = YNotebook()
+    ynotebook.append_cell(
+        {
+            "cell_type": "code",
+            "source": "",
+        }
+    )
+    ycell = ynotebook.ycells[0]
+    add_stdin(ycell)
+    cell = ycell.to_py()
+    # cell ID is random, ignore that
+    del cell["id"]
+    assert cell == {
+        "outputs": [
+            {
+                "output_type": "stdin",
+                "input": "",
+                "prompt": "",
+                "state": {
+                    "password": False,
+                    "pending": True,
+                },
+            }
+        ],
+        "source": "",
+        "metadata": {},
+        "cell_type": "code",
+    }
