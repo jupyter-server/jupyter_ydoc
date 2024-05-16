@@ -109,6 +109,10 @@ class YNotebook(YBaseDoc):
             and not cell["attachments"]
         ):
             del cell["attachments"]
+        outputs = cell.get("outputs", [])
+        for idx, output in enumerate(outputs):
+            if output["output_type"] == "stdin":
+                del outputs[idx]
         return cell
 
     def append_cell(self, value: Dict[str, Any]) -> None:
