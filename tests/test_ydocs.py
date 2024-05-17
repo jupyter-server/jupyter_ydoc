@@ -12,7 +12,6 @@ def test_yblob():
     changes = []
 
     def callback(topic, event):
-        print(topic, event)
         changes.append((topic, event))
 
     yblob.observe(callback)
@@ -33,20 +32,22 @@ def test_stdin():
         }
     )
     ycell = ynotebook.ycells[0]
-    add_stdin(ycell)
+    add_stdin(ycell, prompt="pwd:", password=True)
+    stdin = ycell["outputs"][0]["input"]
+    stdin += "mypassword"
     cell = ycell.to_py()
     # cell ID is random, ignore that
     del cell["id"]
+    # input ID is random, ignore that
+    del cell["outputs"][0]["id"]
     assert cell == {
         "outputs": [
             {
                 "output_type": "stdin",
-                "input": "",
-                "prompt": "",
-                "state": {
-                    "password": False,
-                    "pending": True,
-                },
+                "input": "mypassword",
+                "prompt": "pwd:",
+                "password": True,
+                "submitted": False,
             }
         ],
         "source": "",
