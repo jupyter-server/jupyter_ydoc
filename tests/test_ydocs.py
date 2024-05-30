@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from jupyter_ydoc import YBlob, YNotebook, add_stdin
+from jupyter_ydoc import YBlob, YNotebook, add_stdin_output
 
 
 def test_yblob():
@@ -23,7 +23,7 @@ def test_yblob():
     assert event.keys["bytes"]["newValue"] == b"345"
 
 
-def test_stdin():
+def test_stdin_output():
     ynotebook = YNotebook()
     ynotebook.append_cell(
         {
@@ -32,22 +32,24 @@ def test_stdin():
         }
     )
     ycell = ynotebook.ycells[0]
-    add_stdin(ycell, prompt="pwd:", password=True)
-    stdin = ycell["outputs"][0]["input"]
+    youtputs = ycell["outputs"]
+    stdin_idx = add_stdin_output(youtputs, prompt="pwd:", password=True)
+    stdin_output = youtputs[stdin_idx]
+    stdin = stdin_output["value"]
     stdin += "mypassword"
+    stdin_output["submitted"] = True
+
     cell = ycell.to_py()
     # cell ID is random, ignore that
     del cell["id"]
-    # input ID is random, ignore that
-    del cell["outputs"][0]["id"]
     assert cell == {
         "outputs": [
             {
                 "output_type": "stdin",
-                "input": "mypassword",
+                "value": "mypassword",
                 "prompt": "pwd:",
                 "password": True,
-                "submitted": False,
+                "submitted": True,
             }
         ],
         "source": "",

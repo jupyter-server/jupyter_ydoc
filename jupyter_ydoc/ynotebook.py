@@ -109,6 +109,7 @@ class YNotebook(YBaseDoc):
             and not cell["attachments"]
         ):
             del cell["attachments"]
+        # filter out stdin output
         outputs = cell.get("outputs", [])
         del_outputs = []
         for idx, output in enumerate(outputs):

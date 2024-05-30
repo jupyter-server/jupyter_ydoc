@@ -1,14 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from uuid import uuid4
-
-from pycrdt import Map, Text
+from pycrdt import Array, Map, Text
 
 
-def add_stdin(cell: Map, prompt: str = "", password: bool = False) -> str:
+def add_stdin_output(outputs: Array, prompt: str = "", password: bool = False) -> int:
     """
-    Adds an stdin Map in the cell outputs, and returns its ID.
+    Adds an stdin output Map in the cell outputs, and returns its index.
 
     Schema:
 
@@ -16,24 +14,21 @@ def add_stdin(cell: Map, prompt: str = "", password: bool = False) -> str:
 
         {
             "output_type": "stdin",
-            "id": str,
             "submitted": bool,
             "password": bool
             "prompt": str,
-            "input": Text
+            "value": Text
         }
     """
-    idx = uuid4().hex
-    stdin = Map(
+    stdin_output = Map(
         {
             "output_type": "stdin",
-            "id": idx,
             "submitted": False,
             "password": password,
             "prompt": prompt,
-            "input": Text(),
+            "value": Text(),
         }
     )
-    outputs = cell.get("outputs")
-    outputs.append(stdin)
-    return idx
+    stdin_idx = len(outputs)
+    outputs.append(stdin_output)
+    return stdin_idx
