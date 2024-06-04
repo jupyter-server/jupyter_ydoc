@@ -758,7 +758,12 @@ export class YCodeCell
    * Execution, display, or stream outputs.
    */
   getOutputs(): Array<nbformat.IOutput> {
-    return JSONExt.deepCopy(this._youtputs.toArray());
+    return JSONExt.deepCopy(
+      this._youtputs.toArray().filter(
+        // Filter out stdin output.
+        el => !(el instanceof Y.Map && el.get('output_type') === 'stdin')
+      )
+    );
   }
 
   /**
