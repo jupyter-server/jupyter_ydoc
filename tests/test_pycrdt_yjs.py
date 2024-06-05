@@ -74,6 +74,31 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
         assert ytest.source == nb
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("yjs_client", "1", indirect=True)
+async def test_ypy_yjs_1(yws_server, yjs_client):
+    ydoc = Doc()
+    ynotebook = YNotebook(ydoc)
+    nb = stringify_source(json.loads((files_dir / "nb1.ipynb").read_text()))
+    ynotebook.source = nb
+    async with connect("ws://localhost:1234/my-roomname") as websocket, WebsocketProvider(
+        ydoc, websocket
+    ):
+        output_text = ynotebook.ycells[0]["outputs"][0]["text"]
+        assert output_text.to_py() == ["Hello,"]
+        event = Event()
+
+        def callback(_event):
+            event.set()
+
+        output_text.observe(callback)
+
+        with move_on_after(10):
+            await event.wait()
+
+        assert output_text.to_py() == ["Hello,", " World!"]
+
+
 def test_plotly_renderer():
     """This test checks in particular that the type cast is not breaking the data."""
     ydoc = Doc()

@@ -753,6 +753,9 @@ export class YCodeCell
   set outputs(v: Array<nbformat.IOutput>) {
     this.setOutputs(v);
   }
+  get youtputs(): Y.Array<any> {
+    return this._youtputs;
+  }
 
   /**
    * Execution, display, or stream outputs.
