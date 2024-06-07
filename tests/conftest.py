@@ -43,6 +43,10 @@ async def yws_server(request):
 @pytest.fixture
 def yjs_client(request):
     client_id = request.param
-    p = subprocess.Popen(f"yarn node {here / 'yjs_client_'}{client_id}.js", shell=True)
+    p = subprocess.Popen(["node", f"{here / 'yjs_client_'}{client_id}.js"])
     yield p
-    p.kill()
+    p.terminate()
+    try:
+        p.wait(timeout=10)
+    except Exception:
+        p.kill()
