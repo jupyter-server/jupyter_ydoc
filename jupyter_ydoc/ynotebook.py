@@ -65,7 +65,7 @@ class YNotebook(YBaseDoc):
         :return: Document's version.
         :rtype: str
         """
-        return "1.0.0"
+        return "2.0.0"
 
     @property
     def ycells(self):
