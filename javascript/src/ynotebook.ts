@@ -69,7 +69,7 @@ export class YNotebook
   /**
    * Document version
    */
-  readonly version: string = '1.0.0';
+  readonly version: string = '2.0.0';
 
   /**
    * Creates a standalone YNotebook
