@@ -764,8 +764,8 @@ export class YCodeCell
     return JSONExt.deepCopy(this._youtputs.toJSON());
   }
 
-  createOutputs(outputs: Array<nbformat.IOutput>): Array<any> {
-    const newOutputs: Array<any> = [];
+  createOutputs(outputs: Array<nbformat.IOutput>): Array<Y.Map<any>> {
+    const newOutputs: Array<Y.Map<any>> = [];
     for (const output of outputs) {
       let _newOutput: { [id: string]: any };
       const newOutput = new Y.Map();
@@ -795,6 +795,17 @@ export class YCodeCell
       this._youtputs.delete(0, this._youtputs.length);
       const newOutputs = this.createOutputs(outputs);
       this._youtputs.insert(0, newOutputs);
+    }, false);
+  }
+
+  /**
+   * Push text to a stream output.
+   */
+  pushStreamOutput(index: number, text: string): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Array<string>;
+      prevText.push([text]);
     }, false);
   }
 
@@ -863,7 +874,7 @@ export class YCodeCell
     return changes;
   }
 
-  private _youtputs: Y.Array<nbformat.IOutput>;
+  private _youtputs: Y.Array<Y.Map<any>>;
 }
 
 class YAttachmentCell
