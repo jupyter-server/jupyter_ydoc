@@ -770,11 +770,16 @@ export class YCodeCell
       let _newOutput: { [id: string]: any };
       const newOutput = new Y.Map();
       if (output.output_type === 'stream') {
-        // Set the text field as a Y.Array
+        // Set the text field as a Y.Text
         const { text, ...outputWithoutText } = output;
         _newOutput = outputWithoutText;
-        const newText = new Y.Array();
-        newText.push(text as string[]);
+        const newText = new Y.Text();
+        let length = 0;
+        // text is a list of strings
+        for (const str of text as string[]) {
+          newText.insert(length, str);
+          length += str.length;
+        }
         _newOutput['text'] = newText;
       } else {
         _newOutput = output;
@@ -799,13 +804,25 @@ export class YCodeCell
   }
 
   /**
-   * Push text to a stream output.
+   * Remove text from a stream output.
    */
-  pushStreamOutput(index: number, text: string): void {
+  removeStreamOutput(index: number, start: number): void {
     this.transact(() => {
       const output = this._youtputs.get(index);
-      const prevText = output.get('text') as Y.Array<string>;
-      prevText.push([text]);
+      const prevText = output.get('text') as Y.Text;
+      const length = prevText.length - start;
+      prevText.delete(start, length);
+    }, false);
+  }
+
+  /**
+   * Append text to a stream output.
+   */
+  appendStreamOutput(index: number, text: string): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Text;
+      prevText.insert(prevText.length, text);
     }, false);
   }
 
