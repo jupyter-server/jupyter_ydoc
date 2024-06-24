@@ -764,17 +764,22 @@ export class YCodeCell
     return JSONExt.deepCopy(this._youtputs.toJSON());
   }
 
-  createOutputs(outputs: Array<nbformat.IOutput>): Array<any> {
-    const newOutputs: Array<any> = [];
+  createOutputs(outputs: Array<nbformat.IOutput>): Array<Y.Map<any>> {
+    const newOutputs: Array<Y.Map<any>> = [];
     for (const output of outputs) {
       let _newOutput: { [id: string]: any };
       const newOutput = new Y.Map();
       if (output.output_type === 'stream') {
-        // Set the text field as a Y.Array
+        // Set the text field as a Y.Text
         const { text, ...outputWithoutText } = output;
         _newOutput = outputWithoutText;
-        const newText = new Y.Array();
-        newText.push(text as string[]);
+        const newText = new Y.Text();
+        let length = 0;
+        // text is a list of strings
+        for (const str of text as string[]) {
+          newText.insert(length, str);
+          length += str.length;
+        }
         _newOutput['text'] = newText;
       } else {
         _newOutput = output;
@@ -795,6 +800,29 @@ export class YCodeCell
       this._youtputs.delete(0, this._youtputs.length);
       const newOutputs = this.createOutputs(outputs);
       this._youtputs.insert(0, newOutputs);
+    }, false);
+  }
+
+  /**
+   * Remove text from a stream output.
+   */
+  removeStreamOutput(index: number, start: number): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Text;
+      const length = prevText.length - start;
+      prevText.delete(start, length);
+    }, false);
+  }
+
+  /**
+   * Append text to a stream output.
+   */
+  appendStreamOutput(index: number, text: string): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Text;
+      prevText.insert(prevText.length, text);
     }, false);
   }
 
@@ -863,7 +891,7 @@ export class YCodeCell
     return changes;
   }
 
-  private _youtputs: Y.Array<nbformat.IOutput>;
+  private _youtputs: Y.Array<Y.Map<any>>;
 }
 
 class YAttachmentCell
