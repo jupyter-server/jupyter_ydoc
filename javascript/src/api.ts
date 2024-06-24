@@ -22,6 +22,7 @@ import type {
 } from '@lumino/coreutils';
 import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
+import * as Y from 'yjs';
 
 /**
  * Changes on Sequence-like data are expressed as Quill-inspired deltas.
@@ -737,7 +738,7 @@ export type CellChange = SourceChange & {
   /**
    * Cell output changes
    */
-  outputsChange?: Delta<nbformat.IOutput[]>;
+  outputsChange?: Delta<Y.Map<any>>;
   /**
    * Cell execution count change
    */
