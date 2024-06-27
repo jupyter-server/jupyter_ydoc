@@ -564,11 +564,11 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param f Transaction to execute
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
-  transact(f: () => void, undoable = true): void {
+  transact(f: () => void, undoable = true, origin: any = null): void {
     !this.notebook || this.notebook.disableDocumentWideUndoRedo
       ? this.ymodel.doc == null
         ? f()
-        : this.ymodel.doc.transact(f, undoable ? this : null)
+        : this.ymodel.doc.transact(f, undoable ? this : origin)
       : this.notebook.transact(f, undoable);
   }
 
@@ -656,8 +656,13 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Handle a change to the ymodel.
    */
-  private _modelObserver = (events: Y.YEvent<any>[]) => {
-    this._changed.emit(this.getChanges(events));
+  private _modelObserver = (
+    events: Y.YEvent<any>[],
+    transaction: Y.Transaction
+  ) => {
+    if (transaction.origin !== 'modeldb') {
+      this._changed.emit(this.getChanges(events));
+    }
   };
 
   protected _metadataChanged = new Signal<this, IMapChange>(this);
@@ -838,15 +843,20 @@ export class YCodeCell
   updateOutputs(
     start: number,
     end: number,
-    outputs: Array<nbformat.IOutput> = []
+    outputs: Array<nbformat.IOutput> = [],
+    origin: any = null
   ): void {
     const fin =
       end < this._youtputs.length ? end - start : this._youtputs.length - start;
-    this.transact(() => {
-      this._youtputs.delete(start, fin);
-      const newOutputs = this.createOutputs(outputs);
-      this._youtputs.insert(start, newOutputs);
-    }, false);
+    this.transact(
+      () => {
+        this._youtputs.delete(start, fin);
+        const newOutputs = this.createOutputs(outputs);
+        this._youtputs.insert(start, newOutputs);
+      },
+      false,
+      origin
+    );
   }
 
   /**

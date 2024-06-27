@@ -78,7 +78,7 @@ export interface ISharedBase extends IObservableDisposable {
    * @param f Transaction to execute
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
-  transact(f: () => void, undoable?: boolean): void;
+  transact(f: () => void, undoable?: boolean, origin?: any): void;
 }
 
 /**
