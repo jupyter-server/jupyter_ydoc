@@ -169,9 +169,13 @@ export abstract class YDocument<T extends DocumentChange>
   /**
    * Perform a transaction. While the function f is called, all changes to the shared
    * document are bundled into a single event.
+   *
+   * @param f Transaction to execute
+   * @param undoable Whether to track the change in the action history or not (default `true`)
+   * @param origin Transaction origin
    */
-  transact(f: () => void, undoable = true): void {
-    this.ydoc.transact(f, undoable ? this : null);
+  transact(f: () => void, undoable = true, origin: any = null): void {
+    this.ydoc.transact(f, undoable ? this : origin);
   }
 
   /**
