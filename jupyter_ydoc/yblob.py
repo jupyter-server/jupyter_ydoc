@@ -33,6 +33,7 @@ class YBlob(YBaseDoc):
         """
         super().__init__(ydoc)
         self._ysource = self._ydoc.get("source", type=Map)
+        self.undo_manager.expand_scope(self._ysource)
 
     @property
     def version(self) -> str:
