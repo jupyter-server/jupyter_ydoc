@@ -31,7 +31,8 @@ class YUnicode(YBaseDoc):
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
         super().__init__(ydoc)
-        self._ydoc["source"] = self._ysource = Text()
+        self._ysource = self._ydoc.get("source", type=Text)
+        self.undo_manager.expand_scope(self._ysource)
 
     @property
     def version(self) -> str:
