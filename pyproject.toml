@@ -31,7 +31,7 @@ test = [
     "pytest",
     "pytest-asyncio",
     "websockets >=10.0",
-    "pycrdt-websocket >=0.12.6,<0.13.0",
+    "pycrdt-websocket >=0.14.1,<0.15.0",
 ]
 docs = [
     "sphinx",
