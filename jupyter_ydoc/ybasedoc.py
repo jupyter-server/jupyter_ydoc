@@ -33,7 +33,7 @@ class YBaseDoc(ABC):
             self._ydoc = ydoc
         self._ystate = self._ydoc.get("state", type=Map)
         self._subscriptions = {}
-        self._undo_manager = UndoManager(self._ystate, 0)
+        self._undo_manager = UndoManager(self._ydoc, 0)
 
     @property
     @abstractmethod
