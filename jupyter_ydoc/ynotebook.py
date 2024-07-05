@@ -56,6 +56,7 @@ class YNotebook(YBaseDoc):
         super().__init__(ydoc)
         self._ymeta = self._ydoc.get("meta", type=Map)
         self._ycells = self._ydoc.get("cells", type=Array)
+        self.undo_manager.expand_scope(self._ycells)
 
     @property
     def version(self) -> str:

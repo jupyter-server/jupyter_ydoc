@@ -2,9 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Optional
 
-from pycrdt import Doc, Map, Subscription
+from pycrdt import Doc, Map, Subscription, UndoManager
 
 
 class YBaseDoc(ABC):
@@ -14,6 +14,11 @@ class YBaseDoc(ABC):
     to be able to get and set the content of the document as well as
     subscribe to changes in the document.
     """
+
+    _ydoc: Doc
+    _ystate: Map
+    _subscriptions: dict[Any, Subscription]
+    _undo_manager: UndoManager
 
     def __init__(self, ydoc: Optional[Doc] = None):
         """
@@ -27,7 +32,8 @@ class YBaseDoc(ABC):
         else:
             self._ydoc = ydoc
         self._ystate = self._ydoc.get("state", type=Map)
-        self._subscriptions: Dict[Any, Subscription] = {}
+        self._subscriptions = {}
+        self._undo_manager = UndoManager(doc=self._ydoc, capture_timeout_millis=0)
 
     @property
     @abstractmethod
@@ -40,6 +46,15 @@ class YBaseDoc(ABC):
         """
 
     @property
+    def undo_manager(self) -> UndoManager:
+        """
+        A :class:`pycrdt.UndoManager` for the document.
+
+        :return: The document's undo manager.
+        :rtype: :class:`pycrdt.UndoManager`
+        """
+        return self._undo_manager
+
     def ystate(self) -> Map:
         """
         A :class:`pycrdt.Map` containing the state of the document.
