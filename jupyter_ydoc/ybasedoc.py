@@ -2,7 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
 
 from pycrdt import Doc, Map, Subscription, UndoManager
 
@@ -17,7 +17,7 @@ class YBaseDoc(ABC):
 
     _ydoc: Doc
     _ystate: Map
-    _subscriptions: dict[Any, Subscription]
+    _subscriptions: Dict[Any, Subscription]
     _undo_manager: UndoManager
 
     def __init__(self, ydoc: Optional[Doc] = None):
