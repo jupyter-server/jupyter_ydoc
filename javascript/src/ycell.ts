@@ -660,7 +660,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     events: Y.YEvent<any>[],
     transaction: Y.Transaction
   ) => {
-    if (transaction.origin !== 'modeldb') {
+    if (transaction.origin !== 'silent-change') {
       this._changed.emit(this.getChanges(events));
     }
   };
@@ -771,13 +771,12 @@ export class YCodeCell
 
   createOutputs(outputs: Array<nbformat.IOutput>): Array<Y.Map<any>> {
     const newOutputs: Array<Y.Map<any>> = [];
-    for (const output of outputs) {
-      let _newOutput: { [id: string]: any };
-      const newOutput = new Y.Map();
+    for (const output of JSONExt.deepCopy(outputs)) {
+      let _newOutput1: { [id: string]: any };
       if (output.output_type === 'stream') {
         // Set the text field as a Y.Text
         const { text, ...outputWithoutText } = output;
-        _newOutput = outputWithoutText;
+        _newOutput1 = outputWithoutText;
         const newText = new Y.Text();
         let length = 0;
         // text is a list of strings
@@ -785,13 +784,15 @@ export class YCodeCell
           newText.insert(length, str);
           length += str.length;
         }
-        _newOutput['text'] = newText;
+        _newOutput1['text'] = newText;
       } else {
-        _newOutput = output;
+        _newOutput1 = output;
       }
-      for (const [key, value] of Object.entries(_newOutput)) {
-        newOutput.set(key, value);
+      const _newOutput2: [string, any][] = [];
+      for (const [key, value] of Object.entries(_newOutput1)) {
+        _newOutput2.push([key, value]);
       }
+      const newOutput = new Y.Map(_newOutput2);
       newOutputs.push(newOutput);
     }
     return newOutputs;
