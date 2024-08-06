@@ -22,6 +22,7 @@ import type {
 } from '@lumino/coreutils';
 import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
+import * as Y from 'yjs';
 
 /**
  * Changes on Sequence-like data are expressed as Quill-inspired deltas.
@@ -77,7 +78,7 @@ export interface ISharedBase extends IObservableDisposable {
    * @param f Transaction to execute
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
-  transact(f: () => void, undoable?: boolean): void;
+  transact(f: () => void, undoable?: boolean, origin?: any): void;
 }
 
 /**
@@ -737,7 +738,7 @@ export type CellChange = SourceChange & {
   /**
    * Cell output changes
    */
-  outputsChange?: Delta<nbformat.IOutput[]>;
+  outputsChange?: Delta<Y.Map<any>>;
   /**
    * Cell execution count change
    */

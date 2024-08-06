@@ -170,8 +170,8 @@ export abstract class YDocument<T extends DocumentChange>
    * Perform a transaction. While the function f is called, all changes to the shared
    * document are bundled into a single event.
    */
-  transact(f: () => void, undoable = true): void {
-    this.ydoc.transact(f, undoable ? this : null);
+  transact(f: () => void, undoable = true, origin: any = null): void {
+    this.ydoc.transact(f, undoable ? this : origin);
   }
 
   /**

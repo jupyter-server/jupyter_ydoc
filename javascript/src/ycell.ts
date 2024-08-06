@@ -564,11 +564,11 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param f Transaction to execute
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
-  transact(f: () => void, undoable = true): void {
+  transact(f: () => void, undoable = true, origin: any = null): void {
     !this.notebook || this.notebook.disableDocumentWideUndoRedo
       ? this.ymodel.doc == null
         ? f()
-        : this.ymodel.doc.transact(f, undoable ? this : null)
+        : this.ymodel.doc.transact(f, undoable ? this : origin)
       : this.notebook.transact(f, undoable);
   }
 
@@ -656,8 +656,13 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Handle a change to the ymodel.
    */
-  private _modelObserver = (events: Y.YEvent<any>[]) => {
-    this._changed.emit(this.getChanges(events));
+  private _modelObserver = (
+    events: Y.YEvent<any>[],
+    transaction: Y.Transaction
+  ) => {
+    if (transaction.origin !== 'silent-change') {
+      this._changed.emit(this.getChanges(events));
+    }
   };
 
   protected _metadataChanged = new Signal<this, IMapChange>(this);
@@ -753,12 +758,44 @@ export class YCodeCell
   set outputs(v: Array<nbformat.IOutput>) {
     this.setOutputs(v);
   }
+  get youtputs(): Y.Array<any> {
+    return this._youtputs;
+  }
 
   /**
    * Execution, display, or stream outputs.
    */
   getOutputs(): Array<nbformat.IOutput> {
-    return JSONExt.deepCopy(this._youtputs.toArray());
+    return JSONExt.deepCopy(this._youtputs.toJSON());
+  }
+
+  createOutputs(outputs: Array<nbformat.IOutput>): Array<Y.Map<any>> {
+    const newOutputs: Array<Y.Map<any>> = [];
+    for (const output of JSONExt.deepCopy(outputs)) {
+      let _newOutput1: { [id: string]: any };
+      if (output.output_type === 'stream') {
+        // Set the text field as a Y.Text
+        const { text, ...outputWithoutText } = output;
+        _newOutput1 = outputWithoutText;
+        const newText = new Y.Text();
+        let length = 0;
+        // text is a list of strings
+        for (const str of text as string[]) {
+          newText.insert(length, str);
+          length += str.length;
+        }
+        _newOutput1['text'] = newText;
+      } else {
+        _newOutput1 = output;
+      }
+      const _newOutput2: [string, any][] = [];
+      for (const [key, value] of Object.entries(_newOutput1)) {
+        _newOutput2.push([key, value]);
+      }
+      const newOutput = new Y.Map(_newOutput2);
+      newOutputs.push(newOutput);
+    }
+    return newOutputs;
   }
 
   /**
@@ -767,7 +804,31 @@ export class YCodeCell
   setOutputs(outputs: Array<nbformat.IOutput>): void {
     this.transact(() => {
       this._youtputs.delete(0, this._youtputs.length);
-      this._youtputs.insert(0, outputs);
+      const newOutputs = this.createOutputs(outputs);
+      this._youtputs.insert(0, newOutputs);
+    }, false);
+  }
+
+  /**
+   * Remove text from a stream output.
+   */
+  removeStreamOutput(index: number, start: number): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Text;
+      const length = prevText.length - start;
+      prevText.delete(start, length);
+    }, false);
+  }
+
+  /**
+   * Append text to a stream output.
+   */
+  appendStreamOutput(index: number, text: string): void {
+    this.transact(() => {
+      const output = this._youtputs.get(index);
+      const prevText = output.get('text') as Y.Text;
+      prevText.insert(prevText.length, text);
     }, false);
   }
 
@@ -783,14 +844,20 @@ export class YCodeCell
   updateOutputs(
     start: number,
     end: number,
-    outputs: Array<nbformat.IOutput> = []
+    outputs: Array<nbformat.IOutput> = [],
+    origin: any = null
   ): void {
     const fin =
       end < this._youtputs.length ? end - start : this._youtputs.length - start;
-    this.transact(() => {
-      this._youtputs.delete(start, fin);
-      this._youtputs.insert(start, outputs);
-    }, false);
+    this.transact(
+      () => {
+        this._youtputs.delete(start, fin);
+        const newOutputs = this.createOutputs(outputs);
+        this._youtputs.insert(start, newOutputs);
+      },
+      false,
+      origin
+    );
   }
 
   /**
@@ -835,7 +902,7 @@ export class YCodeCell
     return changes;
   }
 
-  private _youtputs: Y.Array<nbformat.IOutput>;
+  private _youtputs: Y.Array<Y.Map<any>>;
 }
 
 class YAttachmentCell

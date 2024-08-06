@@ -62,6 +62,7 @@ class YNotebook(YBaseDoc):
         super().__init__(ydoc)
         self._ymeta = self._ydoc.get("meta", type=Map)
         self._ycells = self._ydoc.get("cells", type=Array)
+        self.undo_manager.expand_scope(self._ycells)
 
     @property
     def version(self) -> str:
@@ -71,7 +72,7 @@ class YNotebook(YBaseDoc):
         :return: Document's version.
         :rtype: str
         """
-        return "1.0.0"
+        return "2.0.0"
 
     @property
     def ycells(self):
@@ -166,7 +167,12 @@ class YNotebook(YBaseDoc):
             if "attachments" in cell and not cell["attachments"]:
                 del cell["attachments"]
         elif cell_type == "code":
-            cell["outputs"] = Array(cell.get("outputs", []))
+            outputs = cell.get("outputs", [])
+            for idx, output in enumerate(outputs):
+                if output.get("output_type") == "stream":
+                    output["text"] = Array(output.get("text", []))
+                outputs[idx] = Map(output)
+            cell["outputs"] = Array(outputs)
             cell["pending_requests"] = Array()
 
         return Map(cell)
