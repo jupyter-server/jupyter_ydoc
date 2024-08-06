@@ -124,6 +124,16 @@ class YBaseDoc(ABC):
         """
         return self._ystate.get("path")
 
+    @property
+    def file_id(self) -> Optional[str]:
+        """
+        Returns document's file ID.
+
+        :return: Document's file ID.
+        :rtype: Optional[str]
+        """
+        return self._ystate.get("file_id")
+
     @path.setter
     def path(self, value: str) -> None:
         """
@@ -133,6 +143,16 @@ class YBaseDoc(ABC):
         :type value: str
         """
         self._ystate["path"] = value
+
+    @file_id.setter
+    def file_id(self, value: str) -> None:
+        """
+        Sets document's file ID.
+
+        :param value: Document's file ID.
+        :type value: str
+        """
+        self._ystate["file_id"] = value
 
     @abstractmethod
     def get(self) -> Any:
