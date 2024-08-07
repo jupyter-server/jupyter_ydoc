@@ -752,10 +752,10 @@ export class YCodeCell
   /**
    * The code cell's execution state.
    */
-  get execution_state(): 'running' | 'idle' {
+  get executionState(): 'running' | 'idle' {
     return this.ymodel.get('execution_state') ?? 'idle';
   }
-  set execution_state(state: 'running' | 'idle') {
+  set executionState(state: 'running' | 'idle') {
     if (this.ymodel.get('execution_state') !== state) {
       this.transact(() => {
         this.ymodel.set('execution_state', state);
