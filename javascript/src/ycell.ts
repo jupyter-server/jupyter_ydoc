@@ -958,7 +958,7 @@ class YAttachmentCell
 
     if (modelEvent && modelEvent.keysChanged.has('attachments')) {
       const change = modelEvent.changes.keys.get('attachments');
-      changes.executionCountChange = {
+      changes.attachmentsChange = {
         oldValue: change!.oldValue,
         newValue: this.ymodel.get('attachments')
       };
