@@ -10,6 +10,7 @@ import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
 import type {
   CellChange,
+  IExecutionState,
   IMapChange,
   ISharedAttachmentsCell,
   ISharedBaseCell,
@@ -752,10 +753,10 @@ export class YCodeCell
   /**
    * The code cell's execution state.
    */
-  get executionState(): 'running' | 'idle' {
+  get executionState(): IExecutionState {
     return this.ymodel.get('execution_state') ?? 'idle';
   }
-  set executionState(state: 'running' | 'idle') {
+  set executionState(state: IExecutionState) {
     if (this.ymodel.get('execution_state') !== state) {
       this.transact(() => {
         this.ymodel.set('execution_state', state);
@@ -910,6 +911,14 @@ export class YCodeCell
       changes.executionCountChange = {
         oldValue: change!.oldValue,
         newValue: this.ymodel.get('execution_count')
+      };
+    }
+
+    if (modelEvent && modelEvent.keysChanged.has('execution_state')) {
+      const change = modelEvent.changes.keys.get('execution_state');
+      changes.executionStateChange = {
+        oldValue: change!.oldValue,
+        newValue: this.ymodel.get('execution_state')
       };
     }
 

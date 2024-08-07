@@ -494,6 +494,8 @@ export interface ISharedBaseCell<
   toJSON(): nbformat.IBaseCell;
 }
 
+export type IExecutionState = 'running' | 'idle';
+
 /**
  * Implements an API for nbformat.ICodeCell.
  */
@@ -508,6 +510,11 @@ export interface ISharedCodeCell
    * The code cell's prompt number. Will be null if the cell has not been run.
    */
   execution_count: nbformat.ExecutionCount;
+
+  /**
+   * The code cell's execution state.
+   */
+  executionState: IExecutionState;
 
   /**
    * Cell outputs
@@ -745,6 +752,13 @@ export type CellChange = SourceChange & {
   executionCountChange?: {
     oldValue?: number;
     newValue?: number;
+  };
+  /**
+   * Cell execution state change
+   */
+  executionStateChange?: {
+    oldValue?: IExecutionState;
+    newValue?: IExecutionState;
   };
   /**
    * Cell metadata change
