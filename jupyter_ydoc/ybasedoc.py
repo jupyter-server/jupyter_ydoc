@@ -117,7 +117,7 @@ class YBaseDoc(ABC):
     @property
     def hash(self) -> Optional[str]:
         """
-        Returns whether the document hash as computed by contents manager.
+        Returns the document hash as computed by contents manager.
 
         :return: The document hash.
         :rtype: Optional[str]
