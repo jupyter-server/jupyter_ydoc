@@ -115,6 +115,26 @@ class YBaseDoc(ABC):
         self._ystate["dirty"] = value
 
     @property
+    def hash(self) -> Optional[str]:
+        """
+        Returns the document hash as computed by contents manager.
+
+        :return: The document hash.
+        :rtype: Optional[str]
+        """
+        return self._ystate.get("hash")
+
+    @hash.setter
+    def hash(self, value: str) -> None:
+        """
+        Sets the document hash.
+
+        :param value: The document hash.
+        :type value: str
+        """
+        self._ystate["hash"] = value
+
+    @property
     def path(self) -> Optional[str]:
         """
         Returns document's path.
