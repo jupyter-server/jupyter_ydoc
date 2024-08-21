@@ -747,6 +747,10 @@ export type CellChange = SourceChange & {
    */
   outputsChange?: Delta<Y.Map<any>>;
   /**
+   * Cell stream output text changes
+   */
+  streamOutputChange?: Delta<Y.Text>;
+  /**
    * Cell execution count change
    */
   executionCountChange?: {
