@@ -904,6 +904,9 @@ export class YCodeCell
     const changes = super.getChanges(events);
 
     const streamOutputEvent = events.find(
+      // Changes to the 'text' of a cell's stream output can be accessed like so:
+      // ycell['outputs'][output_idx]['text']
+      // This translates to an event path of: ['outputs', output_idx, 'text]
       event =>
         event.path.length === 3 &&
         event.path[0] === 'outputs' &&
