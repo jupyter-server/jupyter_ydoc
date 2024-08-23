@@ -827,24 +827,32 @@ export class YCodeCell
   /**
    * Remove text from a stream output.
    */
-  removeStreamOutput(index: number, start: number): void {
-    this.transact(() => {
-      const output = this._youtputs.get(index);
-      const prevText = output.get('text') as Y.Text;
-      const length = prevText.length - start;
-      prevText.delete(start, length);
-    }, false);
+  removeStreamOutput(index: number, start: number, origin: any = null): void {
+    this.transact(
+      () => {
+        const output = this._youtputs.get(index);
+        const prevText = output.get('text') as Y.Text;
+        const length = prevText.length - start;
+        prevText.delete(start, length);
+      },
+      false,
+      origin
+    );
   }
 
   /**
    * Append text to a stream output.
    */
-  appendStreamOutput(index: number, text: string): void {
-    this.transact(() => {
-      const output = this._youtputs.get(index);
-      const prevText = output.get('text') as Y.Text;
-      prevText.insert(prevText.length, text);
-    }, false);
+  appendStreamOutput(index: number, text: string, origin: any = null): void {
+    this.transact(
+      () => {
+        const output = this._youtputs.get(index);
+        const prevText = output.get('text') as Y.Text;
+        prevText.insert(prevText.length, text);
+      },
+      false,
+      origin
+    );
   }
 
   /**
@@ -894,6 +902,19 @@ export class YCodeCell
    */
   protected getChanges(events: Y.YEvent<any>[]): Partial<CellChange> {
     const changes = super.getChanges(events);
+
+    const streamOutputEvent = events.find(
+      // Changes to the 'text' of a cell's stream output can be accessed like so:
+      // ycell['outputs'][output_idx]['text']
+      // This translates to an event path of: ['outputs', output_idx, 'text]
+      event =>
+        event.path.length === 3 &&
+        event.path[0] === 'outputs' &&
+        event.path[2] === 'text'
+    );
+    if (streamOutputEvent) {
+      changes.streamOutputChange = streamOutputEvent.changes.delta as any;
+    }
 
     const outputEvent = events.find(
       event => event.target === this.ymodel.get('outputs')
