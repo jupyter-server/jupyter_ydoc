@@ -222,17 +222,7 @@ class YNotebook(YBaseDoc):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
-        cells = value["cells"] or [
-            {
-                "cell_type": "code",
-                "execution_count": None,
-                # auto-created empty code cell without outputs ought be trusted
-                "metadata": {"trusted": True},
-                "outputs": [],
-                "source": "",
-                "id": str(uuid4()),
-            }
-        ]
+        cells = value["cells"]
 
         with self._ydoc.transaction():
             # clear document
