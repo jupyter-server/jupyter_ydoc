@@ -4,7 +4,7 @@
 |----------------------------------------------------------------------------*/
 
 import type * as nbformat from '@jupyterlab/nbformat';
-import { JSONExt, PartialJSONValue } from '@lumino/coreutils';
+import { JSONExt, JSONValue, PartialJSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import * as Y from 'yjs';
 import type {
@@ -402,6 +402,24 @@ export class YNotebook
         ymetadata.set(key, value);
       }
     });
+  }
+
+  /**
+   * Get the notebook source
+   *
+   * @returns The notebook
+   */
+  getSource(): JSONValue {
+    return this.toJSON() as JSONValue;
+  }
+
+  /**
+   * Set the notebook source
+   *
+   * @param value The notebook
+   */
+  setSource(value: JSONValue): void {
+    this.fromJSON(value as nbformat.INotebookContent);
   }
 
   /**
