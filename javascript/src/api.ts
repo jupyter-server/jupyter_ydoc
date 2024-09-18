@@ -85,7 +85,7 @@ export interface ISharedBase extends IObservableDisposable {
  * Implement an API for Context information on the shared information.
  * This is used by, for example, docregistry to share the file-path of the edited content.
  */
-export interface ISharedDocument extends ISharedBase {
+interface ISharedDocumentNoSource extends ISharedBase {
   /**
    * Document version
    */
@@ -115,6 +115,26 @@ export interface ISharedDocument extends ISharedBase {
    * The changed signal.
    */
   readonly changed: ISignal<this, DocumentChange>;
+}
+
+/**
+ * Implement an API for Context information on the shared information.
+ * This is used by, for example, docregistry to share the file-path of the edited content.
+ */
+export interface ISharedDocument extends ISharedDocumentNoSource {
+  /**
+   * Get the document source.
+   *
+   * @returns Source.
+   */
+  getSource(): string | JSONValue;
+
+  /**
+   * Set the document source.
+   *
+   * @param value New source.
+   */
+  setSource(value: string | JSONValue): void;
 }
 
 /**
@@ -158,7 +178,7 @@ export interface ISharedText extends ISharedBase {
 /**
  * Text/Markdown/Code files are represented as ISharedFile
  */
-export interface ISharedFile extends ISharedDocument, ISharedText {
+export interface ISharedFile extends ISharedDocumentNoSource, ISharedText {
   /**
    * The changed signal.
    */

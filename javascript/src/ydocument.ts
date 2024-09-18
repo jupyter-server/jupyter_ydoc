@@ -146,6 +146,38 @@ export abstract class YDocument<T extends DocumentChange>
   }
 
   /**
+   * Get the document source
+   *
+   * @returns The source
+   */
+  get source(): JSONValue | string {
+    return this.getSource();
+  }
+
+  /**
+   * Set the document source
+   *
+   * @param value The source to set
+   */
+  set source(value: JSONValue | string) {
+    this.setSource(value);
+  }
+
+  /**
+   * Get the document source
+   *
+   * @returns The source
+   */
+  abstract getSource(): JSONValue | string;
+
+  /**
+   * Set the document source
+   *
+   * @param value The source to set
+   */
+  abstract setSource(value: JSONValue | string): void;
+
+  /**
    * Undo an operation.
    */
   undo(): void {
