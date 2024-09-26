@@ -793,12 +793,8 @@ export class YCodeCell
         const { text, ...outputWithoutText } = output;
         _newOutput1 = outputWithoutText;
         const newText = new Y.Text();
-        let length = 0;
-        // text is a list of strings
-        for (const str of text as string[]) {
-          newText.insert(length, str);
-          length += str.length;
-        }
+        let _text = text instanceof Array ? text.join() : (text as string);
+        newText.insert(0, _text);
         _newOutput1['text'] = newText;
       } else {
         _newOutput1 = output;
