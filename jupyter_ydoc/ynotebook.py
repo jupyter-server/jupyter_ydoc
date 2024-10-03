@@ -6,8 +6,7 @@ from functools import partial
 from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
 
-from pycrdt import Array, Doc, Map, Text
-from pycrdt_websocket.awareness import Awareness
+from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
 from .ybasedoc import YBaseDoc

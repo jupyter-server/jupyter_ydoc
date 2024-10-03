@@ -4,8 +4,7 @@
 from functools import partial
 from typing import Any, Callable, Optional
 
-from pycrdt import Doc, Map
-from pycrdt_websocket.awareness import Awareness
+from pycrdt import Awareness, Doc, Map
 
 from .ybasedoc import YBaseDoc
 

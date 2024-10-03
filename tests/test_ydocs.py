@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from pycrdt_websocket.awareness import Awareness
+from pycrdt import Awareness
 
 from jupyter_ydoc import YBlob, YNotebook
 

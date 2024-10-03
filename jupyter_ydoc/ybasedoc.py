@@ -4,8 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional
 
-from pycrdt import Doc, Map, Subscription, UndoManager
-from pycrdt_websocket.awareness import Awareness
+from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 
 class YBaseDoc(ABC):
