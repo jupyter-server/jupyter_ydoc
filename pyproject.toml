@@ -28,7 +28,7 @@ dev = [
 ]
 test = [
     "pre-commit",
-    "pytest >=9.16",
+    "pytest",
     "pytest-asyncio",
     "websockets >=10.0",
     "pycrdt-websocket >=0.14.1,<0.15.0",

@@ -26,12 +26,14 @@ class YBaseDoc(ABC):
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
+        :param awareness: The :class:`pycrdt.Awareness` that share non persistent data
+                          between clients.
+        :type awareness: :class:`pycrdt.Awareness`, optional.
         """
         if ydoc is None:
             self._ydoc = Doc()
         else:
             self._ydoc = ydoc
-
         self._awareness = awareness
 
         self._ystate = self._ydoc.get("state", type=Map)
@@ -80,19 +82,20 @@ class YBaseDoc(ABC):
     @property
     def awareness(self) -> Awareness | None:
         """
-        Return the awareness.
+        Returns the awareness.
 
         :return: The document's awareness.
-        :rtype: :class:`pycrdt_websocket.awareness.Awareness`
+        :rtype: :class:`pycrdt.Awareness` or None.
         """
         return self._awareness
 
     @awareness.setter
-    def awareness(self, value: Awareness):
+    def awareness(self, value: Awareness) -> None:
         """
         Sets the awareness.
 
-        :param: The awareness.
+        :param value: The awareness to set.
+        :type value: :class:`pycrdt.Awareness`.
         """
         self._awareness = value
 
