@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict, Optional
 from uuid import uuid4
 
 from pycrdt import Array, Doc, Map, Text
+from pycrdt_websocket.awareness import Awareness
 
 from .utils import cast_all
 from .ybasedoc import YBaseDoc
@@ -47,14 +48,14 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
         """
         Constructs a YNotebook.
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
-        super().__init__(ydoc)
+        super().__init__(ydoc, awareness)
         self._ymeta = self._ydoc.get("meta", type=Map)
         self._ycells = self._ydoc.get("cells", type=Array)
         self.undo_manager.expand_scope(self._ycells)

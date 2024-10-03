@@ -5,6 +5,7 @@ from functools import partial
 from typing import Any, Callable, Optional
 
 from pycrdt import Doc, Map
+from pycrdt_websocket.awareness import Awareness
 
 from .ybasedoc import YBaseDoc
 
@@ -24,14 +25,14 @@ class YBlob(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
         """
         Constructs a YBlob.
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
         """
-        super().__init__(ydoc)
+        super().__init__(ydoc, awareness)
         self._ysource = self._ydoc.get("source", type=Map)
         self.undo_manager.expand_scope(self._ysource)
 

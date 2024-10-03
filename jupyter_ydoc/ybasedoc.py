@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional
 
 from pycrdt import Doc, Map, Subscription, UndoManager
+from pycrdt_websocket.awareness import Awareness
 
 
 class YBaseDoc(ABC):
@@ -20,7 +21,7 @@ class YBaseDoc(ABC):
     _subscriptions: Dict[Any, Subscription]
     _undo_manager: UndoManager
 
-    def __init__(self, ydoc: Optional[Doc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
         """
         Constructs a YBaseDoc.
 
@@ -31,6 +32,9 @@ class YBaseDoc(ABC):
             self._ydoc = Doc()
         else:
             self._ydoc = ydoc
+
+        self._awareness = awareness
+
         self._ystate = self._ydoc.get("state", type=Map)
         self._subscriptions = {}
         self._undo_manager = UndoManager(doc=self._ydoc, capture_timeout_millis=0)
@@ -73,6 +77,25 @@ class YBaseDoc(ABC):
         :rtype: :class:`pycrdt.Doc`
         """
         return self._ydoc
+
+    @property
+    def awareness(self) -> Awareness | None:
+        """
+        Return the awareness.
+
+        :return: The document's awareness.
+        :rtype: :class:`pycrdt_websocket.awareness.Awareness`
+        """
+        return self._awareness
+
+    @awareness.setter
+    def awareness(self, value: Awareness):
+        """
+        Sets the awareness.
+
+        :param: The awareness.
+        """
+        self._awareness = value
 
     @property
     def source(self) -> Any:
