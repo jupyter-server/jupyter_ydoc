@@ -29,7 +29,7 @@ class YUnicode(YBaseDoc):
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
-        :param awareness: The :class:`pycrdt.Awareness` that share non persistent data
+        :param awareness: The :class:`pycrdt.Awareness` that shares non persistent data
                           between clients.
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
