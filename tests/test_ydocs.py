@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from pycrdt import Awareness
+from pycrdt import Awareness, Doc
 
 from jupyter_ydoc import YBlob, YNotebook
 
@@ -59,10 +59,9 @@ def test_ynotebook_undo_manager():
 
 def test_awareness():
     yblob = YBlob()
-
     assert yblob.awareness is None
 
-    awareness = Awareness(yblob.ydoc)
-    yblob.awareness = awareness
-
+    ydoc = Doc()
+    awareness = Awareness(ydoc)
+    yblob = YBlob(ydoc, awareness)
     assert yblob.awareness == awareness
