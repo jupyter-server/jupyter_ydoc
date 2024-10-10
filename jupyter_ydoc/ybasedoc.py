@@ -4,7 +4,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, Optional
 
-from pycrdt import Doc, Map, Subscription, UndoManager
+from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 
 class YBaseDoc(ABC):
@@ -20,17 +20,22 @@ class YBaseDoc(ABC):
     _subscriptions: Dict[Any, Subscription]
     _undo_manager: UndoManager
 
-    def __init__(self, ydoc: Optional[Doc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
         """
         Constructs a YBaseDoc.
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
+        :param awareness: The :class:`pycrdt.Awareness` that shares non persistent data
+                          between clients.
+        :type awareness: :class:`pycrdt.Awareness`, optional.
         """
         if ydoc is None:
             self._ydoc = Doc()
         else:
             self._ydoc = ydoc
+        self.awareness = awareness
+
         self._ystate = self._ydoc.get("state", type=Map)
         self._subscriptions = {}
         self._undo_manager = UndoManager(doc=self._ydoc, capture_timeout_millis=0)
