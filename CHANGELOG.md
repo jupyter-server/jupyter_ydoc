@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 2.1.2
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.1.1...5473320c254c5838ea245e74e7d8bf176917383e))
+
+### Maintenance and upkeep improvements
+
+- Backport PR #277: Doc awareness [#279](https://github.com/jupyter-server/jupyter_ydoc/pull/279) ([@brichet](https://github.com/brichet))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-07-10&to=2024-10-10&type=c))
+
+[@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2024-07-10..2024-10-10&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2024-07-10..2024-10-10&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2024-07-10..2024-10-10&type=Issues) | [@lumberbot-app](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Alumberbot-app+updated%3A2024-07-10..2024-10-10&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 2.1.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.1.0...9c7a436bf9cd3ab36c8ec285a7a2225fc2d195e0))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-07-10&to=2024-07-10&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2024-07-10..2024-07-10&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 2.1.0
 
