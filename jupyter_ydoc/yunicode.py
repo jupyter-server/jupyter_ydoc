@@ -4,7 +4,7 @@
 from functools import partial
 from typing import Any, Callable, Optional
 
-from pycrdt import Doc, Text
+from pycrdt import Awareness, Doc, Text
 
 from .ybasedoc import YBaseDoc
 
@@ -23,14 +23,17 @@ class YUnicode(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None):
+    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
         """
         Constructs a YUnicode.
 
         :param ydoc: The :class:`pycrdt.Doc` that will hold the data of the document, if provided.
         :type ydoc: :class:`pycrdt.Doc`, optional.
+        :param awareness: The :class:`pycrdt.Awareness` that shares non persistent data
+                          between clients.
+        :type awareness: :class:`pycrdt.Awareness`, optional.
         """
-        super().__init__(ydoc)
+        super().__init__(ydoc, awareness)
         self._ysource = self._ydoc.get("source", type=Text)
         self.undo_manager.expand_scope(self._ysource)
 
