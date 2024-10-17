@@ -22,6 +22,7 @@ import type {
 } from '@lumino/coreutils';
 import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
+import { IAwareness } from './awareness.js';
 
 /**
  * Changes on Sequence-like data are expressed as Quill-inspired deltas.
@@ -94,6 +95,11 @@ export interface ISharedDocument extends ISharedBase {
    * Document state
    */
   readonly state: JSONObject;
+
+  /**
+   * Document awareness
+   */
+  readonly awareness: IAwareness;
 
   /**
    * Get the value for a state attribute
