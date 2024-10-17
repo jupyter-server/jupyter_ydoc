@@ -23,7 +23,7 @@ import type {
 import type { IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
 import * as Y from 'yjs';
-import { IAwareness } from './awareness';
+import { IAwareness } from './awareness.js';
 
 /**
  * Changes on Sequence-like data are expressed as Quill-inspired deltas.
