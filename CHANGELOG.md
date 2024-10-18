@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.0.0b0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.0-a10...5a205d912bb399684a2886d4d323b77669f63eb8))
+
+### Enhancements made
+
+- Add the awareness in the shared document interface [#282](https://github.com/jupyter-server/jupyter_ydoc/pull/282) ([@brichet](https://github.com/brichet))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-17&to=2024-10-18&type=c))
+
+[@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2024-10-17..2024-10-18&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.0.0a10
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.0-a9...dc71f641f72826232772509a8c9cea474d7ccc9f))
@@ -15,8 +31,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-10&to=2024-10-17&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2024-10-10..2024-10-17&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.0.0a9
 
