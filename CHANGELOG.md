@@ -2,6 +2,60 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.0.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.0.1...8cf3b0f53bf763edf254e91fed65aaa7062e3250))
+
+### Enhancements made
+
+- Add the awareness in the shared document interface [#282](https://github.com/jupyter-server/jupyter_ydoc/pull/282) ([@brichet](https://github.com/brichet))
+- Doc awareness [#277](https://github.com/jupyter-server/jupyter_ydoc/pull/277) ([@brichet](https://github.com/brichet))
+- Improve notebook output stream initialization [#275](https://github.com/jupyter-server/jupyter_ydoc/pull/275) ([@davidbrochart](https://github.com/davidbrochart))
+- Add YDocument source getter/setter [#273](https://github.com/jupyter-server/jupyter_ydoc/pull/273) ([@davidbrochart](https://github.com/davidbrochart))
+- Allow empty notebook [#266](https://github.com/jupyter-server/jupyter_ydoc/pull/266) ([@davidbrochart](https://github.com/davidbrochart))
+- Add `streamOutputChange` attribute to cell change object [#264](https://github.com/jupyter-server/jupyter_ydoc/pull/264) ([@davidbrochart](https://github.com/davidbrochart))
+- Add `hash` property with setter and getter [#262](https://github.com/jupyter-server/jupyter_ydoc/pull/262) ([@krassowski](https://github.com/krassowski))
+- Expose `execution_state` in the JS package [#259](https://github.com/jupyter-server/jupyter_ydoc/pull/259) ([@krassowski](https://github.com/krassowski))
+- Add undo_manager to Y documents [#248](https://github.com/jupyter-server/jupyter_ydoc/pull/248) ([@davidbrochart](https://github.com/davidbrochart))
+- Add optional origin to transaction, filter out 'modeldb' origin [#246](https://github.com/jupyter-server/jupyter_ydoc/pull/246) ([@davidbrochart](https://github.com/davidbrochart))
+- Add appendStreamOutput and removeStreamOutput methods [#241](https://github.com/jupyter-server/jupyter_ydoc/pull/241) ([@davidbrochart](https://github.com/davidbrochart))
+- Update python>=3.8, pycrdt>=0.8.11, pre-commit, README [#217](https://github.com/jupyter-server/jupyter_ydoc/pull/217) ([@davidbrochart](https://github.com/davidbrochart))
+- Store YBlob as bytes, not base64-encoded string [#209](https://github.com/jupyter-server/jupyter_ydoc/pull/209) ([@davidbrochart](https://github.com/davidbrochart))
+- Change notebook code cell stream output schema [#201](https://github.com/jupyter-server/jupyter_ydoc/pull/201) ([@davidbrochart](https://github.com/davidbrochart))
+- Add cell execution_state [#197](https://github.com/jupyter-server/jupyter_ydoc/pull/197) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Bugs fixed
+
+- Fix attachments change attribute assignment [#260](https://github.com/jupyter-server/jupyter_ydoc/pull/260) ([@krassowski](https://github.com/krassowski))
+- Fix createOutputs, rename 'modeldb' origin to 'silent-change' [#254](https://github.com/jupyter-server/jupyter_ydoc/pull/254) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Revert #266 [#280](https://github.com/jupyter-server/jupyter_ydoc/pull/280) ([@davidbrochart](https://github.com/davidbrochart))
+- Improve notebook output stream initialization [#275](https://github.com/jupyter-server/jupyter_ydoc/pull/275) ([@davidbrochart](https://github.com/davidbrochart))
+- Fix dict type for python 3.8 [#253](https://github.com/jupyter-server/jupyter_ydoc/pull/253) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump toshimaru/auto-author-assign from 2.1.0 to 2.1.1 [#247](https://github.com/jupyter-server/jupyter_ydoc/pull/247) ([@dependabot](https://github.com/dependabot))
+- Revert publish 3.0.0a0 (9c87cfd7c7e967a1fbef8ce96899d426862e84fb) [#245](https://github.com/jupyter-server/jupyter_ydoc/pull/245) ([@davidbrochart](https://github.com/davidbrochart))
+- Update releaser workflows [#244](https://github.com/jupyter-server/jupyter_ydoc/pull/244) ([@jtpio](https://github.com/jtpio))
+- Bump notebook version 1.0.0 -> 2.0.0 [#236](https://github.com/jupyter-server/jupyter_ydoc/pull/236) ([@davidbrochart](https://github.com/davidbrochart))
+- Fix subscription type, update pycrdt>=0.8.16 [#222](https://github.com/jupyter-server/jupyter_ydoc/pull/222) ([@davidbrochart](https://github.com/davidbrochart))
+- Update python>=3.8, pycrdt>=0.8.11, pre-commit, README [#217](https://github.com/jupyter-server/jupyter_ydoc/pull/217) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump pre-commit/action from 3.0.0 to 3.0.1 [#215](https://github.com/jupyter-server/jupyter_ydoc/pull/215) ([@dependabot](https://github.com/dependabot))
+- Remove mention to y_py in docs [#214](https://github.com/jupyter-server/jupyter_ydoc/pull/214) ([@martinRenou](https://github.com/martinRenou))
+- Bump toshimaru/auto-author-assign from 2.0.1 to 2.1.0 [#212](https://github.com/jupyter-server/jupyter_ydoc/pull/212) ([@dependabot](https://github.com/dependabot))
+
+### Documentation improvements
+
+- Remove mention to y_py in docs [#214](https://github.com/jupyter-server/jupyter_ydoc/pull/214) ([@martinRenou](https://github.com/martinRenou))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-12-26&to=2024-10-29&type=c))
+
+[@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2023-12-26..2024-10-29&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-12-26..2024-10-29&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2023-12-26..2024-10-29&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2023-12-26..2024-10-29&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2023-12-26..2024-10-29&type=Issues) | [@lumberbot-app](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Alumberbot-app+updated%3A2023-12-26..2024-10-29&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AmartinRenou+updated%3A2023-12-26..2024-10-29&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-12-26..2024-10-29&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2023-12-26..2024-10-29&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AZsailer+updated%3A2023-12-26..2024-10-29&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.0.0b0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.0-a10...5a205d912bb399684a2886d4d323b77669f63eb8))
@@ -15,8 +69,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-17&to=2024-10-18&type=c))
 
 [@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2024-10-17..2024-10-18&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.0.0a10
 
