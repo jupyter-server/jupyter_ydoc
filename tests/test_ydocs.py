@@ -14,7 +14,6 @@ def test_yblob():
     changes = []
 
     def callback(topic, event):
-        print(topic, event)
         changes.append((topic, event))
 
     yblob.observe(callback)

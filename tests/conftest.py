@@ -3,11 +3,15 @@
 
 import json
 import subprocess
+from functools import partial
 from pathlib import Path
 
 import pytest
-from pycrdt_websocket import WebsocketServer
-from websockets import serve
+from anyio import Event, create_task_group
+from hypercorn import Config
+from hypercorn.asyncio import serve
+from pycrdt_websocket import ASGIServer, WebsocketServer
+from utils import ensure_server_running
 
 # workaround until these PRs are merged:
 # - https://github.com/yjs/y-websocket/pull/104
@@ -27,15 +31,26 @@ update_json_file(here.parent / "node_modules/y-websocket/package.json", d)
 
 
 @pytest.fixture
-async def yws_server(request):
+async def yws_server(request, unused_tcp_port):
     try:
-        kwargs = request.param
-    except Exception:
-        kwargs = {}
-    websocket_server = WebsocketServer(**kwargs)
-    try:
-        async with websocket_server, serve(websocket_server.serve, "localhost", 1234):
-            yield websocket_server
+        async with create_task_group() as tg:
+            try:
+                kwargs = request.param
+            except Exception:
+                kwargs = {}
+            websocket_server = WebsocketServer(**kwargs)
+            app = ASGIServer(websocket_server)
+            config = Config()
+            config.bind = [f"localhost:{unused_tcp_port}"]
+            shutdown_event = Event()
+            async with websocket_server as websocket_server:
+                tg.start_soon(
+                    partial(serve, app, config, shutdown_trigger=shutdown_event.wait, mode="asgi")
+                )
+                await ensure_server_running("localhost", unused_tcp_port)
+                pytest.port = unused_tcp_port
+                yield unused_tcp_port, websocket_server
+                shutdown_event.set()
     except Exception:
         pass
 
@@ -43,7 +58,7 @@ async def yws_server(request):
 @pytest.fixture
 def yjs_client(request):
     client_id = request.param
-    p = subprocess.Popen(["node", f"{here / 'yjs_client_'}{client_id}.js"])
+    p = subprocess.Popen(["node", f"{here / 'yjs_client_'}{client_id}.js", str(pytest.port)])
     yield p
     p.terminate()
     try:
