@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.0.1
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.0...2ed6216e488db36c2757390c96195db9909e7908))
+
+### Maintenance and upkeep improvements
+
+- Fix tests [#288](https://github.com/jupyter-server/jupyter_ydoc/pull/288) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-29&to=2024-11-18&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2024-10-29..2024-11-18&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2024-10-29..2024-11-18&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.0.0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.0.1...8cf3b0f53bf763edf254e91fed65aaa7062e3250))
@@ -53,8 +69,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2023-12-26&to=2024-10-29&type=c))
 
 [@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2023-12-26..2024-10-29&type=Issues) | [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2023-12-26..2024-10-29&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2023-12-26..2024-10-29&type=Issues) | [@jtpio](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2023-12-26..2024-10-29&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2023-12-26..2024-10-29&type=Issues) | [@lumberbot-app](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Alumberbot-app+updated%3A2023-12-26..2024-10-29&type=Issues) | [@martinRenou](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AmartinRenou+updated%3A2023-12-26..2024-10-29&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2023-12-26..2024-10-29&type=Issues) | [@welcome](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Awelcome+updated%3A2023-12-26..2024-10-29&type=Issues) | [@Zsailer](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AZsailer+updated%3A2023-12-26..2024-10-29&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.0.0b0
 
