@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 2.1.4
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.1.3...d649fbe64a6687f4cea08e50a64060389ee39984))
+
+### Enhancements made
+
+- Add optional origin to transaction, filter out 'modeldb' origin [#246](https://github.com/jupyter-server/jupyter_ydoc/pull/246) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Fix tests [#288](https://github.com/jupyter-server/jupyter_ydoc/pull/288) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-18&to=2024-11-29&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2024-10-18..2024-11-29&type=Issues) | [@fcollonval](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Afcollonval+updated%3A2024-10-18..2024-11-29&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 2.1.3
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@2.1.2...e8c0e18cb51b5191e5ac3947f519010a41d2c03c))
@@ -15,8 +35,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2024-10-10&to=2024-10-18&type=c))
 
 [@brichet](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2024-10-10..2024-10-18&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 2.1.2
 
