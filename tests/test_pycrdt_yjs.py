@@ -6,9 +6,10 @@ from pathlib import Path
 
 import pytest
 from anyio import Event, create_task_group, move_on_after
+from httpx_ws import aconnect_ws
 from pycrdt import Doc, Map
 from pycrdt_websocket import WebsocketProvider
-from websockets import connect  # type: ignore
+from utils import Websocket
 
 from jupyter_ydoc import YNotebook
 from jupyter_ydoc.utils import cast_all
@@ -61,10 +62,12 @@ class YTest:
 @pytest.mark.asyncio
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
 async def test_ypy_yjs_0(yws_server, yjs_client):
+    port, _ = yws_server
     ydoc = Doc()
     ynotebook = YNotebook(ydoc)
-    async with connect("ws://localhost:1234/my-roomname") as websocket, WebsocketProvider(
-        ydoc, websocket
+    room_name = "my-roomname"
+    async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, WebsocketProvider(
+        ydoc, Websocket(websocket, room_name)
     ):
         nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
         ynotebook.source = nb

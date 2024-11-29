@@ -6,12 +6,13 @@
 import { YNotebook } from '@jupyter/ydoc'
 import { WebsocketProvider } from 'y-websocket'
 
+const port = process.argv[2]
 const notebook = new YNotebook()
 const ytest = notebook.ydoc.getMap('_test')
 import ws from 'ws'
 
 const wsProvider = new WebsocketProvider(
-  'ws://localhost:1234', 'my-roomname',
+  `ws://127.0.0.1:${port}`, 'my-roomname',
   notebook.ydoc,
   { WebSocketPolyfill: ws }
 )
