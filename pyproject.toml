@@ -30,7 +30,8 @@ test = [
     "pre-commit",
     "pytest",
     "pytest-asyncio",
-    "websockets >=10.0",
+    "httpx-ws >=0.5.2",
+    "hypercorn >=0.16.0",
     "pycrdt-websocket >=0.15.0,<0.16.0",
 ]
 docs = [
