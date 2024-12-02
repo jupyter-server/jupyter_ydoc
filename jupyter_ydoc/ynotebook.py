@@ -166,7 +166,12 @@ class YNotebook(YBaseDoc):
             outputs = cell.get("outputs", [])
             for idx, output in enumerate(outputs):
                 if output.get("output_type") == "stream":
-                    output["text"] = Array(output.get("text", []))
+                    text = output.get("text", "")
+                    if isinstance(text, str):
+                        ytext = Text(text)
+                    else:
+                        ytext = Text("".join(text))
+                    output["text"] = ytext
                 outputs[idx] = Map(output)
             cell["outputs"] = Array(outputs)
             cell["execution_state"] = "idle"
