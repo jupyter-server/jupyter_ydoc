@@ -90,7 +90,7 @@ async def test_ypy_yjs_1(yws_server, yjs_client):
         ydoc, Websocket(websocket, room_name)
     ):
         output_text = ynotebook.ycells[0]["outputs"][0]["text"]
-        assert output_text.to_py() == ["Hello,"]
+        assert output_text.to_py() == "Hello,"
         event = Event()
 
         def callback(_event):
@@ -101,7 +101,7 @@ async def test_ypy_yjs_1(yws_server, yjs_client):
         with move_on_after(10):
             await event.wait()
 
-        assert output_text.to_py() == ["Hello,", " World!"]
+        assert output_text.to_py() == "Hello,", " World!"
 
 
 def test_plotly_renderer():
