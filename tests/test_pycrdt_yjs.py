@@ -89,7 +89,7 @@ async def test_ypy_yjs_1(yws_server, yjs_client):
     async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, WebsocketProvider(
         ydoc, Websocket(websocket, room_name)
     ):
-        output_text = ynotebook.ycells[0]["outputs"][0]["text"]
+        output_text = ynotebook.ycells[0].outputs[0]["text"]
         assert output_text.to_py() == "Hello,"
         event = Event()
 
