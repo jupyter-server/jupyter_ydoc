@@ -41,30 +41,24 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Install mamba
+        uses: mamba-org/setup-micromamba@v2
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          python-version: "3.11"
-
+          environment-name: jupyter_ydoc
       - name: Install dependencies
         run: |
-          mamba install pip nodejs=18
+          micromamba install pip nodejs=18
           pip install ".[test]"
-
       - name: Build JavaScript assets
         working-directory: javascript
         run: |
           yarn
           yarn build
-
       - name: Linter check
         if: ${{ !contains(matrix.os, 'windows') }}
         working-directory: javascript
         run: |
           yarn lint:check
-
       - name: Integrity check
         if: ${{ !contains(matrix.os, 'windows') }}
         working-directory: javascript
@@ -76,13 +70,11 @@ jobs:
             echo "Integrity test failed; please run locally 'yarn integrity' and commit the changes"
             exit 1
           fi
-
       - name: Run JS tests
         working-directory: javascript
         run: |
           yarn build:test
           yarn test:cov
-
       - name: Run Python tests
         run: |
           python -m pytest -v
