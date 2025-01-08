@@ -1,10 +1,22 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from __future__ import annotations
 
-from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
+from abc import ABC, abstractmethod
+from typing import Any, Callable
+
+from pycrdt import Awareness, Doc, Subscription, TypedDoc, TypedMap, UndoManager
+
+
+class YState(TypedMap):
+    dirty: bool
+    hash: str
+    path: str
+
+
+class YDoc(TypedDoc):
+    state: YState
 
 
 class YBaseDoc(ABC):
@@ -15,12 +27,12 @@ class YBaseDoc(ABC):
     subscribe to changes in the document.
     """
 
-    _ydoc: Doc
-    _ystate: Map
-    _subscriptions: Dict[Any, Subscription]
+    _ydoc: YDoc
+    _ystate: YState
+    _subscriptions: dict[Any, Subscription]
     _undo_manager: UndoManager
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    def __init__(self, ydoc: YDoc | Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YBaseDoc.
 
@@ -30,15 +42,15 @@ class YBaseDoc(ABC):
                           between clients.
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
-        if ydoc is None:
-            self._ydoc = Doc()
-        else:
+        if isinstance(ydoc, YDoc):
             self._ydoc = ydoc
+        else:
+            self._ydoc = YDoc(ydoc)
         self.awareness = awareness
 
-        self._ystate = self._ydoc.get("state", type=Map)
+        self._ydoc.state = self._ystate = YState()
         self._subscriptions = {}
-        self._undo_manager = UndoManager(doc=self._ydoc, capture_timeout_millis=0)
+        self._undo_manager = UndoManager(doc=self._ydoc._, capture_timeout_millis=0)
 
     @property
     @abstractmethod
@@ -60,22 +72,22 @@ class YBaseDoc(ABC):
         """
         return self._undo_manager
 
-    def ystate(self) -> Map:
+    def ystate(self) -> YState:
         """
-        A :class:`pycrdt.Map` containing the state of the document.
+        A :class:`YState` containing the state of the document.
 
         :return: The document's state.
-        :rtype: :class:`pycrdt.Map`
+        :rtype: :class:`YState`
         """
         return self._ystate
 
     @property
-    def ydoc(self) -> Doc:
+    def ydoc(self) -> YDoc:
         """
-        The underlying :class:`pycrdt.Doc` that contains the data.
+        The :class:`YDoc` that contains the data.
 
         :return: The document's ydoc.
-        :rtype: :class:`pycrdt.Doc`
+        :rtype: :class:`YDoc`
         """
         return self._ydoc
 
@@ -100,14 +112,17 @@ class YBaseDoc(ABC):
         return self.set(value)
 
     @property
-    def dirty(self) -> Optional[bool]:
+    def dirty(self) -> bool | None:
         """
         Returns whether the document is dirty.
 
         :return: Whether the document is dirty.
-        :rtype: Optional[bool]
+        :rtype: bool | None
         """
-        return self._ystate.get("dirty")
+        try:
+            return self._ystate.dirty
+        except KeyError:
+            return None
 
     @dirty.setter
     def dirty(self, value: bool) -> None:
@@ -117,17 +132,20 @@ class YBaseDoc(ABC):
         :param value: Whether the document is clean or dirty.
         :type value: bool
         """
-        self._ystate["dirty"] = value
+        self._ystate.dirty = value
 
     @property
-    def hash(self) -> Optional[str]:
+    def hash(self) -> str | None:
         """
         Returns the document hash as computed by contents manager.
 
         :return: The document hash.
-        :rtype: Optional[str]
+        :rtype: str | None
         """
-        return self._ystate.get("hash")
+        try:
+            return self._ystate.hash
+        except KeyError:
+            return None
 
     @hash.setter
     def hash(self, value: str) -> None:
@@ -137,17 +155,20 @@ class YBaseDoc(ABC):
         :param value: The document hash.
         :type value: str
         """
-        self._ystate["hash"] = value
+        self._ystate.hash = value
 
     @property
-    def path(self) -> Optional[str]:
+    def path(self) -> str | None:
         """
         Returns document's path.
 
         :return: Document's path.
-        :rtype: Optional[str]
+        :rtype: str | None
         """
-        return self._ystate.get("path")
+        try:
+            return self._ystate.path
+        except KeyError:
+            return None
 
     @path.setter
     def path(self, value: str) -> None:
@@ -157,7 +178,7 @@ class YBaseDoc(ABC):
         :param value: Document's path.
         :type value: str
         """
-        self._ystate["path"] = value
+        self._ystate.path = value
 
     @abstractmethod
     def get(self) -> Any:

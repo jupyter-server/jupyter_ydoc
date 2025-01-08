@@ -49,6 +49,7 @@ jobs:
         run: |
           micromamba install pip nodejs=18
           pip install ".[test]"
+          pip install "pycrdt >=0.12.1"
       - name: Build JavaScript assets
         working-directory: javascript
         run: |

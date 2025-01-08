@@ -32,7 +32,7 @@ def test_ynotebook_undo_manager():
         "source": "Hello",
     }
     ynotebook.append_cell(cell0)
-    source = ynotebook.ycells[0]["source"]
+    source = ynotebook.ycells[0].source
     source += ", World!\n"
     cell1 = {
         "cell_type": "code",
@@ -40,16 +40,16 @@ def test_ynotebook_undo_manager():
     }
     ynotebook.append_cell(cell1)
     assert len(ynotebook.ycells) == 2
-    assert str(ynotebook.ycells[0]["source"]) == "Hello, World!\n"
-    assert str(ynotebook.ycells[1]["source"]) == "print(1 + 1)\n"
+    assert str(ynotebook.ycells[0].source) == "Hello, World!\n"
+    assert str(ynotebook.ycells[1].source) == "print(1 + 1)\n"
     assert ynotebook.undo_manager.can_undo()
     ynotebook.undo_manager.undo()
     assert len(ynotebook.ycells) == 1
-    assert str(ynotebook.ycells[0]["source"]) == "Hello, World!\n"
+    assert str(ynotebook.ycells[0].source) == "Hello, World!\n"
     assert ynotebook.undo_manager.can_undo()
     ynotebook.undo_manager.undo()
     assert len(ynotebook.ycells) == 1
-    assert str(ynotebook.ycells[0]["source"]) == "Hello"
+    assert str(ynotebook.ycells[0].source) == "Hello"
     assert ynotebook.undo_manager.can_undo()
     ynotebook.undo_manager.undo()
     assert len(ynotebook.ycells) == 0
