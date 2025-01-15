@@ -202,7 +202,11 @@ class YNotebook(YBaseDoc):
         cells = []
         for i in range(len(self._ycells)):
             cell = self.get_cell(i)
-            if "id" in cell and meta.get("nbformat", 0) == 4 and meta.get("nbformat_minor", 0) <= 4:
+            if (
+                "id" in cell
+                and int(meta.get("nbformat", 0)) == 4
+                and int(meta.get("nbformat_minor", 0)) <= 4
+            ):
                 # strip cell IDs if we have notebook format 4.0-4.4
                 del cell["id"]
             if (
