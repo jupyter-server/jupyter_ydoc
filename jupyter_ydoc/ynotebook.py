@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import copy
-from dataclasses import dataclass
 from functools import partial
 from typing import Any, Callable
 from uuid import uuid4
@@ -20,20 +19,9 @@ NBFORMAT_MAJOR_VERSION = 4
 NBFORMAT_MINOR_VERSION = 5
 
 
-@dataclass
-class LanguageInfo:
-    name: str
-
-
-@dataclass
-class Kernelspec:
-    name: str
-    display_name: str
-
-
 class YMetadata(TypedMap):
-    language_info: dict  # LanguageInfo
-    kernelspec: dict  # Kernelspec
+    language_info: dict
+    kernelspec: dict
 
 
 class YMeta(TypedMap):
@@ -310,11 +298,7 @@ class YNotebook(YBaseDoc):
             ymetadata = YMetadata()
             self._ymeta.metadata = ymetadata
             metadata = nb.get("metadata", {})
-            # ymetadata.language_info =
-            # asdict(LanguageInfo(**metadata.get("language_info", {"name": ""})))
             ymetadata.language_info = metadata.get("language_info", {"name": ""})
-            # ymetadata.kernelspec =
-            # asdict(Kernelspec(**metadata.get("kernelspec", {"name": "", "display_name": ""})))
             ymetadata.kernelspec = metadata.get("kernelspec", {"name": "", "display_name": ""})
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
