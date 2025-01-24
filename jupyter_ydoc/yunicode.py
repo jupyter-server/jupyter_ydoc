@@ -1,12 +1,18 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from __future__ import annotations
+
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from pycrdt import Awareness, Doc, Text
 
-from .ybasedoc import YBaseDoc
+from .ybasedoc import YBaseDoc, YDoc
+
+
+class YUnicodeDoc(YDoc):
+    source: Text
 
 
 class YUnicode(YBaseDoc):
@@ -23,7 +29,10 @@ class YUnicode(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    _ydoc: YUnicodeDoc
+    _ysource: Text
+
+    def __init__(self, ydoc: Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YUnicode.
 
@@ -33,8 +42,8 @@ class YUnicode(YBaseDoc):
                           between clients.
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
-        super().__init__(ydoc, awareness)
-        self._ysource = self._ydoc.get("source", type=Text)
+        super().__init__(YUnicodeDoc(ydoc), awareness)
+        self._ydoc.source = self._ysource = Text()
         self.undo_manager.expand_scope(self._ysource)
 
     @property
@@ -63,7 +72,7 @@ class YUnicode(YBaseDoc):
         :param value: The content of the document.
         :type value: str
         """
-        with self._ydoc.transaction():
+        with self._ydoc._.transaction():
             # clear document
             self._ysource.clear()
             # initialize document
@@ -78,5 +87,5 @@ class YUnicode(YBaseDoc):
         :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
+        self._subscriptions[self._ystate] = self._ystate._.observe(partial(callback, "state"))
         self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))

@@ -1,20 +1,53 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from __future__ import annotations
+
 import copy
 from functools import partial
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 from uuid import uuid4
 
-from pycrdt import Array, Awareness, Doc, Map, Text
+from pycrdt import Array, Awareness, Doc, Map, Text, TypedArray, TypedMap
 
 from .utils import cast_all
-from .ybasedoc import YBaseDoc
+from .ybasedoc import YBaseDoc, YDoc
 
 # The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
 # The default minor version of the notebook format.
 NBFORMAT_MINOR_VERSION = 5
+
+
+class YMetadata(TypedMap):
+    language_info: dict
+    kernelspec: dict
+
+
+class YMeta(TypedMap):
+    nbformat: int
+    nbformat_minor: int
+    metadata: YMetadata
+
+
+class YCell(TypedMap):
+    id: str
+    cell_type: str
+    source: Text
+    metadata: Map
+    execution_state: str
+    execution_count: int | None
+    outputs: Array[Map] | None
+    attachments: dict | None
+
+
+class YCells(TypedArray[YCell]):
+    type: YCell
+
+
+class YNotebookDoc(YDoc):
+    meta: YMeta
+    cells: YCells
 
 
 class YNotebook(YBaseDoc):
@@ -47,7 +80,11 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    _ydoc: YNotebookDoc
+    _ymeta: YMeta
+    _ycells: YCells
+
+    def __init__(self, ydoc: Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YNotebook.
 
@@ -57,10 +94,10 @@ class YNotebook(YBaseDoc):
                           between clients.
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
-        super().__init__(ydoc, awareness)
-        self._ymeta = self._ydoc.get("meta", type=Map)
-        self._ycells = self._ydoc.get("cells", type=Array)
-        self.undo_manager.expand_scope(self._ycells)
+        super().__init__(YNotebookDoc(ydoc), awareness)
+        self._ydoc.meta = self._ymeta = YMeta()
+        self._ydoc.cells = self._ycells = YCells()
+        self.undo_manager.expand_scope(self._ycells._)
 
     @property
     def version(self) -> str:
@@ -92,7 +129,7 @@ class YNotebook(YBaseDoc):
         """
         return len(self._ycells)
 
-    def get_cell(self, index: int) -> Dict[str, Any]:
+    def get_cell(self, index: int) -> dict[str, Any]:
         """
         Returns a cell.
 
@@ -102,8 +139,8 @@ class YNotebook(YBaseDoc):
         :return: A cell.
         :rtype: Dict[str, Any]
         """
-        meta = self._ymeta.to_py()
-        cell = self._ycells[index].to_py()
+        meta = self._ymeta._.to_py()
+        cell = self._ycells[index]._.to_py()
         cell.pop("execution_state", None)
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
@@ -117,7 +154,7 @@ class YNotebook(YBaseDoc):
             del cell["attachments"]
         return cell
 
-    def append_cell(self, value: Dict[str, Any]) -> None:
+    def append_cell(self, value: dict[str, Any]) -> None:
         """
         Appends a cell.
 
@@ -127,7 +164,7 @@ class YNotebook(YBaseDoc):
         ycell = self.create_ycell(value)
         self._ycells.append(ycell)
 
-    def set_cell(self, index: int, value: Dict[str, Any]) -> None:
+    def set_cell(self, index: int, value: dict[str, Any]) -> None:
         """
         Sets a cell into indicated position.
 
@@ -140,9 +177,9 @@ class YNotebook(YBaseDoc):
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell)
 
-    def create_ycell(self, value: Dict[str, Any]) -> Map:
+    def create_ycell(self, value: dict[str, Any]) -> YCell:
         """
-        Creates YMap with the content of the cell.
+        Creates YCell with the content of the cell.
 
         :param value: A cell.
         :type value: Dict[str, Any]
@@ -176,9 +213,9 @@ class YNotebook(YBaseDoc):
             cell["outputs"] = Array(outputs)
             cell["execution_state"] = "idle"
 
-        return Map(cell)
+        return YCell(Map(cell))
 
-    def set_ycell(self, index: int, ycell: Map) -> None:
+    def set_ycell(self, index: int, ycell: YCell) -> None:
         """
         Sets a Y cell into the indicated position.
 
@@ -190,14 +227,14 @@ class YNotebook(YBaseDoc):
         """
         self._ycells[index] = ycell
 
-    def get(self) -> Dict:
+    def get(self) -> dict:
         """
         Returns the content of the document.
 
         :return: Document's content.
         :rtype: Dict
         """
-        meta = self._ymeta.to_py()
+        meta = self._ymeta._.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
@@ -224,7 +261,7 @@ class YNotebook(YBaseDoc):
             nbformat_minor=int(meta.get("nbformat_minor", 0)),
         )
 
-    def set(self, value: Dict) -> None:
+    def set(self, value: dict) -> None:
         """
         Sets the content of the document.
 
@@ -246,23 +283,23 @@ class YNotebook(YBaseDoc):
             }
         ]
 
-        with self._ydoc.transaction():
+        with self._ydoc._.transaction():
             # clear document
-            self._ymeta.clear()
-            self._ycells.clear()
-            for key in [k for k in self._ystate.keys() if k not in ("dirty", "path")]:
-                del self._ystate[key]
+            self._ymeta._.clear()
+            self._ycells._.clear()
+            for key in [k for k in self._ystate._.keys() if k not in ("dirty", "path")]:
+                del self._ystate._[key]
 
             # initialize document
             self._ycells.extend([self.create_ycell(cell) for cell in cells])
-            self._ymeta["nbformat"] = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
-            self._ymeta["nbformat_minor"] = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
+            self._ymeta.nbformat = int(nb.get("nbformat", NBFORMAT_MAJOR_VERSION))
+            self._ymeta.nbformat_minor = int(nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION))
 
+            ymetadata = YMetadata()
+            self._ymeta.metadata = ymetadata
             metadata = nb.get("metadata", {})
-            metadata.setdefault("language_info", {"name": ""})
-            metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
-
-            self._ymeta["metadata"] = Map(metadata)
+            ymetadata.language_info = metadata.get("language_info", {"name": ""})
+            ymetadata.kernelspec = metadata.get("kernelspec", {"name": "", "display_name": ""})
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
@@ -272,6 +309,6 @@ class YNotebook(YBaseDoc):
         :type callback: Callable[[str, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
-        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
+        self._subscriptions[self._ystate] = self._ystate._.observe(partial(callback, "state"))
+        self._subscriptions[self._ymeta] = self._ymeta._.observe_deep(partial(callback, "meta"))
+        self._subscriptions[self._ycells] = self._ycells._.observe_deep(partial(callback, "cells"))
