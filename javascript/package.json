@@ -20,7 +20,7 @@
     },
     "files": [
         "lib/**/*.{d.ts,js,js.map,json}",
-        "src/**/*.{ts}"
+        "src/**/*.ts"
     ],
     "scripts": {
         "build": "tsc -b",
