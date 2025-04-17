@@ -227,10 +227,6 @@ export class YNotebook
       );
     });
 
-    yCells.forEach(c => {
-      c.setUndoManager();
-    });
-
     return yCells;
   }
 
@@ -592,7 +588,6 @@ export class YNotebook
       const type = (item.content as Y.ContentType).type as Y.Map<any>;
       if (!this._ycellMapping.has(type)) {
         const c = createCellModelFromSharedType(type, { notebook: this });
-        c!.setUndoManager();
         this._ycellMapping.set(type, c);
       }
     });

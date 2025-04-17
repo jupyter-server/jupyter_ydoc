@@ -171,8 +171,12 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     this._undoManager = null;
     if (options.notebook) {
       this._notebook = options.notebook as YNotebook;
-      // We cannot create a undo manager with the cell not yet attached in the notebook
-      // so we defer that to the notebook insertCell method
+      if (this._notebook.disableDocumentWideUndoRedo) {
+        this._undoManager = new Y.UndoManager([this.ymodel], {
+          trackedOrigins: new Set([this]),
+          doc: this._notebook.ydoc
+        });
+      }
     } else {
       // Standalone cell
       const doc = new Y.Doc();
@@ -187,7 +191,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
-   * Cell notebook awareness or null if the cell is standalone.
+   * Cell notebook awareness or null.
    */
   get awareness(): Awareness | null {
     return this._awareness ?? this.notebook?.awareness ?? null;
@@ -286,22 +290,6 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     return this.notebook?.disableDocumentWideUndoRedo
       ? this._undoManager
       : this.notebook.undoManager;
-  }
-
-  /**
-   * Defer setting the undo manager as it requires the
-   * cell to be attached to the notebook Y document.
-   */
-  setUndoManager(): void {
-    if (this._undoManager) {
-      throw new Error('The cell undo manager is already set.');
-    }
-
-    if (this._notebook && this._notebook.disableDocumentWideUndoRedo) {
-      this._undoManager = new Y.UndoManager([this.ymodel], {
-        trackedOrigins: new Set([this])
-      });
-    }
   }
 
   readonly ymodel: Y.Map<any>;
