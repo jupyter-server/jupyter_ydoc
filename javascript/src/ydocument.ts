@@ -7,7 +7,12 @@ import { JSONExt, JSONObject, JSONValue } from '@lumino/coreutils';
 import { ISignal, Signal } from '@lumino/signaling';
 import { Awareness } from 'y-protocols/awareness';
 import * as Y from 'yjs';
-import type { DocumentChange, ISharedDocument, StateChange } from './api.js';
+import type {
+  DocumentChange,
+  IDocumentProvider,
+  ISharedDocument,
+  StateChange
+} from './api.js';
 
 /**
  * Generic shareable document.
@@ -17,6 +22,8 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
+    this.rootRoomId = options?.rootRoomId ?? '';
+    this.currentRoomId = options?.currentRoomId ?? '';
 
     this._ystate = this._ydoc.getMap('state');
 
@@ -34,6 +41,21 @@ export abstract class YDocument<T extends DocumentChange>
    * Document version
    */
   abstract readonly version: string;
+
+  addFork(forkId: string) {
+    this.ystate.set(`fork_${forkId}`, 'new');
+  }
+
+  get provider(): IDocumentProvider {
+    if (this._provider === undefined) {
+      throw new Error('YDocument has no provider');
+    }
+    return this._provider;
+  }
+
+  set provider(provider: IDocumentProvider) {
+    this._provider = provider;
+  }
 
   /**
    * YJS document.
@@ -232,6 +254,9 @@ export abstract class YDocument<T extends DocumentChange>
   private _awareness: Awareness;
   private _isDisposed = false;
   private _disposed = new Signal<this, void>(this);
+  private _provider: IDocumentProvider;
+  public rootRoomId: string;
+  public currentRoomId: string;
 }
 
 /**
@@ -246,5 +271,15 @@ export namespace YDocument {
      * The optional YJS document for YDocument.
      */
     ydoc?: Y.Doc;
+
+    /**
+     * The document root room ID, defaults to ''.
+     */
+    rootRoomId?: string;
+
+    /**
+     * The document current room ID, defaults to ''.
+     */
+    currentRoomId?: string;
   }
 }

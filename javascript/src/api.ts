@@ -20,7 +20,7 @@ import type {
   JSONValue,
   PartialJSONValue
 } from '@lumino/coreutils';
-import type { IObservableDisposable } from '@lumino/disposable';
+import type { IDisposable, IObservableDisposable } from '@lumino/disposable';
 import type { ISignal } from '@lumino/signaling';
 import * as Y from 'yjs';
 import { IAwareness } from './awareness.js';
@@ -83,6 +83,26 @@ export interface ISharedBase extends IObservableDisposable {
 }
 
 /**
+ * An interface for a document provider.
+ */
+export interface IDocumentProvider extends IDisposable {
+  /**
+   * Returns a Promise that resolves when the document provider is ready.
+   */
+  readonly ready: Promise<void>;
+
+  /**
+   * Request to fork the room in the backend, returns the fork ID.
+   */
+  fork(): Promise<string>;
+
+  /**
+   * Connect the shared document to a room with given ID (disconnect from previous room).
+   */
+  connect(roomId: string, merge?: boolean): void;
+}
+
+/**
  * Implement an API for Context information on the shared information.
  * This is used by, for example, docregistry to share the file-path of the edited content.
  */
@@ -121,6 +141,28 @@ interface ISharedDocumentNoSource extends ISharedBase {
    * The changed signal.
    */
   readonly changed: ISignal<this, DocumentChange>;
+
+  /**
+   * The document's provider.
+   */
+  provider: IDocumentProvider;
+
+  /**
+   * Add a fork ID to the document's ystate, as a new key 'fork_{forkId}'
+   *
+   * @param forkId The fork ID to add to the document
+   */
+  addFork(forkId: string): void;
+
+  /**
+   * The document root room ID
+   */
+  rootRoomId: string;
+
+  /**
+   * The document current room ID
+   */
+  currentRoomId: string;
 }
 
 /**
