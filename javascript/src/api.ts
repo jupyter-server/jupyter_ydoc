@@ -573,6 +573,11 @@ export interface ISharedCodeCell
   ): void;
 
   /**
+   * Clear all outputs from the cell.
+   */
+  clearOutputs(): void;
+
+  /**
    * Serialize the model to JSON.
    */
   toJSON(): nbformat.IBaseCell;
