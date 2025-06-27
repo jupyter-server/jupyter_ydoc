@@ -333,3 +333,22 @@ describe('@jupyter/ydoc', () => {
     });
   });
 });
+
+test('should clear outputs from a code cell', () => {
+  const codeCell = YCodeCell.create();
+  const outputs = [
+    {
+      data: {
+        'text/plain': ['Hello, world!']
+      },
+      metadata: {},
+      output_type: 'execute_result'
+    }
+  ];
+
+  codeCell.setOutputs(outputs);
+  expect(codeCell.getOutputs()).toEqual(outputs);
+
+  codeCell.clearOutputs();
+  expect(codeCell.getOutputs()).toEqual([]);
+});

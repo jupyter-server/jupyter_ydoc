@@ -575,7 +575,7 @@ export interface ISharedCodeCell
   /**
    * Clear all outputs from the cell.
    */
-  clearOutputs(): void;
+  clearOutputs(origin: any): void;
 
   /**
    * Serialize the model to JSON.
