@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.1.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.5...280e6e33c0d283456e5519607186db08bccfaa5b))
+
+### Enhancements made
+
+- Add `clearOutputs()` method to `ISharedCodeCell` [#330](https://github.com/jupyter-server/jupyter_ydoc/pull/330) ([@Darshan808](https://github.com/Darshan808))
+
+### Maintenance and upkeep improvements
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-05-07&to=2025-07-01&type=c))
+
+[@Darshan808](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3ADarshan808+updated%3A2025-05-07..2025-07-01&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-05-07..2025-07-01&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.0.5
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.4...9a28796415aeb19ffaf0ca7f5fab2bf39ee04755))
@@ -15,8 +33,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-04-18&to=2025-05-07&type=c))
 
 [@dlqqq](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adlqqq+updated%3A2025-04-18..2025-05-07&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-04-18..2025-05-07&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.0.4
 
