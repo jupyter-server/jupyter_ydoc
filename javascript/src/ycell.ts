@@ -868,6 +868,19 @@ export class YCodeCell
   }
 
   /**
+   * Clear all outputs from the cell.
+   */
+  clearOutputs(origin: any = null): void {
+    this.transact(
+      () => {
+        this._youtputs.delete(0, this._youtputs.length);
+      },
+      false,
+      origin
+    );
+  }
+
+  /**
    * Serialize the model to JSON.
    */
   toJSON(): nbformat.ICodeCell {
