@@ -32,7 +32,7 @@ test = [
     "pytest-asyncio",
     "httpx-ws >=0.5.2",
     "hypercorn >=0.16.0",
-    "pycrdt-websocket >=0.15.0,<0.16.0",
+    "pycrdt-websocket >=0.16.0,<0.17.0",
 ]
 docs = [
     "sphinx",
