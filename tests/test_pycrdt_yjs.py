@@ -8,7 +8,7 @@ import pytest
 from anyio import Event, create_task_group, move_on_after
 from httpx_ws import aconnect_ws
 from pycrdt import Doc, Map
-from pycrdt_websocket import WebsocketProvider
+from pycrdt.websocket import WebsocketProvider
 from utils import Websocket
 
 from jupyter_ydoc import YNotebook
