@@ -10,7 +10,7 @@ import pytest
 from anyio import Event, create_task_group
 from hypercorn import Config
 from hypercorn.asyncio import serve
-from pycrdt_websocket import ASGIServer, WebsocketServer
+from pycrdt.websocket import ASGIServer, WebsocketServer
 from utils import ensure_server_running
 
 # workaround until these PRs are merged:
