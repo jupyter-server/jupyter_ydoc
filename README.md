@@ -48,3 +48,5 @@ following to your package's `pyproject.toml`:
 [project.entry-points.jupyter_ydoc]
 my_document = "my_package.my_file:MyDocumentClass"
 ```
+
+
