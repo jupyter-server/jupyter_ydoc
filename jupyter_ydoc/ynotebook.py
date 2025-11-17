@@ -3,7 +3,7 @@
 
 import copy
 from functools import partial
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
 
 from pycrdt import Array, Awareness, Doc, Map, Text
@@ -102,8 +102,11 @@ class YNotebook(YBaseDoc):
         :return: A cell.
         :rtype: Dict[str, Any]
         """
+        return self._cell_to_py(self._ycells[index])
+
+    def _cell_to_py(self, ycell: Map) -> Dict[str, Any]:
         meta = self._ymeta.to_py()
-        cell = self._ycells[index].to_py()
+        cell = ycell.to_py()
         cell.pop("execution_state", None)
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
@@ -234,7 +237,7 @@ class YNotebook(YBaseDoc):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
-        cells = value["cells"] or [
+        new_cells = value["cells"] or [
             {
                 "cell_type": "code",
                 "execution_count": None,
@@ -245,26 +248,69 @@ class YNotebook(YBaseDoc):
                 "id": str(uuid4()),
             }
         ]
+        old_ycells_by_id = {ycell["id"]: ycell for ycell in self._ycells}
 
         with self._ydoc.transaction():
-            # clear document
-            self._ymeta.clear()
-            self._ycells.clear()
+            new_cell_list: List[dict] = []
+            retained_cells = set()
+
+            # Determine cells to be retained
+            for new_cell in new_cells:
+                cell_id = new_cell.get("id")
+                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
+                    old_cell = self._cell_to_py(old_ycell)
+                    if old_cell == new_cell:
+                        new_cell_list.append(old_cell)
+                        retained_cells.add(cell_id)
+                        continue
+                # New or changed cell
+                new_cell_list.append(new_cell)
+
+            # First delete all non-retained cells
+            if not retained_cells:
+                # fast path if no cells were retained
+                self._ycells.clear()
+            else:
+                index = 0
+                for old_ycell in list(self._ycells):
+                    if old_ycell["id"] not in retained_cells:
+                        self._ycells.pop(index)
+                    else:
+                        index += 1
+
+            # Now add new cells
+            index = 0
+            for new_cell in new_cell_list:
+                if len(self._ycells) > index:
+                    if self._ycells[index]["id"] == new_cell.get("id"):
+                        # retained cell
+                        index += 1
+                        continue
+                self._ycells.insert(index, self.create_ycell(new_cell))
+                index += 1
+
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
             ]:
                 del self._ystate[key]
 
-            # initialize document
-            self._ycells.extend([self.create_ycell(cell) for cell in cells])
-            self._ymeta["nbformat"] = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
-            self._ymeta["nbformat_minor"] = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
+            nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
+            nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
 
+            if self._ymeta.get("nbformat") != nbformat_major:
+                self._ymeta["nbformat"] = nbformat_major
+
+            if self._ymeta.get("nbformat_minor") != nbformat_minor:
+                self._ymeta["nbformat_minor"] = nbformat_minor
+
+            old_y_metadata = self._ymeta.get("metadata")
+            old_metadata = old_y_metadata.to_py() if old_y_metadata else {}
             metadata = nb.get("metadata", {})
-            metadata.setdefault("language_info", {"name": ""})
-            metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
 
-            self._ymeta["metadata"] = Map(metadata)
+            if metadata != old_metadata:
+                metadata.setdefault("language_info", {"name": ""})
+                metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
+                self._ymeta["metadata"] = Map(metadata)
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
