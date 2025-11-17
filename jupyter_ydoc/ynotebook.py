@@ -253,7 +253,7 @@ class YNotebook(YBaseDoc):
 
         with self._ydoc.transaction():
             try:
-                new_cell_list: List[tuple[Map, dict]] = []
+                new_cell_list: List[dict] = []
                 retained_cells = set()
 
                 # Determine cells to be retained
@@ -262,11 +262,11 @@ class YNotebook(YBaseDoc):
                     if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
                         old_cell = self._cell_to_py(old_ycell)
                         if old_cell == new_cell:
-                            new_cell_list.append((old_ycell, old_cell))
+                            new_cell_list.append(old_cell)
                             retained_cells.add(cell_id)
                             continue
                     # New or changed cell
-                    new_cell_list.append((self.create_ycell(new_cell), new_cell))
+                    new_cell_list.append(new_cell)
 
                 # First delete all non-retained cells
                 if not retained_cells:
@@ -282,23 +282,20 @@ class YNotebook(YBaseDoc):
 
                 # Now add new cells
                 index = 0
-                for new_ycell, new_cell in new_cell_list:
+                for new_cell in new_cell_list:
                     if len(self._ycells) > index:
-                        # we need to compare against a python cell to avoid
-                        # an extra transaction on new cells which are not yet
-                        # integrated into the ydoc document.
                         if self._ycells[index]["id"] == new_cell.get("id"):
                             # retained cell
                             index += 1
                             continue
-                    self._ycells.insert(index, new_ycell)
+                    self._ycells.insert(index, self.create_ycell(new_cell))
                     index += 1
 
             except Exception as e:
                 # Fallback to total overwrite, warn to allow debugging
                 warn(f"All cells were reloaded due to an error in granular reload logic: {e}")
                 self._ycells.clear()
-                self._ycells.extend([new_ycell for (new_ycell, _new_cell) in new_cell_list])
+                self._ycells.extend([self.create_ycell(new_cell) for new_cell in new_cell_list])
 
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
