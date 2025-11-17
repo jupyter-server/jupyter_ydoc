@@ -5,7 +5,6 @@ import copy
 from functools import partial
 from typing import Any, Callable, Dict, List, Optional
 from uuid import uuid4
-from warnings import warn
 
 from pycrdt import Array, Awareness, Doc, Map, Text
 
@@ -252,50 +251,43 @@ class YNotebook(YBaseDoc):
         old_ycells_by_id = {ycell["id"]: ycell for ycell in self._ycells}
 
         with self._ydoc.transaction():
-            try:
-                new_cell_list: List[dict] = []
-                retained_cells = set()
+            new_cell_list: List[dict] = []
+            retained_cells = set()
 
-                # Determine cells to be retained
-                for new_cell in new_cells:
-                    cell_id = new_cell.get("id")
-                    if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
-                        old_cell = self._cell_to_py(old_ycell)
-                        if old_cell == new_cell:
-                            new_cell_list.append(old_cell)
-                            retained_cells.add(cell_id)
-                            continue
-                    # New or changed cell
-                    new_cell_list.append(new_cell)
+            # Determine cells to be retained
+            for new_cell in new_cells:
+                cell_id = new_cell.get("id")
+                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
+                    old_cell = self._cell_to_py(old_ycell)
+                    if old_cell == new_cell:
+                        new_cell_list.append(old_cell)
+                        retained_cells.add(cell_id)
+                        continue
+                # New or changed cell
+                new_cell_list.append(new_cell)
 
-                # First delete all non-retained cells
-                if not retained_cells:
-                    # fast path if no cells were retained
-                    self._ycells.clear()
-                else:
-                    index = 0
-                    for old_ycell in list(self._ycells):
-                        if old_ycell["id"] not in retained_cells:
-                            self._ycells.pop(index)
-                        else:
-                            index += 1
-
-                # Now add new cells
-                index = 0
-                for new_cell in new_cell_list:
-                    if len(self._ycells) > index:
-                        if self._ycells[index]["id"] == new_cell.get("id"):
-                            # retained cell
-                            index += 1
-                            continue
-                    self._ycells.insert(index, self.create_ycell(new_cell))
-                    index += 1
-
-            except Exception as e:
-                # Fallback to total overwrite, warn to allow debugging
-                warn(f"All cells were reloaded due to an error in granular reload logic: {e}")
+            # First delete all non-retained cells
+            if not retained_cells:
+                # fast path if no cells were retained
                 self._ycells.clear()
-                self._ycells.extend([self.create_ycell(new_cell) for new_cell in new_cell_list])
+            else:
+                index = 0
+                for old_ycell in list(self._ycells):
+                    if old_ycell["id"] not in retained_cells:
+                        self._ycells.pop(index)
+                    else:
+                        index += 1
+
+            # Now add new cells
+            index = 0
+            for new_cell in new_cell_list:
+                if len(self._ycells) > index:
+                    if self._ycells[index]["id"] == new_cell.get("id"):
+                        # retained cell
+                        index += 1
+                        continue
+                self._ycells.insert(index, self.create_ycell(new_cell))
+                index += 1
 
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
