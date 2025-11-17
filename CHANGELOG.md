@@ -2,6 +2,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.2.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.1.0...85206ea5cadcb7fc0419edc98fb47b765f3050b5))
+
+### Bugs fixed
+
+- Improve reloading of documents to avoid spurious side-effects [#355](https://github.com/jupyter-server/jupyter_ydoc/pull/355) ([@krassowski](https://github.com/krassowski))
+- Preserve `document_id` state when setting notebook source [#338](https://github.com/jupyter-server/jupyter_ydoc/pull/338) ([@apeng-stripe](https://github.com/apeng-stripe))
+
+### Maintenance and upkeep improvements
+
+- Bump actions/upload-artifact from 4 to 5 [#349](https://github.com/jupyter-server/jupyter_ydoc/pull/349) ([@dependabot](https://github.com/dependabot))
+- Bump actions/setup-python from 5 to 6 [#340](https://github.com/jupyter-server/jupyter_ydoc/pull/340) ([@dependabot](https://github.com/dependabot))
+- Test against `pycrdt-websocket` `v0.16.0` & update dev dependencies [#339](https://github.com/jupyter-server/jupyter_ydoc/pull/339) ([@krassowski](https://github.com/krassowski))
+- Bump actions/checkout from 4 to 5 [#337](https://github.com/jupyter-server/jupyter_ydoc/pull/337) ([@dependabot](https://github.com/dependabot))
+- Bump actions/create-github-app-token from 1 to 2 [#318](https://github.com/jupyter-server/jupyter_ydoc/pull/318) ([@dependabot](https://github.com/dependabot))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-07-01&to=2025-11-17&type=c))
+
+[@apeng-stripe](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Aapeng-stripe+updated%3A2025-07-01..2025-11-17&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2025-07-01..2025-11-17&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-07-01..2025-11-17&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-07-01..2025-11-17&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.1.0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.0.5...280e6e33c0d283456e5519607186db08bccfaa5b))
@@ -17,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-05-07&to=2025-07-01&type=c))
 
 [@Darshan808](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3ADarshan808+updated%3A2025-05-07..2025-07-01&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-05-07..2025-07-01&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.0.5
 
