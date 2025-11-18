@@ -2,6 +2,24 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.2.1
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.2.0...af869e7be801c1ca49c30256e30f2683ce03749c))
+
+### Bugs fixed
+
+- Fix syntax highlighting regression (default metadata structure not being set) [#358](https://github.com/jupyter-server/jupyter_ydoc/pull/358) ([@krassowski](https://github.com/krassowski))
+
+### Maintenance and upkeep improvements
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-11-17&to=2025-11-18&type=c))
+
+[@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-11-17..2025-11-18&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-11-17..2025-11-18&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.2.0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.1.0...85206ea5cadcb7fc0419edc98fb47b765f3050b5))
@@ -24,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-07-01&to=2025-11-17&type=c))
 
 [@apeng-stripe](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Aapeng-stripe+updated%3A2025-07-01..2025-11-17&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adependabot+updated%3A2025-07-01..2025-11-17&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-07-01..2025-11-17&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-07-01..2025-11-17&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.1.0
 
