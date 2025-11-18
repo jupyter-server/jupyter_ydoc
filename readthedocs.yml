@@ -5,13 +5,10 @@ build:
   tools:
     python: "3.10"
     nodejs: "14"
+  jobs:
+    install:
+      - pip install --upgrade pip
+      - pip install --group 'docs'
 
 sphinx:
   configuration: docs/source/conf.py
-
-python:
-  install:
-    - method: pip
-      path: .
-      extra_requirements:
-        - docs
