@@ -304,7 +304,7 @@ class YNotebook(YBaseDoc):
                 self._ymeta["nbformat_minor"] = nbformat_minor
 
             old_y_metadata = self._ymeta.get("metadata")
-            old_metadata = old_y_metadata.to_py() if old_y_metadata else {}
+            old_metadata = old_y_metadata.to_py() if old_y_metadata else None
             metadata = nb.get("metadata", {})
 
             if metadata != old_metadata:
