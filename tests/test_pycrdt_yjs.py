@@ -65,8 +65,9 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
     ydoc = Doc()
     ynotebook = YNotebook(ydoc)
     room_name = "my-roomname"
-    async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, Provider(
-        ydoc, Websocket(websocket, room_name)
+    async with (
+        aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket,
+        Provider(ydoc, Websocket(websocket, room_name)),
     ):
         nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
         ynotebook.source = nb
@@ -85,8 +86,9 @@ async def test_ypy_yjs_1(yws_server, yjs_client):
     nb = stringify_source(json.loads((files_dir / "nb1.ipynb").read_text()))
     ynotebook.source = nb
     room_name = "my-roomname"
-    async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, Provider(
-        ydoc, Websocket(websocket, room_name)
+    async with (
+        aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket,
+        Provider(ydoc, Websocket(websocket, room_name)),
     ):
         output_text = ynotebook.ycells[0]["outputs"][0]["text"]
         assert output_text.to_py() == "Hello,"

@@ -2,8 +2,9 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+from collections.abc import Callable
 from functools import partial
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 from pycrdt import Array, Awareness, Doc, Map, Text
@@ -47,7 +48,7 @@ class YNotebook(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    def __init__(self, ydoc: Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YNotebook.
 
@@ -92,7 +93,7 @@ class YNotebook(YBaseDoc):
         """
         return len(self._ycells)
 
-    def get_cell(self, index: int) -> Dict[str, Any]:
+    def get_cell(self, index: int) -> dict[str, Any]:
         """
         Returns a cell.
 
@@ -104,7 +105,7 @@ class YNotebook(YBaseDoc):
         """
         return self._cell_to_py(self._ycells[index])
 
-    def _cell_to_py(self, ycell: Map) -> Dict[str, Any]:
+    def _cell_to_py(self, ycell: Map) -> dict[str, Any]:
         meta = self._ymeta.to_py()
         cell = ycell.to_py()
         cell.pop("execution_state", None)
@@ -120,7 +121,7 @@ class YNotebook(YBaseDoc):
             del cell["attachments"]
         return cell
 
-    def append_cell(self, value: Dict[str, Any]) -> None:
+    def append_cell(self, value: dict[str, Any]) -> None:
         """
         Appends a cell.
 
@@ -130,7 +131,7 @@ class YNotebook(YBaseDoc):
         ycell = self.create_ycell(value)
         self._ycells.append(ycell)
 
-    def set_cell(self, index: int, value: Dict[str, Any]) -> None:
+    def set_cell(self, index: int, value: dict[str, Any]) -> None:
         """
         Sets a cell into indicated position.
 
@@ -143,7 +144,7 @@ class YNotebook(YBaseDoc):
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell)
 
-    def create_ycell(self, value: Dict[str, Any]) -> Map:
+    def create_ycell(self, value: dict[str, Any]) -> Map:
         """
         Creates YMap with the content of the cell.
 
@@ -193,7 +194,7 @@ class YNotebook(YBaseDoc):
         """
         self._ycells[index] = ycell
 
-    def get(self) -> Dict:
+    def get(self) -> dict:
         """
         Returns the content of the document.
 
@@ -227,7 +228,7 @@ class YNotebook(YBaseDoc):
             nbformat_minor=int(meta.get("nbformat_minor", 0)),
         )
 
-    def set(self, value: Dict) -> None:
+    def set(self, value: dict) -> None:
         """
         Sets the content of the document.
 
@@ -251,7 +252,7 @@ class YNotebook(YBaseDoc):
         old_ycells_by_id = {ycell["id"]: ycell for ycell in self._ycells}
 
         with self._ydoc.transaction():
-            new_cell_list: List[dict] = []
+            new_cell_list: list[dict] = []
             retained_cells = set()
 
             # Determine cells to be retained

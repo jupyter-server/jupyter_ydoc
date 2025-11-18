@@ -1,15 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from typing import Dict, List, Type, Union
 
-INT = Type[int]
-FLOAT = Type[float]
+INT = type[int]
+FLOAT = type[float]
 
 
-def cast_all(
-    o: Union[List, Dict], from_type: Union[INT, FLOAT], to_type: Union[FLOAT, INT]
-) -> Union[List, Dict]:
+def cast_all(o: list | dict, from_type: INT | FLOAT, to_type: FLOAT | INT) -> list | dict:
     if isinstance(o, list):
         for i, v in enumerate(o):
             if type(v) is from_type:

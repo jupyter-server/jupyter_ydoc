@@ -2,7 +2,8 @@
 # Distributed under the terms of the Modified BSD License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
@@ -17,10 +18,10 @@ class YBaseDoc(ABC):
 
     _ydoc: Doc
     _ystate: Map
-    _subscriptions: Dict[Any, Subscription]
+    _subscriptions: dict[Any, Subscription]
     _undo_manager: UndoManager
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    def __init__(self, ydoc: Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YBaseDoc.
 
@@ -100,7 +101,7 @@ class YBaseDoc(ABC):
         return self.set(value)
 
     @property
-    def dirty(self) -> Optional[bool]:
+    def dirty(self) -> bool | None:
         """
         Returns whether the document is dirty.
 
@@ -120,7 +121,7 @@ class YBaseDoc(ABC):
         self._ystate["dirty"] = value
 
     @property
-    def hash(self) -> Optional[str]:
+    def hash(self) -> str | None:
         """
         Returns the document hash as computed by contents manager.
 
@@ -140,7 +141,7 @@ class YBaseDoc(ABC):
         self._ystate["hash"] = value
 
     @property
-    def path(self) -> Optional[str]:
+    def path(self) -> str | None:
         """
         Returns document's path.
 
