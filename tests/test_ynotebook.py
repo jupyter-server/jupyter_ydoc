@@ -44,6 +44,15 @@ def test_set_preserves_cells_when_unchanged():
     assert changes == []
 
 
+def test_set_populates_metadata():
+    nb = YNotebook()
+    nb.set({"cells": []})
+    assert nb.get()["metadata"] == {
+        "kernelspec": {"display_name": "", "name": ""},
+        "language_info": {"name": ""},
+    }
+
+
 def test_set_preserves_cells_with_insert_and_remove():
     nb = YNotebook()
     nb.set(
