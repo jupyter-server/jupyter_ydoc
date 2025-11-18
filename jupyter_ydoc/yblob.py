@@ -64,6 +64,9 @@ class YBlob(YBaseDoc):
         :param value: The content of the document.
         :type value: bytes
         """
+        if self.get() == value:
+            return
+
         self._ysource["bytes"] = value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:

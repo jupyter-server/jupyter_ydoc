@@ -67,6 +67,7 @@ class YUnicode(YBaseDoc):
             # no-op if the values are already the same,
             # to avoid side-effects such as cursor jumping to the top
             return
+
         with self._ydoc.transaction():
             # clear document
             self._ysource.clear()

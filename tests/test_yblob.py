@@ -1,27 +1,29 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from jupyter_ydoc import YUnicode
+from jupyter_ydoc import YBlob
 
 
 def test_set_no_op_if_unchanged():
-    text = YUnicode()
+    blob = YBlob()
 
-    assert text.version == "1.0.0"
+    assert blob.version == "2.0.0"
 
-    text.set("test content")
+    content0 = b"012"
+    blob.set(content0)
 
     changes = []
 
     def record_changes(topic, event):
         changes.append((topic, event))  # pragma: nocover
 
-    text.observe(record_changes)
+    blob.observe(record_changes)
 
-    model = text.get()
+    content1 = blob.get()
+    assert content0 == content1
 
-    # Call set with identical text
-    text.set(model)
+    # Call set with identical content
+    blob.set(content0)
 
     # No changes should be observed at all
     assert changes == []

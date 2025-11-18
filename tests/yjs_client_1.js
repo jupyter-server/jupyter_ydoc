@@ -25,8 +25,8 @@ notebook.changed.connect(() => {
   if (cell) {
     const youtput = cell.youtputs.get(0)
     const text = youtput.get('text')
-    if (text.length === 1) {
-      text.insert(1, [' World!'])
+    if (text.toString() === 'Hello,') {
+      text.insert(6, ' World!')
     }
   }
 })

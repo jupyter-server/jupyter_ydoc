@@ -21,7 +21,7 @@ class Websocket:
         try:
             message = await self.recv()
         except Exception:
-            raise StopAsyncIteration()
+            raise StopAsyncIteration()  # pragma: nocover
         return message
 
     async def send(self, message: bytes):
@@ -37,7 +37,7 @@ async def ensure_server_running(host: str, port: int) -> None:
     while True:
         try:
             await connect_tcp(host, port)
-        except OSError:
+        except OSError:  # pragma: nocover
             pass
         else:
             break

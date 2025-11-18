@@ -63,5 +63,5 @@ def yjs_client(request):
     p.terminate()
     try:
         p.wait(timeout=10)
-    except Exception:
+    except Exception:  # pragma: nocover
         p.kill()
