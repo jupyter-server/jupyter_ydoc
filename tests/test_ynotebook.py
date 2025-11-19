@@ -26,12 +26,15 @@ class AnyInstanceOf:
 
 def test_set_preserves_cells_when_unchanged():
     nb = YNotebook()
+
+    assert nb.version == "2.0.0"
+
     nb.set({"cells": [make_code_cell("print('a')\n"), make_code_cell("print('b')\n")]})
 
     changes = []
 
     def record_changes(topic, event):
-        changes.append((topic, event))
+        changes.append((topic, event))  # pragma: nocover
 
     nb.observe(record_changes)
 

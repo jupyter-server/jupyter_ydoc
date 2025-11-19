@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 import pytest
-from anyio import Event, create_task_group, move_on_after
+from anyio import Event, create_task_group, fail_after, move_on_after, sleep
 from httpx_ws import aconnect_ws
 from pycrdt import Doc, Map, Provider
 from utils import Websocket
@@ -65,8 +65,9 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
     ydoc = Doc()
     ynotebook = YNotebook(ydoc)
     room_name = "my-roomname"
-    async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, Provider(
-        ydoc, Websocket(websocket, room_name)
+    async with (
+        aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket,
+        Provider(ydoc, Websocket(websocket, room_name)),
     ):
         nb = stringify_source(json.loads((files_dir / "nb0.ipynb").read_text()))
         ynotebook.source = nb
@@ -85,22 +86,18 @@ async def test_ypy_yjs_1(yws_server, yjs_client):
     nb = stringify_source(json.loads((files_dir / "nb1.ipynb").read_text()))
     ynotebook.source = nb
     room_name = "my-roomname"
-    async with aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket, Provider(
-        ydoc, Websocket(websocket, room_name)
+    async with (
+        aconnect_ws(f"http://localhost:{port}/{room_name}") as websocket,
+        Provider(ydoc, Websocket(websocket, room_name)),
     ):
         output_text = ynotebook.ycells[0]["outputs"][0]["text"]
         assert output_text.to_py() == "Hello,"
-        event = Event()
 
-        def callback(_event):
-            event.set()
-
-        output_text.observe(callback)
-
-        with move_on_after(10):
-            await event.wait()
-
-        assert output_text.to_py() == "Hello,", " World!"
+        with fail_after(10):
+            while True:
+                await sleep(0.1)
+                if output_text.to_py() == "Hello, World!":
+                    break
 
 
 def test_plotly_renderer():

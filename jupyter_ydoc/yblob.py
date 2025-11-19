@@ -1,8 +1,9 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from collections.abc import Callable
 from functools import partial
-from typing import Any, Callable, Optional
+from typing import Any
 
 from pycrdt import Awareness, Doc, Map
 
@@ -24,7 +25,7 @@ class YBlob(YBaseDoc):
         }
     """
 
-    def __init__(self, ydoc: Optional[Doc] = None, awareness: Optional[Awareness] = None):
+    def __init__(self, ydoc: Doc | None = None, awareness: Awareness | None = None):
         """
         Constructs a YBlob.
 
@@ -64,6 +65,9 @@ class YBlob(YBaseDoc):
         :param value: The content of the document.
         :type value: bytes
         """
+        if self.get() == value:
+            return
+
         self._ysource["bytes"] = value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:

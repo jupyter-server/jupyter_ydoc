@@ -30,8 +30,6 @@ Which is just a shortcut to:
 
 ```py
 from importlib.metadata import entry_points
-# for Python < 3.10, install importlib_metadata and do:
-# from importlib_metadata import entry_points
 
 ydocs = {ep.name: ep.load() for ep in entry_points(group="jupyter_ydoc")}
 ```
