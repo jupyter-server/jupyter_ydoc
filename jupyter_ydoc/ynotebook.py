@@ -262,53 +262,9 @@ class YNotebook(YBaseDoc):
                 cell_id = new_cell.get("id")
                 if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
                     old_cell = self._cell_to_py(old_ycell)
-                    updated_granularly = True
-                    if old_cell != new_cell:
-                        # attempt to update cell granularly
-                        old_keys = set(old_cell.keys())
-                        new_keys = set(new_cell.keys())
-
-                        shared_keys = old_keys & new_keys
-                        removed_keys = old_keys - new_keys
-                        added_keys = new_keys - old_keys
-
-                        for key in shared_keys:
-                            if old_cell[key] != new_cell[key]:
-                                if key == "output" and value:
-                                    # outputs require complex handling - some have Text type nested;
-                                    # for now skip creating them; clearing all outputs is fine
-                                    updated_granularly = False
-
-                                if key in _CELL_KEY_TYPE_MAP:
-                                    kind = _CELL_KEY_TYPE_MAP[key]
-                                    value = new_cell[key]
-                                    if kind == Text:
-                                        old: Text = old_ycell[key]
-                                        old.clear()
-                                        old.insert(0, value)
-                                    elif kind == Array:
-                                        old: Array = old_ycell[key]
-                                        old.clear()
-                                        old.extend(value)
-                                    elif kind == Map:
-                                        old: Map = old_ycell[key]
-                                        old.clear()
-                                        for k, v in value.items():
-                                            old[k] = v
-                                else:
-                                    old_ycell[key] = new_cell[key]
-
-                        for key in removed_keys:
-                            del old_ycell[key]
-
-                        for key in added_keys:
-                            if key in _CELL_KEY_TYPE_MAP:
-                                # we hard-reload cells when keys that require nested types get added
-                                # to allow the frontend to connect observers; this could be changed
-                                # in the future, once frontends learn how to observe all changes
-                                updated_granularly = False
-                            else:
-                                old_ycell[key] = new_cell[key]
+                    updated_granularly = self._update_cell(
+                        old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
+                    )
 
                     if updated_granularly:
                         new_cell_list.append(old_cell)
@@ -374,3 +330,53 @@ class YNotebook(YBaseDoc):
         self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
         self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
         self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
+
+    def _update_cell(self, old_cell: dict, new_cell: dict, old_ycell: Map) -> bool:
+        if old_cell == new_cell:
+            return True
+        # attempt to update cell granularly
+        old_keys = set(old_cell.keys())
+        new_keys = set(new_cell.keys())
+
+        shared_keys = old_keys & new_keys
+        removed_keys = old_keys - new_keys
+        added_keys = new_keys - old_keys
+
+        for key in shared_keys:
+            if old_cell[key] != new_cell[key]:
+                value = new_cell[key]
+                if key == "output" and value:
+                    # outputs require complex handling - some have Text type nested;
+                    # for now skip creating them; clearing all outputs is fine
+                    return False
+
+                if key in _CELL_KEY_TYPE_MAP:
+                    kind = _CELL_KEY_TYPE_MAP[key]
+                    if kind == Text and value:
+                        old: Text = old_ycell[key]
+                        old.clear()
+                        old.insert(0, value)
+                    elif kind == Array:
+                        old: Array = old_ycell[key]
+                        old.clear()
+                        old.extend(value)
+                    elif kind == Map:
+                        old: Map = old_ycell[key]
+                        old.clear()
+                        for k, v in value.items():
+                            old[k] = v
+                else:
+                    old_ycell[key] = new_cell[key]
+
+        for key in removed_keys:
+            del old_ycell[key]
+
+        for key in added_keys:
+            if key in _CELL_KEY_TYPE_MAP:
+                # we hard-reload cells when keys that require nested types get added
+                # to allow the frontend to connect observers; this could be changed
+                # in the future, once frontends learn how to observe all changes
+                return False
+            else:
+                old_ycell[key] = new_cell[key]
+        return True
