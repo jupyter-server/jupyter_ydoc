@@ -352,7 +352,12 @@ class YNotebook(YBaseDoc):
 
                 if key in _CELL_KEY_TYPE_MAP:
                     kind = _CELL_KEY_TYPE_MAP[key]
-                    if kind == Text and value:
+
+                    if not isinstance(old_ycell[key], kind):
+                        # if our assumptions about types do not, fall back to hard update
+                        return False
+
+                    if kind == Text:
                         old: Text = old_ycell[key]
                         old.clear()
                         old.insert(0, value)
