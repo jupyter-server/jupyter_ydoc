@@ -125,6 +125,8 @@ def test_set_preserves_cells_with_insert_and_remove():
         ([["source", "'b'"]], {TextEvent}),
         ([["outputs", []]], {ArrayEvent}),
         ([["execution_count", 2]], {MapEvent}),
+        ([["metadata", {"tags": []}]], {MapEvent}),
+        ([["new_key", "test"]], {MapEvent}),
         # multi-attribute modifications
         ([["source", "10"], ["execution_count", 10]], {TextEvent, MapEvent}),
     ],
