@@ -1,7 +1,9 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from pycrdt import Map
+
+from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
+from pytest import mark
 
 from jupyter_ydoc import YNotebook
 
@@ -114,3 +116,66 @@ def test_set_preserves_cells_with_insert_and_remove():
         {"delete": 1},
         {"insert": [AnyInstanceOf(Map)]},
     ]
+
+
+@mark.parametrize(
+    "modifications, expected_events",
+    [
+        # modifications of single attributes
+        ([["source", "'b'"]], {TextEvent}),
+        ([["outputs", []]], {ArrayEvent}),
+        ([["execution_count", 2]], {MapEvent}),
+        ([["metadata", {"tags": []}]], {MapEvent}),
+        ([["new_key", "test"]], {MapEvent}),
+        # multi-attribute modifications
+        ([["source", "10"], ["execution_count", 10]], {TextEvent, MapEvent}),
+    ],
+)
+def test_modify_single_cell(modifications, expected_events):
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {
+                    "id": "8800f7d8-6cad-42ef-a339-a9c185ffdd54",
+                    "cell_type": "code",
+                    "source": "'a'",
+                    "metadata": {"tags": ["test-tag"]},
+                    "outputs": [{"name": "stdout", "output_type": "stream", "text": ["a\n"]}],
+                    "execution_count": 1,
+                },
+            ]
+        }
+    )
+
+    # Get the model as Python object
+    model = nb.get()
+
+    # Make changes
+    for modification in modifications:
+        key, new_value = modification
+        model["cells"][0][key] = new_value
+
+    changes = []
+
+    def record_changes(topic, event):
+        changes.append((topic, event))
+
+    nb.observe(record_changes)
+    nb.set(model)
+
+    for modification in modifications:
+        key, new_value = modification
+        after = nb.ycells[0][key]
+        after_py = after.to_py() if hasattr(after, "to_py") else after
+        assert after_py == new_value
+
+    # there should be only one change
+    assert len(changes) == 1
+    cell_events = [e for t, e in changes if t == "cells"]
+    # and it should be a cell change
+    assert len(cell_events) == 1
+    # but it should be a change to cell data, not a change to the cell list
+    events = cell_events[0]
+    assert len(events) == len(expected_events)
+    assert {type(e) for e in events} == expected_events
