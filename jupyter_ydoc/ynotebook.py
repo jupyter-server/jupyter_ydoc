@@ -354,13 +354,13 @@ class YNotebook(YBaseDoc):
                     kind = _CELL_KEY_TYPE_MAP[key]
 
                     if not isinstance(old_ycell[key], kind):
-                        # if our assumptions about types do not, fall back to hard update
+                        # if our assumptions about types do not hold, fall back to hard update
                         return False
 
                     if kind == Text:
                         old: Text = old_ycell[key]
                         old.clear()
-                        old.insert(0, value)
+                        old += value
                     elif kind == Array:
                         old: Array = old_ycell[key]
                         old.clear()
@@ -368,8 +368,7 @@ class YNotebook(YBaseDoc):
                     elif kind == Map:
                         old: Map = old_ycell[key]
                         old.clear()
-                        for k, v in value.items():
-                            old[k] = v
+                        old.update(value)
                 else:
                     old_ycell[key] = new_cell[key]
 
