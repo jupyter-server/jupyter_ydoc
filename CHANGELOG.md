@@ -2,6 +2,22 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.3.1
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.0...0a0d0bc23b5894db0b00c5b073861025757c72db))
+
+### Bugs fixed
+
+- Hard-reload a cell if its outputs change and include `stream` [#362](https://github.com/jupyter-server/jupyter_ydoc/pull/362) ([@krassowski](https://github.com/krassowski))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-11-21&to=2025-11-21&type=c))
+
+[@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-11-21..2025-11-21&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.3.0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.2.1...91d2742a5faff878f7d802e994922e7c3bcf9d33))
@@ -19,8 +35,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-11-18&to=2025-11-21&type=c))
 
 [@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2025-11-18..2025-11-21&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-11-18..2025-11-21&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.2.1
 
