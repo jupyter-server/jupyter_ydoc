@@ -142,14 +142,33 @@ class ExpectedEvent:
     [
         # modifications of single attributes
         ([["source", "'b'"]], [ExpectedEvent(TextEvent)]),
+        ([["execution_count", 2]], [ExpectedEvent(MapEvent)]),
+        ([["metadata", {"tags": []}]], [ExpectedEvent(MapEvent)]),
+        ([["new_key", "test"]], [ExpectedEvent(MapEvent)]),
+        # outputs can be cleared using granular logic
         ([["outputs", []]], [ExpectedEvent(ArrayEvent, path=[0, "outputs"])]),
+        # stream outputs require a hard cell reload, which is why we expect top-level array change
         (
             [["outputs", [{"name": "stdout", "output_type": "stream", "text": "b\n"}]]],
             [ExpectedEvent(ArrayEvent, path=[])],
         ),
-        ([["execution_count", 2]], [ExpectedEvent(MapEvent)]),
-        ([["metadata", {"tags": []}]], [ExpectedEvent(MapEvent)]),
-        ([["new_key", "test"]], [ExpectedEvent(MapEvent)]),
+        # other output types can be changed granularly
+        (
+            [
+                [
+                    "outputs",
+                    [
+                        {
+                            "data": {"text/plain": ["1"]},
+                            "execution_count": 1,
+                            "metadata": {},
+                            "output_type": "execute_result",
+                        }
+                    ],
+                ]
+            ],
+            [ExpectedEvent(ArrayEvent, path=[0, "outputs"])],
+        ),
         # multi-attribute modifications
         (
             [["source", "10"], ["execution_count", 10]],
