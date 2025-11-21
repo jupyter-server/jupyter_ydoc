@@ -345,9 +345,14 @@ class YNotebook(YBaseDoc):
         for key in shared_keys:
             if old_cell[key] != new_cell[key]:
                 value = new_cell[key]
-                if key == "outputs" and value:
-                    # outputs require complex handling - some have Text type nested;
-                    # for now skip creating them; clearing all outputs is fine
+                if (
+                    key == "outputs"
+                    and value
+                    and any(output.get("output_type") == "stream" for output in value)
+                ):
+                    # Outputs with stream require complex handling as they have
+                    # the Text type nested inside; for now skip creating them.
+                    # Clearing all outputs is fine.
                     return False
 
                 if key in _CELL_KEY_TYPE_MAP:
