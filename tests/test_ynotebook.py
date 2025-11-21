@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from dataclasses import dataclass
 
 from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
 from pytest import mark
@@ -118,17 +119,61 @@ def test_set_preserves_cells_with_insert_and_remove():
     ]
 
 
+@dataclass
+class ExpectedEvent:
+    kind: type
+    path: str | None = None
+
+    def __eq__(self, other):
+        if not isinstance(other, self.kind):
+            return False
+        if self.path is not None and self.path != other.path:
+            return False
+        return True
+
+    def __repr__(self):
+        if self.path is not None:
+            return f"ExpectedEvent({self.kind.__name__}, path={self.path!r})"
+        return f"ExpectedEvent({self.kind.__name__})"
+
+
 @mark.parametrize(
     "modifications, expected_events",
     [
         # modifications of single attributes
-        ([["source", "'b'"]], {TextEvent}),
-        ([["outputs", []]], {ArrayEvent}),
-        ([["execution_count", 2]], {MapEvent}),
-        ([["metadata", {"tags": []}]], {MapEvent}),
-        ([["new_key", "test"]], {MapEvent}),
+        ([["source", "'b'"]], [ExpectedEvent(TextEvent)]),
+        ([["execution_count", 2]], [ExpectedEvent(MapEvent)]),
+        ([["metadata", {"tags": []}]], [ExpectedEvent(MapEvent)]),
+        ([["new_key", "test"]], [ExpectedEvent(MapEvent)]),
+        # outputs can be cleared using granular logic
+        ([["outputs", []]], [ExpectedEvent(ArrayEvent, path=[0, "outputs"])]),
+        # stream outputs require a hard cell reload, which is why we expect top-level array change
+        (
+            [["outputs", [{"name": "stdout", "output_type": "stream", "text": "b\n"}]]],
+            [ExpectedEvent(ArrayEvent, path=[])],
+        ),
+        # other output types can be changed granularly
+        (
+            [
+                [
+                    "outputs",
+                    [
+                        {
+                            "data": {"text/plain": ["1"]},
+                            "execution_count": 1,
+                            "metadata": {},
+                            "output_type": "execute_result",
+                        }
+                    ],
+                ]
+            ],
+            [ExpectedEvent(ArrayEvent, path=[0, "outputs"])],
+        ),
         # multi-attribute modifications
-        ([["source", "10"], ["execution_count", 10]], {TextEvent, MapEvent}),
+        (
+            [["source", "10"], ["execution_count", 10]],
+            [ExpectedEvent(MapEvent), ExpectedEvent(TextEvent)],
+        ),
     ],
 )
 def test_modify_single_cell(modifications, expected_events):
@@ -177,5 +222,4 @@ def test_modify_single_cell(modifications, expected_events):
     assert len(cell_events) == 1
     # but it should be a change to cell data, not a change to the cell list
     events = cell_events[0]
-    assert len(events) == len(expected_events)
-    assert {type(e) for e in events} == expected_events
+    assert events == expected_events
