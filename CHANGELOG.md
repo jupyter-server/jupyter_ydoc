@@ -2,6 +2,26 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.3.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.2.1...91d2742a5faff878f7d802e994922e7c3bcf9d33))
+
+### Bugs fixed
+
+- Fix cell modifications causing cell output reload and shift to active cell index [#360](https://github.com/jupyter-server/jupyter_ydoc/pull/360) ([@krassowski](https://github.com/krassowski))
+
+### Maintenance and upkeep improvements
+
+- Add more tests, require Python 3.10+ [#359](https://github.com/jupyter-server/jupyter_ydoc/pull/359) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-11-18&to=2025-11-21&type=c))
+
+[@davidbrochart](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2025-11-18..2025-11-21&type=Issues) | [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-11-18..2025-11-21&type=Issues)
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.2.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.2.0...af869e7be801c1ca49c30256e30f2683ce03749c))
@@ -17,8 +37,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-11-17&to=2025-11-18&type=c))
 
 [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-11-17..2025-11-18&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-11-17..2025-11-18&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.2.0
 
