@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 from collections.abc import Callable
+from difflib import SequenceMatcher
 from functools import partial
 from typing import Any
 
@@ -64,17 +65,40 @@ class YUnicode(YBaseDoc):
         :param value: The content of the document.
         :type value: str
         """
-        if self.get() == value:
+        old_value = self.get()
+        if old_value == value:
             # no-op if the values are already the same,
             # to avoid side-effects such as cursor jumping to the top
             return
 
         with self._ydoc.transaction():
-            # clear document
-            self._ysource.clear()
-            # initialize document
-            if value:
-                self._ysource += value
+            matcher = SequenceMatcher(a=old_value, b=value)
+
+            # for very different strings, just replace the whole content;
+            # this avoids generating a huge number of operations
+            if matcher.ratio() < 0.6:
+                # clear document
+                self._ysource.clear()
+                # initialize document
+                if value:
+                    self._ysource += value
+            else:
+                operations = matcher.get_opcodes()
+                offset = 0
+                for tag, i1, i2, j1, j2 in operations:
+                    if tag == "replace":
+                        self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
+                        offset += (j2 - j1) - (i2 - i1)
+                    elif tag == "delete":
+                        del self._ysource[i1 + offset : i2 + offset]
+                        offset -= i2 - i1
+                    elif tag == "insert":
+                        self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
+                        offset += j2 - j1
+                    elif tag == "equal":
+                        pass
+                    else:
+                        raise ValueError(f"Unknown tag '{tag}' in sequence matcher")
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
