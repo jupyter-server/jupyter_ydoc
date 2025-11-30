@@ -10,6 +10,9 @@ from pycrdt import Awareness, Doc, Text
 
 from .ybasedoc import YBaseDoc
 
+# Heuristic threshold as recommended in difflib documentation
+SIMILARITY_THREESHOLD = 0.6
+
 
 class YUnicode(YBaseDoc):
     """
@@ -74,15 +77,10 @@ class YUnicode(YBaseDoc):
         with self._ydoc.transaction():
             matcher = SequenceMatcher(a=old_value, b=value)
 
-            # for very different strings, just replace the whole content;
-            # this avoids generating a huge number of operations
-            if matcher.ratio() < 0.6:
-                # clear document
-                self._ysource.clear()
-                # initialize document
-                if value:
-                    self._ysource += value
-            else:
+            if (
+                matcher.real_quick_ratio() >= SIMILARITY_THREESHOLD
+                and matcher.ratio() >= SIMILARITY_THREESHOLD
+            ):
                 operations = matcher.get_opcodes()
                 offset = 0
                 for tag, i1, i2, j1, j2 in operations:
@@ -99,6 +97,15 @@ class YUnicode(YBaseDoc):
                         pass
                     else:
                         raise ValueError(f"Unknown tag '{tag}' in sequence matcher")
+            else:
+                # for very different strings, just replace the whole content;
+                # this avoids generating a huge number of operations
+
+                # clear document
+                self._ysource.clear()
+                # initialize document
+                if value:
+                    self._ysource += value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
