@@ -2,12 +2,16 @@
 # Distributed under the terms of the Modified BSD License.
 
 from collections.abc import Callable
+from difflib import SequenceMatcher
 from functools import partial
 from typing import Any
 
 from pycrdt import Awareness, Doc, Text
 
 from .ybasedoc import YBaseDoc
+
+# Heuristic threshold as recommended in difflib documentation
+SIMILARITY_THREESHOLD = 0.6
 
 
 class YUnicode(YBaseDoc):
@@ -35,7 +39,7 @@ class YUnicode(YBaseDoc):
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
         super().__init__(ydoc, awareness)
-        self._ysource = self._ydoc.get("source", type=Text)
+        self._ysource: Text = self._ydoc.get("source", type=Text)
         self.undo_manager.expand_scope(self._ysource)
 
     @property
@@ -64,17 +68,45 @@ class YUnicode(YBaseDoc):
         :param value: The content of the document.
         :type value: str
         """
-        if self.get() == value:
+        old_value = self.get()
+        if old_value == value:
             # no-op if the values are already the same,
             # to avoid side-effects such as cursor jumping to the top
             return
 
         with self._ydoc.transaction():
-            # clear document
-            self._ysource.clear()
-            # initialize document
-            if value:
-                self._ysource += value
+            matcher = SequenceMatcher(a=old_value, b=value)
+
+            if (
+                matcher.real_quick_ratio() >= SIMILARITY_THREESHOLD
+                and matcher.ratio() >= SIMILARITY_THREESHOLD
+            ):
+                operations = matcher.get_opcodes()
+                offset = 0
+                for tag, i1, i2, j1, j2 in operations:
+                    match tag:
+                        case "replace":
+                            self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
+                            offset += (j2 - j1) - (i2 - i1)
+                        case "delete":
+                            del self._ysource[i1 + offset : i2 + offset]
+                            offset -= i2 - i1
+                        case "insert":
+                            self._ysource.insert(i1 + offset, value[j1:j2])
+                            offset += j2 - j1
+                        case "equal":
+                            pass
+                        case _:
+                            raise ValueError(f"Unknown tag '{tag}' in sequence matcher")
+            else:
+                # for very different strings, just replace the whole content;
+                # this avoids generating a huge number of operations
+
+                # clear document
+                self._ysource.clear()
+                # initialize document
+                if value:
+                    self._ysource += value
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """

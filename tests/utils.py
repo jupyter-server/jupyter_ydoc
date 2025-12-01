@@ -1,6 +1,8 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from dataclasses import dataclass
+
 from anyio import Lock, connect_tcp
 
 
@@ -41,3 +43,27 @@ async def ensure_server_running(host: str, port: int) -> None:
             pass
         else:
             break
+
+
+@dataclass
+class ExpectedEvent:
+    kind: type
+    path: str | None = None
+    delta: list[dict] | None = None
+
+    def __eq__(self, other):
+        if not isinstance(other, self.kind):
+            return False
+        if self.path is not None and self.path != other.path:
+            return False
+        if self.delta is not None and self.delta != other.delta:
+            return False
+        return True
+
+    def __repr__(self):
+        fragments = [self.kind.__name__]
+        if self.path is not None:
+            fragments.append(f"path={self.path!r}")
+        if self.delta is not None:
+            fragments.append(f"delta={self.delta!r}")
+        return f"ExpectedEvent({', '.join(fragments)})"

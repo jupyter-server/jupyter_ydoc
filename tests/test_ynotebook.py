@@ -1,10 +1,9 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from dataclasses import dataclass
-
 from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
 from pytest import mark
+from utils import ExpectedEvent
 
 from jupyter_ydoc import YNotebook
 
@@ -117,24 +116,6 @@ def test_set_preserves_cells_with_insert_and_remove():
         {"delete": 1},
         {"insert": [AnyInstanceOf(Map)]},
     ]
-
-
-@dataclass
-class ExpectedEvent:
-    kind: type
-    path: str | None = None
-
-    def __eq__(self, other):
-        if not isinstance(other, self.kind):
-            return False
-        if self.path is not None and self.path != other.path:
-            return False
-        return True
-
-    def __repr__(self):
-        if self.path is not None:
-            return f"ExpectedEvent({self.kind.__name__}, path={self.path!r})"
-        return f"ExpectedEvent({self.kind.__name__})"
 
 
 @mark.parametrize(
