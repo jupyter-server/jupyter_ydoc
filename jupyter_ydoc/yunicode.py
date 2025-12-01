@@ -84,19 +84,20 @@ class YUnicode(YBaseDoc):
                 operations = matcher.get_opcodes()
                 offset = 0
                 for tag, i1, i2, j1, j2 in operations:
-                    if tag == "replace":
-                        self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
-                        offset += (j2 - j1) - (i2 - i1)
-                    elif tag == "delete":
-                        del self._ysource[i1 + offset : i2 + offset]
-                        offset -= i2 - i1
-                    elif tag == "insert":
-                        self._ysource.insert(i1 + offset, value[j1:j2])
-                        offset += j2 - j1
-                    elif tag == "equal":
-                        pass
-                    else:
-                        raise ValueError(f"Unknown tag '{tag}' in sequence matcher")
+                    match tag:
+                        case "replace":
+                            self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
+                            offset += (j2 - j1) - (i2 - i1)
+                        case "delete":
+                            del self._ysource[i1 + offset : i2 + offset]
+                            offset -= i2 - i1
+                        case "insert":
+                            self._ysource.insert(i1 + offset, value[j1:j2])
+                            offset += j2 - j1
+                        case "equal":
+                            pass
+                        case _:
+                            raise ValueError(f"Unknown tag '{tag}' in sequence matcher")
             else:
                 # for very different strings, just replace the whole content;
                 # this avoids generating a huge number of operations
