@@ -39,7 +39,7 @@ class YUnicode(YBaseDoc):
         :type awareness: :class:`pycrdt.Awareness`, optional.
         """
         super().__init__(ydoc, awareness)
-        self._ysource = self._ydoc.get("source", type=Text)
+        self._ysource: Text = self._ydoc.get("source", type=Text)
         self.undo_manager.expand_scope(self._ysource)
 
     @property
@@ -91,7 +91,7 @@ class YUnicode(YBaseDoc):
                         del self._ysource[i1 + offset : i2 + offset]
                         offset -= i2 - i1
                     elif tag == "insert":
-                        self._ysource[i1 + offset : i2 + offset] = value[j1:j2]
+                        self._ysource.insert(i1 + offset, value[j1:j2])
                         offset += j2 - j1
                     elif tag == "equal":
                         pass
