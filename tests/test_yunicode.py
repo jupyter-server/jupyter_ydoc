@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import pytest
 from pycrdt import TextEvent
 from utils import ExpectedEvent
 
@@ -188,3 +189,125 @@ def test_set_hard_reload_if_very_different():
     assert source_events == [
         ExpectedEvent(TextEvent, delta=[{"delete": 109}, {"insert": twinkle_lyrics}])
     ]
+
+
+@pytest.mark.parametrize(
+    "initial, updated, granular",
+    [
+        (
+            # emojis swapped
+            "I like security 🎨 but I really love painting 🔒",
+            "I like security 🔒 but I really love painting 🎨",
+            True,
+        ),
+        (
+            # text changes, emojis stay in place
+            "Here is a rocket: ⭐ and a star: 🚀",
+            "Here is a star: ⭐ and a rocket: 🚀",
+            True,
+        ),
+        (
+            # change of text and emojis
+            "Here are some happy faces: 😀😁😂",
+            "Here are some sad faces: 😞😢😭",
+            True,
+        ),
+        (
+            # change of characters with combining marks
+            "Combining characters: á é í ó ú",
+            "Combining characters: ú ó í é á",
+            True,
+        ),
+        (
+            "Flags: 🇺🇸🇬🇧🇨🇦",
+            "Flags: 🇨🇦🇬🇧🇺🇸",
+            True,
+        ),
+        (
+            # Emoji with skin tone modifiers
+            "Waving hands: 👋👋🏻👋🏿",
+            "Waving hands: 👋🏿👋🏻👋",
+            False,  # overlapping grapheme clusters, should trigger hard reload
+        ),
+        (
+            # Zero-width joiner sequences (family emoji)
+            "A family 👨‍👩‍👧‍👦 (with two children)",
+            "A family 👨‍👩‍👧 (with one child)",
+            True,
+        ),
+        (
+            # Mixed RTL/LTR text
+            "Hello שלום world",
+            "Hello עולם world",
+            True,
+        ),
+        (
+            # Zero-width characters
+            "Word​break vs Word​​break",  # zero-width space
+            "Word​​break vs Word​break",
+            True,
+        ),
+        (
+            # Keycap sequences
+            "Numbers: 1️⃣2️⃣3️⃣",
+            "Numbers: 3️⃣2️⃣1️⃣",
+            True,
+        ),
+        (
+            # Mixed emoji presentation styles
+            "Text style: ☺︎ vs emoji style: ☺️",
+            "Text style: ☹︎ vs emoji style: ☹️",
+            True,
+        ),
+        (
+            # NFD vs NFC normalization (é can be one or two codepoints)
+            "Café" + "\u0301",  # e + combining acute accent at the end
+            "Caff" + "\u0301",
+            True,
+        ),
+        (
+            # Emoji at boundaries
+            "👋 middle text 🎉",
+            "🎉 middle text 👋",
+            True,
+        ),
+        (
+            # Consecutive emoji with different byte lengths
+            "Grinning face + a flag 😀🏴",
+            "Grinning face + a flag 🏴😀",
+            False,  # overlapping grapheme clusters, should trigger hard reload
+        ),
+        (
+            # Japanese characters
+            "こんにちは世界",
+            "こんにちは地球",
+            True,
+        ),
+        (
+            # Julia math operators
+            "x ∈ [1, 2, 3] && y ≥ 0",
+            "x ∉ [1, 2, 3] || y ≤ 0",
+            True,
+        ),
+    ],
+)
+def test_multibyte_unicode(initial, updated, granular):
+    text = YUnicode()
+    text.set(initial)
+
+    changes = []
+
+    def record_changes(topic, event):
+        changes.append((topic, event))  # pragma: nocover
+
+    text.observe(record_changes)
+
+    text.set(updated)
+
+    assert len(changes) == 1
+    source_events = [e for t, e in changes if t == "source"]
+
+    expected_min_delta_length = 3 if granular else 2
+
+    assert len(source_events[0].delta) >= expected_min_delta_length
+    assert text.get() == updated
