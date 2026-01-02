@@ -251,7 +251,13 @@ class YNotebook(YBaseDoc):
                 "id": str(uuid4()),
             }
         ]
-        old_ycells_by_id: dict[str, Map] = {ycell["id"]: ycell for ycell in self._ycells}
+        # Build dict of old cells by ID, keeping only the first occurrence of each ID
+        # to handle the case where the stored doc already has duplicate IDs.
+        old_ycells_by_id: dict[str, Map] = {}
+        for ycell in self._ycells:
+            cell_id = ycell.get("id")
+            if cell_id is not None and cell_id not in old_ycells_by_id:
+                old_ycells_by_id[cell_id] = ycell
 
         with self._ydoc.transaction():
             new_cell_list: list[dict] = []
@@ -267,34 +273,74 @@ class YNotebook(YBaseDoc):
                     )
 
                     if updated_granularly:
-                        new_cell_list.append(old_cell)
+                        new_cell_list.append(new_cell)
                         retained_cells.add(cell_id)
                         continue
                 # New or changed cell
                 new_cell_list.append(new_cell)
 
-            # First delete all non-retained cells
+            # First delete all non-retained cells and duplicates
             if not retained_cells:
                 # fast path if no cells were retained
                 self._ycells.clear()
             else:
                 index = 0
+                seen: set[str] = set()
                 for old_ycell in list(self._ycells):
-                    if old_ycell["id"] not in retained_cells:
+                    cell_id = old_ycell.get("id")
+                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
                         self._ycells.pop(index)
                     else:
+                        seen.add(cell_id)
                         index += 1
 
+            def build_id_to_index_map() -> dict[str, int]:
+                return {
+                    cell_id: i
+                    for i, cell in enumerate(self._ycells)
+                    if (cell_id := cell.get("id")) is not None
+                }
+            
             # Now add new cells
-            index = 0
-            for new_cell in new_cell_list:
-                if len(self._ycells) > index:
-                    if self._ycells[index]["id"] == new_cell.get("id"):
-                        # retained cell
-                        index += 1
+            # Build id -> index map for O(1) lookups of retained cells3
+            id_to_index = build_id_to_index_map()
+
+            for index, new_cell in enumerate(new_cell_list):
+                new_id = new_cell.get("id")
+
+                # Fast path: correct cell already at this position
+                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
+                    continue
+
+                # Retained cell: move it into position with O(1) lookup
+                if new_id is not None and new_id in retained_cells:
+                    cur = id_to_index.get(new_id)
+
+                    # Defensive: if somehow missing, fall through to insert
+                    if cur is not None and cur != index:
+                        self._ycells.move(cur, index)
+
+                        # Update map for affected range: moved cell + cells that shifted
+                        id_to_index[new_id] = index
+                        for k in range(index + 1, cur + 1):
+                            cid = self._ycells[k].get("id")
+                            if cid is not None:
+                                id_to_index[cid] = k
                         continue
+
+                    if cur == index:
+                        continue
+                    # Retained cell not found - fall through to insert defensively
+
+                # Not retained (or retained-but-missing): insert new ycell
                 self._ycells.insert(index, self.create_ycell(new_cell))
-                index += 1
+
+                # Rebuild map after insert
+                id_to_index = build_id_to_index_map()
+
+            # Remove any extra cells at the end
+            while len(self._ycells) > len(new_cell_list):
+                self._ycells.pop()
 
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
