@@ -300,7 +300,7 @@ class YNotebook(YBaseDoc):
                     for i, cell in enumerate(self._ycells)
                     if (cell_id := cell.get("id")) is not None
                 }
-            
+
             # Now add new cells
             # Build id -> index map for O(1) lookups of retained cells3
             id_to_index = build_id_to_index_map()
