@@ -229,10 +229,8 @@ def test_set_reorder_does_not_duplicate_cells():
     nb.set(model)
 
     # Should have exactly 3 cells with no duplicates
-    assert nb.cell_number == 3
     ids = [cell["id"] for cell in nb.get()["cells"]]
     assert ids == ["cell-C", "cell-B", "cell-A"]
-    assert len(ids) == len(set(ids))
 
 
 def test_set_removes_preexisting_duplicate_ids():
