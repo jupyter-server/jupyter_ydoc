@@ -339,8 +339,7 @@ class YNotebook(YBaseDoc):
                 id_to_index = build_id_to_index_map()
 
             # Remove any extra cells at the end
-            while len(self._ycells) > len(new_cell_list):
-                self._ycells.pop()
+            del self._ycells[len(new_cell_list):]
 
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
