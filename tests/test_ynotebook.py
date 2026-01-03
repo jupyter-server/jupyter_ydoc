@@ -226,12 +226,6 @@ def test_set_reorder_does_not_duplicate_cells():
     # Reorder to C, B, A (same cells, different order)
     model["cells"] = [cells[2], cells[1], cells[0]]
 
-    changes = []
-
-    def record_changes(topic, event):
-        changes.append((topic, event))
-
-    nb.observe(record_changes)
     nb.set(model)
 
     # Should have exactly 3 cells with no duplicates
