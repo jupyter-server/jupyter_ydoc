@@ -302,7 +302,7 @@ class YNotebook(YBaseDoc):
                 }
 
             # Now add new cells
-            # Build id -> index map for O(1) lookups of retained cells3
+            # Build id -> index map for O(1) lookups of retained cells
             id_to_index = build_id_to_index_map()
 
             for index, new_cell in enumerate(new_cell_list):
