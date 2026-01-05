@@ -318,14 +318,14 @@ class YNotebook(YBaseDoc):
 
                     # Defensive: if somehow missing, fall through to insert
                     if cur is not None and cur != index:
-                        self._ycells.move(cur, index)
+                        # Use delete+recreate instead of move() for yjs 13.x compatibility
+                        # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                        # Note: This loses undo history for moved cells, but maintains compat.
+                        del self._ycells[cur]
+                        self._ycells.insert(index, self.create_ycell(new_cell))
 
-                        # Update map for affected range: moved cell + cells that shifted
-                        id_to_index[new_id] = index
-                        for k in range(index + 1, cur + 1):
-                            cid = self._ycells[k].get("id")
-                            if cid is not None:
-                                id_to_index[cid] = k
+                        # Rebuild map after structural change
+                        id_to_index = build_id_to_index_map()
                         continue
 
                     if cur == index:
