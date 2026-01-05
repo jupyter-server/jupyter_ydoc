@@ -294,17 +294,7 @@ class YNotebook(YBaseDoc):
                         seen.add(cell_id)
                         index += 1
 
-            def build_id_to_index_map() -> dict[str, int]:
-                return {
-                    cell_id: i
-                    for i, cell in enumerate(self._ycells)
-                    if (cell_id := cell.get("id")) is not None
-                }
-
-            # Now add new cells
-            # Build id -> index map for O(1) lookups of retained cells
-            id_to_index = build_id_to_index_map()
-
+            # Now reorder/insert cells to match new_cell_list
             for index, new_cell in enumerate(new_cell_list):
                 new_id = new_cell.get("id")
 
@@ -312,31 +302,20 @@ class YNotebook(YBaseDoc):
                 if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
                     continue
 
-                # Retained cell: move it into position with O(1) lookup
+                # Retained cell: find and move it into position
                 if new_id is not None and new_id in retained_cells:
-                    cur = id_to_index.get(new_id)
+                    # Linear scan to find the cell (O(n) per retained cell)
+                    for cur in range(index + 1, len(self._ycells)):
+                        if self._ycells[cur].get("id") == new_id:
+                            # Use delete+recreate instead of move() for yjs 13.x compatibility
+                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                            del self._ycells[cur]
+                            self._ycells.insert(index, self.create_ycell(new_cell))
+                            break
+                    continue
 
-                    # Defensive: if somehow missing, fall through to insert
-                    if cur is not None and cur != index:
-                        # Use delete+recreate instead of move() for yjs 13.x compatibility
-                        # (yjs 13.x doesn't support the move operation that pycrdt generates)
-                        # Note: This loses undo history for moved cells, but maintains compat.
-                        del self._ycells[cur]
-                        self._ycells.insert(index, self.create_ycell(new_cell))
-
-                        # Rebuild map after structural change
-                        id_to_index = build_id_to_index_map()
-                        continue
-
-                    if cur == index:
-                        continue
-                    # Retained cell not found - fall through to insert defensively
-
-                # Not retained (or retained-but-missing): insert new ycell
+                # New cell: insert at position
                 self._ycells.insert(index, self.create_ycell(new_cell))
-
-                # Rebuild map after insert
-                id_to_index = build_id_to_index_map()
 
             # Remove any extra cells at the end
             del self._ycells[len(new_cell_list) :]
