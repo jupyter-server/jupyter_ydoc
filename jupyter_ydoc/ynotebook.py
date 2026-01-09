@@ -251,7 +251,13 @@ class YNotebook(YBaseDoc):
                 "id": str(uuid4()),
             }
         ]
-        old_ycells_by_id: dict[str, Map] = {ycell["id"]: ycell for ycell in self._ycells}
+        # Build dict of old cells by ID, keeping only the first occurrence of each ID
+        # to handle the case where the stored doc already has duplicate IDs.
+        old_ycells_by_id: dict[str, Map] = {}
+        for ycell in self._ycells:
+            cell_id = ycell.get("id")
+            if cell_id is not None and cell_id not in old_ycells_by_id:
+                old_ycells_by_id[cell_id] = ycell
 
         with self._ydoc.transaction():
             new_cell_list: list[dict] = []
@@ -267,34 +273,52 @@ class YNotebook(YBaseDoc):
                     )
 
                     if updated_granularly:
-                        new_cell_list.append(old_cell)
+                        new_cell_list.append(new_cell)
                         retained_cells.add(cell_id)
                         continue
                 # New or changed cell
                 new_cell_list.append(new_cell)
 
-            # First delete all non-retained cells
+            # First delete all non-retained cells and duplicates
             if not retained_cells:
                 # fast path if no cells were retained
                 self._ycells.clear()
             else:
                 index = 0
+                seen: set[str] = set()
                 for old_ycell in list(self._ycells):
-                    if old_ycell["id"] not in retained_cells:
+                    cell_id = old_ycell.get("id")
+                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
                         self._ycells.pop(index)
                     else:
+                        seen.add(cell_id)
                         index += 1
 
-            # Now add new cells
-            index = 0
-            for new_cell in new_cell_list:
-                if len(self._ycells) > index:
-                    if self._ycells[index]["id"] == new_cell.get("id"):
-                        # retained cell
-                        index += 1
-                        continue
+            # Now reorder/insert cells to match new_cell_list
+            for index, new_cell in enumerate(new_cell_list):
+                new_id = new_cell.get("id")
+
+                # Fast path: correct cell already at this position
+                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
+                    continue
+
+                # Retained cell: find and move it into position
+                if new_id is not None and new_id in retained_cells:
+                    # Linear scan to find the cell (O(n) per retained cell)
+                    for cur in range(index + 1, len(self._ycells)):
+                        if self._ycells[cur].get("id") == new_id:
+                            # Use delete+recreate instead of move() for yjs 13.x compatibility
+                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                            del self._ycells[cur]
+                            self._ycells.insert(index, self.create_ycell(new_cell))
+                            break
+                    continue
+
+                # New cell: insert at position
                 self._ycells.insert(index, self.create_ycell(new_cell))
-                index += 1
+
+            # Remove any extra cells at the end
+            del self._ycells[len(new_cell_list) :]
 
             for key in [
                 k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")

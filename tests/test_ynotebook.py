@@ -204,3 +204,127 @@ def test_modify_single_cell(modifications, expected_events):
     # but it should be a change to cell data, not a change to the cell list
     events = cell_events[0]
     assert events == expected_events
+
+
+def test_set_reorder_does_not_duplicate_cells():
+    """Test that reordering cells with the same IDs doesn't create duplicates."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+                {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
+            ]
+        }
+    )
+
+    # Get the model as Python object
+    model = nb.get()
+    cells = model["cells"]
+
+    # Reorder to C, B, A (same cells, different order)
+    model["cells"] = [cells[2], cells[1], cells[0]]
+
+    nb.set(model)
+
+    # Should have exactly 3 cells with no duplicates
+    ids = [cell["id"] for cell in nb.get()["cells"]]
+    assert ids == ["cell-C", "cell-B", "cell-A"]
+
+
+def test_set_removes_preexisting_duplicate_ids():
+    """Test that set() cleans up pre-existing duplicate cell IDs."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+                {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
+            ]
+        }
+    )
+
+    # Manually inject a duplicate ID to simulate corrupted state
+    duplicate_cell = nb.create_ycell(
+        {"id": "cell-B", "cell_type": "markdown", "source": "b-duplicate", "metadata": {}}
+    )
+    nb.ycells.append(duplicate_cell)
+
+    # Verify we have a duplicate
+    assert nb.cell_number == 4
+    ids = [cell["id"] for cell in nb.get()["cells"]]
+    assert ids.count("cell-B") == 2
+
+    # Get the model as Python object (with canonical data - only one cell-B)
+    model = {
+        "cells": [
+            {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+            {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+            {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
+        ]
+    }
+    nb.set(model)
+
+    # Should have exactly 3 cells with no duplicates
+    ids = [cell["id"] for cell in nb.get()["cells"]]
+    assert ids == ["cell-A", "cell-B", "cell-C"]
+
+
+def test_set_reorder_with_mixed_operations():
+    """Test reordering cells while also adding and removing cells."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+                {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
+                {"id": "cell-D", "cell_type": "markdown", "source": "d", "metadata": {}},
+            ]
+        }
+    )
+
+    # Get the model as Python object
+    model = nb.get()
+    cells = model["cells"]
+
+    # Keep A and C from original cells
+    cell_a = cells[0]
+    cell_c = cells[2]
+
+    # New inserted cell
+    new_cell = {"id": "cell-NEW", "cell_type": "markdown", "source": "new", "metadata": {}}
+
+    # Target: C, NEW, A (delete B and D, reorder C and A, insert NEW)
+    model["cells"] = [cell_c, new_cell, cell_a]
+    nb.set(model)
+
+    ids = [cell["id"] for cell in nb.get()["cells"]]
+    assert ids == ["cell-C", "cell-NEW", "cell-A"]
+
+
+def test_set_simple_adjacent_swap():
+    """Test swapping two adjacent cells (common operation)."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+                {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
+            ]
+        }
+    )
+
+    # Get the model as Python object
+    model = nb.get()
+    cells = model["cells"]
+
+    # Swap B and C: A, C, B
+    model["cells"] = [cells[0], cells[2], cells[1]]
+    nb.set(model)
+
+    ids = [cell["id"] for cell in nb.get()["cells"]]
+    assert ids == ["cell-A", "cell-C", "cell-B"]
