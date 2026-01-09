@@ -265,20 +265,11 @@ def test_set_removes_preexisting_duplicate_ids():
             {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
         ]
     }
-
-    changes = []
-
-    def record_changes(topic, event):
-        changes.append((topic, event))
-
-    nb.observe(record_changes)
     nb.set(model)
 
     # Should have exactly 3 cells with no duplicates
-    assert nb.cell_number == 3
     ids = [cell["id"] for cell in nb.get()["cells"]]
     assert ids == ["cell-A", "cell-B", "cell-C"]
-    assert len(ids) == len(set(ids))
 
 
 def test_set_reorder_with_mixed_operations():
@@ -308,19 +299,10 @@ def test_set_reorder_with_mixed_operations():
 
     # Target: C, NEW, A (delete B and D, reorder C and A, insert NEW)
     model["cells"] = [cell_c, new_cell, cell_a]
-
-    changes = []
-
-    def record_changes(topic, event):
-        changes.append((topic, event))
-
-    nb.observe(record_changes)
     nb.set(model)
 
-    assert nb.cell_number == 3
     ids = [cell["id"] for cell in nb.get()["cells"]]
     assert ids == ["cell-C", "cell-NEW", "cell-A"]
-    assert len(ids) == len(set(ids))
 
 
 def test_set_simple_adjacent_swap():
@@ -342,16 +324,7 @@ def test_set_simple_adjacent_swap():
 
     # Swap B and C: A, C, B
     model["cells"] = [cells[0], cells[2], cells[1]]
-
-    changes = []
-
-    def record_changes(topic, event):
-        changes.append((topic, event))
-
-    nb.observe(record_changes)
     nb.set(model)
 
-    assert nb.cell_number == 3
     ids = [cell["id"] for cell in nb.get()["cells"]]
     assert ids == ["cell-A", "cell-C", "cell-B"]
-    assert len(ids) == len(set(ids))
