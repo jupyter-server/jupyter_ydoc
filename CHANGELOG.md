@@ -2,6 +2,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.3.4
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.3...654e8f80f619c7820dd82dfbe3c6d985b6a69e28))
+
+### Bugs fixed
+
+- Fix cell duplication when YStore diverges from disk [#376](https://github.com/jupyter-server/jupyter_ydoc/pull/376) ([@jordanhboxer](https://github.com/jordanhboxer), [@davidbrochart](https://github.com/davidbrochart), [@dmonad](https://github.com/dmonad), [@krassowski](https://github.com/krassowski))
+
+### Maintenance and upkeep improvements
+
+- Bump toshimaru/auto-author-assign from 3.0.0 to 3.0.1 [#375](https://github.com/jupyter-server/jupyter_ydoc/pull/375) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump toshimaru/auto-author-assign from 2.1.1 to 3.0.0 [#373](https://github.com/jupyter-server/jupyter_ydoc/pull/373) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump actions/upload-artifact from 5 to 6 [#371](https://github.com/jupyter-server/jupyter_ydoc/pull/371) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-12-10&to=2026-01-09&type=c))
+
+@davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2025-12-10..2026-01-09&type=Issues)) | @dmonad ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Admonad+updated%3A2025-12-10..2026-01-09&type=Issues)) | @jordanhboxer ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajordanhboxer+updated%3A2025-12-10..2026-01-09&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-12-10..2026-01-09&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.3.3
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.2...3900efdeefef21eb6e117fdd30827ee4c9149ff3))
@@ -17,8 +42,6 @@
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-12-01&to=2025-12-10&type=c))
 
 [@krassowski](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-12-01..2025-12-10&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Apre-commit-ci+updated%3A2025-12-01..2025-12-10&type=Issues)
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.3.2
 
