@@ -380,6 +380,10 @@ async def test_async_notebook():
     # having the notebook already populated adds extra-processing,
     # check that too:
     t0 = monotonic()
+    nb.set(nb_dict0)
+    t1 = monotonic()
+    set_time = t1 - t0
+    t0 = monotonic()
     max_blocking_time = 0
 
     async with create_task_group() as tg:
