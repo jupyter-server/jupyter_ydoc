@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
-from anyio import sleep
+from anyio import lowlevel
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 
@@ -187,7 +187,7 @@ class YBaseDoc(ABC):
         :return: Document's content.
         :rtype: Any
         """
-        await sleep(0)
+        await lowlevel.checkpoint()
         return self.get()
 
     async def aset(self, value: Any) -> None:
@@ -198,7 +198,7 @@ class YBaseDoc(ABC):
         :param value: The content of the document.
         :type value: Any
         """
-        await sleep(0)
+        await lowlevel.checkpoint()
         self.set(value)
 
     @abstractmethod

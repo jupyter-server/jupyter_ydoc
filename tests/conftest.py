@@ -7,9 +7,8 @@ from functools import partial
 from pathlib import Path
 
 import pytest
+from anycorn import Config, serve
 from anyio import Event, create_task_group
-from anycorn import Config
-from anycorn import serve
 from pycrdt.websocket import ASGIServer, WebsocketServer
 from utils import ensure_server_running
 

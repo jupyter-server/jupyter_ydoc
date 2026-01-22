@@ -4,7 +4,7 @@
 from time import monotonic
 from uuid import uuid4
 
-from anyio import create_task_group, sleep
+from anyio import create_task_group, lowlevel
 from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
 from pytest import mark
 from utils import ExpectedEvent
@@ -352,7 +352,7 @@ async def test_async_notebook():
     async def get_max_blocking_time():
         nonlocal t0, max_blocking_time
         while True:
-            await sleep(0)
+            await lowlevel.checkpoint()
             t1 = monotonic()
             dt = t1 - t0
             if dt > max_blocking_time:

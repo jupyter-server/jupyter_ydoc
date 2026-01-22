@@ -7,7 +7,7 @@ from functools import partial
 from typing import Any
 from uuid import uuid4
 
-from anyio import sleep
+from anyio import lowlevel
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
@@ -359,7 +359,7 @@ class YNotebook(YBaseDoc):
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
         for i in range(len(self._ycells)):
-            await sleep(0)
+            await lowlevel.checkpoint()
             cell = self.get_cell(i)
             if (
                 "id" in cell
@@ -409,7 +409,7 @@ class YNotebook(YBaseDoc):
         # to handle the case where the stored doc already has duplicate IDs.
         old_ycells_by_id: dict[str, Map] = {}
         for ycell in self._ycells:
-            await sleep(0)
+            await lowlevel.checkpoint()
             cell_id = ycell.get("id")
             if cell_id is not None and cell_id not in old_ycells_by_id:
                 old_ycells_by_id[cell_id] = ycell
@@ -420,7 +420,7 @@ class YNotebook(YBaseDoc):
 
             # Determine cells to be retained
             for new_cell in new_cells:
-                await sleep(0)
+                await lowlevel.checkpoint()
                 cell_id = new_cell.get("id")
                 if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
                     old_cell = self._cell_to_py(old_ycell)
@@ -443,7 +443,7 @@ class YNotebook(YBaseDoc):
                 index = 0
                 seen: set[str] = set()
                 while True:
-                    await sleep(0)
+                    await lowlevel.checkpoint()
                     if index == len(self._ycells):
                         break
                     old_ycell = self._ycells[index]
@@ -456,7 +456,7 @@ class YNotebook(YBaseDoc):
 
             # Now reorder/insert cells to match new_cell_list
             for index, new_cell in enumerate(new_cell_list):
-                await sleep(0)
+                await lowlevel.checkpoint()
                 new_id = new_cell.get("id")
 
                 # Fast path: correct cell already at this position
@@ -467,7 +467,7 @@ class YNotebook(YBaseDoc):
                 if new_id is not None and new_id in retained_cells:
                     # Linear scan to find the cell (O(n) per retained cell)
                     for cur in range(index + 1, len(self._ycells)):
-                        await sleep(0)
+                        await lowlevel.checkpoint()
                         if self._ycells[cur].get("id") == new_id:
                             # Use delete+recreate instead of move() for yjs 13.x compatibility
                             # (yjs 13.x doesn't support the move operation that pycrdt generates)
