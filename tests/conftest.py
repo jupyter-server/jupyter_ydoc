@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 from anyio import Event, create_task_group
-from hypercorn import Config
-from hypercorn.asyncio import serve
+from anycorn import Config
+from anycorn import serve
 from pycrdt.websocket import ASGIServer, WebsocketServer
 from utils import ensure_server_running
 
@@ -31,7 +31,7 @@ update_json_file(here.parent / "node_modules/y-websocket/package.json", d)
 
 
 @pytest.fixture
-async def yws_server(request, unused_tcp_port):
+async def yws_server(request, free_tcp_port):
     try:
         async with create_task_group() as tg:
             try:
@@ -41,15 +41,15 @@ async def yws_server(request, unused_tcp_port):
             websocket_server = WebsocketServer(**kwargs)
             app = ASGIServer(websocket_server)
             config = Config()
-            config.bind = [f"localhost:{unused_tcp_port}"]
+            config.bind = [f"localhost:{free_tcp_port}"]
             shutdown_event = Event()
             async with websocket_server as websocket_server:
                 tg.start_soon(
                     partial(serve, app, config, shutdown_trigger=shutdown_event.wait, mode="asgi")
                 )
-                await ensure_server_running("localhost", unused_tcp_port)
-                pytest.port = unused_tcp_port
-                yield unused_tcp_port, websocket_server
+                await ensure_server_running("localhost", free_tcp_port)
+                pytest.port = free_tcp_port
+                yield free_tcp_port, websocket_server
                 shutdown_event.set()
     except Exception:
         pass

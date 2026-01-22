@@ -7,6 +7,7 @@ from functools import partial
 from typing import Any
 from uuid import uuid4
 
+from anyio import sleep
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
@@ -286,7 +287,10 @@ class YNotebook(YBaseDoc):
             else:
                 index = 0
                 seen: set[str] = set()
-                for old_ycell in list(self._ycells):
+                while True:
+                    if index == len(self._ycells):
+                        break
+                    old_ycell = self._ycells[index]
                     cell_id = old_ycell.get("id")
                     if cell_id is None or cell_id not in retained_cells or cell_id in seen:
                         self._ycells.pop(index)
@@ -306,6 +310,164 @@ class YNotebook(YBaseDoc):
                 if new_id is not None and new_id in retained_cells:
                     # Linear scan to find the cell (O(n) per retained cell)
                     for cur in range(index + 1, len(self._ycells)):
+                        if self._ycells[cur].get("id") == new_id:
+                            # Use delete+recreate instead of move() for yjs 13.x compatibility
+                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                            del self._ycells[cur]
+                            self._ycells.insert(index, self.create_ycell(new_cell))
+                            break
+                    continue
+
+                # New cell: insert at position
+                self._ycells.insert(index, self.create_ycell(new_cell))
+
+            # Remove any extra cells at the end
+            del self._ycells[len(new_cell_list) :]
+
+            for key in [
+                k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
+            ]:
+                del self._ystate[key]
+
+            nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
+            nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
+
+            if self._ymeta.get("nbformat") != nbformat_major:
+                self._ymeta["nbformat"] = nbformat_major
+
+            if self._ymeta.get("nbformat_minor") != nbformat_minor:
+                self._ymeta["nbformat_minor"] = nbformat_minor
+
+            old_y_metadata = self._ymeta.get("metadata")
+            old_metadata = old_y_metadata.to_py() if old_y_metadata else None
+            metadata = nb.get("metadata", {})
+
+            if metadata != old_metadata:
+                metadata.setdefault("language_info", {"name": ""})
+                metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
+                self._ymeta["metadata"] = Map(metadata)
+
+    async def aget(self) -> dict:
+        """
+        Returns the content of the document, yielding to the event loop often enough
+        to not block it for too long.
+
+        :return: Document's content.
+        :rtype: Dict
+        """
+        meta = self._ymeta.to_py()
+        cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
+        cells = []
+        for i in range(len(self._ycells)):
+            await sleep(0)
+            cell = self.get_cell(i)
+            if (
+                "id" in cell
+                and int(meta.get("nbformat", 0)) == 4
+                and int(meta.get("nbformat_minor", 0)) <= 4
+            ):
+                # strip cell IDs if we have notebook format 4.0-4.4
+                del cell["id"]
+            if (
+                "attachments" in cell
+                and cell["cell_type"] in ["raw", "markdown"]
+                and not cell["attachments"]
+            ):
+                del cell["attachments"]
+            cells.append(cell)
+
+        return dict(
+            cells=cells,
+            metadata=meta.get("metadata", {}),
+            nbformat=int(meta.get("nbformat", 0)),
+            nbformat_minor=int(meta.get("nbformat_minor", 0)),
+        )
+
+    async def aset(self, value: dict) -> None:
+        """
+        Sets the content of the document, yielding to the event loop often enough
+        to not block it for too long.
+
+        :param value: The content of the document.
+        :type value: Dict
+        """
+        nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
+        nb = copy.deepcopy(nb_without_cells)
+        cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
+        new_cells = value["cells"] or [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                # auto-created empty code cell without outputs ought be trusted
+                "metadata": {"trusted": True},
+                "outputs": [],
+                "source": "",
+                "id": str(uuid4()),
+            }
+        ]
+        # Build dict of old cells by ID, keeping only the first occurrence of each ID
+        # to handle the case where the stored doc already has duplicate IDs.
+        old_ycells_by_id: dict[str, Map] = {}
+        for ycell in self._ycells:
+            await sleep(0)
+            cell_id = ycell.get("id")
+            if cell_id is not None and cell_id not in old_ycells_by_id:
+                old_ycells_by_id[cell_id] = ycell
+
+        with self._ydoc.transaction():
+            new_cell_list: list[dict] = []
+            retained_cells = set()
+
+            # Determine cells to be retained
+            for new_cell in new_cells:
+                await sleep(0)
+                cell_id = new_cell.get("id")
+                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
+                    old_cell = self._cell_to_py(old_ycell)
+                    updated_granularly = self._update_cell(
+                        old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
+                    )
+
+                    if updated_granularly:
+                        new_cell_list.append(new_cell)
+                        retained_cells.add(cell_id)
+                        continue
+                # New or changed cell
+                new_cell_list.append(new_cell)
+
+            # First delete all non-retained cells and duplicates
+            if not retained_cells:
+                # fast path if no cells were retained
+                self._ycells.clear()
+            else:
+                index = 0
+                seen: set[str] = set()
+                while True:
+                    await sleep(0)
+                    if index == len(self._ycells):
+                        break
+                    old_ycell = self._ycells[index]
+                    cell_id = old_ycell.get("id")
+                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
+                        self._ycells.pop(index)
+                    else:
+                        seen.add(cell_id)
+                        index += 1
+
+            # Now reorder/insert cells to match new_cell_list
+            for index, new_cell in enumerate(new_cell_list):
+                await sleep(0)
+                new_id = new_cell.get("id")
+
+                # Fast path: correct cell already at this position
+                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
+                    continue
+
+                # Retained cell: find and move it into position
+                if new_id is not None and new_id in retained_cells:
+                    # Linear scan to find the cell (O(n) per retained cell)
+                    for cur in range(index + 1, len(self._ycells)):
+                        await sleep(0)
                         if self._ycells[cur].get("id") == new_id:
                             # Use delete+recreate instead of move() for yjs 13.x compatibility
                             # (yjs 13.x doesn't support the move operation that pycrdt generates)

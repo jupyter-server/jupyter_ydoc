@@ -1,21 +1,30 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from time import monotonic
+from uuid import uuid4
+
+from anyio import create_task_group, sleep
 from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
 from pytest import mark
 from utils import ExpectedEvent
 
 from jupyter_ydoc import YNotebook
 
+pytestmark = mark.anyio
 
-def make_code_cell(source: str):
-    return {
+
+def make_code_cell(source: str, id: str | None = None):
+    cell = {
         "cell_type": "code",
         "source": source,
         "metadata": {},
         "outputs": [],
         "execution_count": None,
     }
+    if id is not None:
+        cell["id"] = id
+    return cell
 
 
 class AnyInstanceOf:
@@ -328,3 +337,79 @@ def test_set_simple_adjacent_swap():
 
     ids = [cell["id"] for cell in nb.get()["cells"]]
     assert ids == ["cell-A", "cell-C", "cell-B"]
+
+
+async def test_async_notebook():
+    nb_dict0 = {"cells": [make_code_cell("print('a')\n", id=str(uuid4())) for _ in range(10_000)]}
+
+    # measure the time to set synchronously
+    nb = YNotebook()
+    t0 = monotonic()
+    nb.set(nb_dict0)
+    t1 = monotonic()
+    set_time = t1 - t0
+
+    async def get_max_blocking_time():
+        nonlocal t0, max_blocking_time
+        while True:
+            await sleep(0)
+            t1 = monotonic()
+            dt = t1 - t0
+            if dt > max_blocking_time:
+                max_blocking_time = dt
+            t0 = t1
+
+    t0 = monotonic()
+    max_blocking_time = 0
+    nb = YNotebook()
+
+    async with create_task_group() as tg:
+        tg.start_soon(get_max_blocking_time)
+        await nb.aset(nb_dict0)
+        tg.cancel_scope.cancel()
+
+    # check that the max blocking time is at least 40 times
+    # smaller than if we did a blocking set:
+    assert max_blocking_time < set_time / 40
+    nb_dict1 = nb.get()
+    del nb_dict1["metadata"]
+    del nb_dict1["nbformat"]
+    del nb_dict1["nbformat_minor"]
+    assert nb_dict0 == nb_dict1
+
+    # having the notebook already populated adds extra-processing,
+    # check that too:
+    t0 = monotonic()
+    max_blocking_time = 0
+
+    async with create_task_group() as tg:
+        tg.start_soon(get_max_blocking_time)
+        await nb.aset(nb_dict0)
+        tg.cancel_scope.cancel()
+
+    # check that the max blocking time is at least 100 times
+    # smaller than if we did a blocking set:
+    assert max_blocking_time < set_time / 100
+    nb_dict1 = nb.get()
+    del nb_dict1["metadata"]
+    del nb_dict1["nbformat"]
+    del nb_dict1["nbformat_minor"]
+    assert nb_dict0 == nb_dict1
+
+    # measure the time to get synchronously:
+    t0 = monotonic()
+    nb.get()
+    t1 = monotonic()
+    get_time = t1 - t0
+
+    t0 = monotonic()
+    max_blocking_time = 0
+
+    async with create_task_group() as tg:
+        tg.start_soon(get_max_blocking_time)
+        await nb.aget()
+        tg.cancel_scope.cancel()
+
+    # check that the max blocking time is at least 100 times
+    # smaller than if we did a blocking get:
+    assert max_blocking_time < get_time / 100

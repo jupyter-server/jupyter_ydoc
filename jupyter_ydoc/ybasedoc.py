@@ -5,6 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
+from anyio import sleep
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 
@@ -177,6 +178,28 @@ class YBaseDoc(ABC):
         :param value: The content of the document.
         :type value: Any
         """
+
+    async def aget(self) -> Any:
+        """
+        Returns the content of the document, yielding to the event loop often enough
+        to not block it for too long.
+
+        :return: Document's content.
+        :rtype: Any
+        """
+        await sleep(0)
+        return self.get()
+
+    async def aset(self, value: Any) -> None:
+        """
+        Sets the content of the document, yielding to the event loop often enough
+        to not block it for too long.
+
+        :param value: The content of the document.
+        :type value: Any
+        """
+        await sleep(0)
+        self.set(value)
 
     @abstractmethod
     def observe(self, callback: Callable[[str, Any], None]) -> None:
