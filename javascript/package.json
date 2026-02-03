@@ -1,6 +1,6 @@
 {
     "name": "@jupyter/ydoc",
-    "version": "3.3.4",
+    "version": "3.3.5",
     "type": "module",
     "description": "Jupyter document structures for collaborative editing using YJS",
     "homepage": "https://github.com/jupyter-server/jupyter_ydoc",

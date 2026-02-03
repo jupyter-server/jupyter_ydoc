@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.3.5
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.4...e121b11000f5c32c7b439f24e019ac8b2111d19e))
+
+### Bugs fixed
+
+- Make `ystate` a property [#384](https://github.com/jupyter-server/jupyter_ydoc/pull/384) ([@davidbrochart](https://github.com/davidbrochart), [@krassowski](https://github.com/krassowski))
+
+### Maintenance and upkeep improvements
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-01-09&to=2026-02-03&type=c))
+
+@davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-01-09..2026-02-03&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-01-09..2026-02-03&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.3.4
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.3...654e8f80f619c7820dd82dfbe3c6d985b6a69e28))
@@ -24,8 +45,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2025-12-10&to=2026-01-09&type=c))
 
 @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2025-12-10..2026-01-09&type=Issues)) | @dmonad ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Admonad+updated%3A2025-12-10..2026-01-09&type=Issues)) | @jordanhboxer ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajordanhboxer+updated%3A2025-12-10..2026-01-09&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2025-12-10..2026-01-09&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.3.3
 
