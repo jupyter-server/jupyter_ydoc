@@ -322,7 +322,7 @@ def test_set_removes_preexisting_duplicate_ids():
 
     # Verify we have a duplicate
     assert nb.cell_number == 4
-    ids = [cell["id"] for cell in nb.get()["cells"]]
+    ids = [cell["id"] for cell in nb.ycells.to_py()]
     assert ids.count("cell-B") == 2
 
     # Get the model as Python object (with canonical data - only one cell-B)
