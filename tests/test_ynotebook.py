@@ -206,6 +206,74 @@ def test_modify_single_cell(modifications, expected_events):
     assert events == expected_events
 
 
+def test_get_merges_exact_duplicates():
+    """Test that identical cells with the same IDs get merged on get()."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+            ]
+        }
+    )
+
+    # Manually inject a duplicate ID to simulate corrupted state
+    nb.ycells.append(
+        nb.create_ycell(
+            {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+        )
+    )
+
+    # Verify we have a duplicate
+    assert len(nb.ycells) == 3
+
+    # Get the model as Python object
+    model = nb.get()
+    cells = model["cells"]
+
+    # Should have exactly 2 cells with no duplicates
+    ids = [cell["id"] for cell in cells]
+    assert ids == ["cell-A", "cell-B"]
+
+
+def test_get_resolves_cell_id_duplicates():
+    """Test that non-identical cells with the same IDs get different IDs on get()."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
+                {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
+            ]
+        }
+    )
+
+    # Manually inject a cell with duplicate ID to simulate corrupted state
+    nb.ycells.append(
+        nb.create_ycell(
+            {"id": "cell-B", "cell_type": "markdown", "source": "X", "metadata": {}},
+        )
+    )
+
+    # Verify we have three cells
+    assert len(nb.ycells) == 3
+
+    # Get the model as Python object
+    model = nb.get()
+    cells = model["cells"]
+
+    # Should have exactly 3 cells with no duplicate IDs
+    ids = [cell["id"] for cell in cells]
+    assert len(set(ids)) == 3  # all IDs are unique
+
+    # Call get again to ensure stable IDs
+    model2 = nb.get()
+    cells2 = model2["cells"]
+    ids2 = [cell["id"] for cell in cells2]
+    assert ids2 == ids
+
+
 def test_set_reorder_does_not_duplicate_cells():
     """Test that reordering cells with the same IDs doesn't create duplicates."""
     nb = YNotebook()
