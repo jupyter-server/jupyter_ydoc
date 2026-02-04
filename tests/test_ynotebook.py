@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import pytest
 from pycrdt import ArrayEvent, Map, MapEvent, TextEvent
 from pytest import mark
 from utils import ExpectedEvent
@@ -259,8 +260,12 @@ def test_get_resolves_cell_id_duplicates():
     # Verify we have three cells
     assert len(nb.ycells) == 3
 
-    # Get the model as Python object
-    model = nb.get()
+    # Get the model as Python object - should emit a warning
+    with pytest.warns(
+        UserWarning, match=r"Non-unique cell ID 'cell-B'.*Corrected to.*Cells differ in.*source"
+    ):
+        model = nb.get()
+
     cells = model["cells"]
 
     # Should have exactly 3 cells with no duplicate IDs
