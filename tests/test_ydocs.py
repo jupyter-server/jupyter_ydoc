@@ -64,3 +64,20 @@ def test_awareness():
     awareness = Awareness(ydoc)
     yblob = YBlob(ydoc, awareness)
     assert yblob.awareness == awareness
+
+
+def test_state():
+    ynotebook = YNotebook()
+    changes = []
+
+    def callback(topic, event):
+        changes.append((topic, event))
+
+    ynotebook.observe(callback)
+    ynotebook.ystate["foo"] = "bar"
+
+    assert ynotebook.ystate["foo"] == "bar"
+    assert len(changes) == 1
+    topic, event = changes[0]
+    assert topic == "state"
+    assert event.keys == {"foo": {"action": "add", "newValue": "bar"}}
