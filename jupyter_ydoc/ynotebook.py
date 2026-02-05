@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+import warnings
 from collections.abc import Callable
 from functools import partial
 from typing import Any
@@ -201,7 +202,7 @@ class YNotebook(YBaseDoc):
         """
         self._ycells[index] = ycell
 
-    def get(self) -> dict:
+    def get(self, deduplicate: bool = True) -> dict:
         """
         Returns the content of the document.
 
@@ -211,8 +212,46 @@ class YNotebook(YBaseDoc):
         meta = self._ymeta.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
+        seen_ids = {}  # maps cell_id -> (index, cell converted to Python dict)
+
         for i in range(len(self._ycells)):
             cell = self._cell_to_py(self._ycells[i], meta)
+            cell_id = cell.get("id")
+
+            if deduplicate and cell_id and cell_id in seen_ids:
+                prev_index, prev_cell = seen_ids[cell_id]
+                # Check if it's an exact duplicate
+                if cell == prev_cell:
+                    # Skip exact duplicates
+                    continue
+                else:
+                    # Non-identical duplicate: assign a new ID
+                    new_id = str(uuid4())
+                    cell["id"] = new_id
+
+                    # Update the ycell to persist the new ID for stable results
+                    self._ycells[i]["id"] = new_id
+
+                    # Find which fields differ
+                    differing_fields = []
+                    all_keys = set(cell.keys()) | set(prev_cell.keys())
+                    for key in sorted(all_keys):
+                        if cell.get(key) != prev_cell.get(key):
+                            differing_fields.append(key)
+
+                    # Emit warning
+                    warnings.warn(
+                        f"Non-unique cell ID '{cell_id}' used by non-identical cells detected. "
+                        f"Corrected to '{new_id}'. Cells differ in {differing_fields}.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+
+                    seen_ids[new_id] = (i, cell)
+            else:
+                if deduplicate and cell_id:
+                    seen_ids[cell_id] = (i, cell)
+
             cells.append(cell)
 
         return dict(
