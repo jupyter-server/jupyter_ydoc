@@ -202,7 +202,7 @@ class YNotebook(YBaseDoc):
         """
         self._ycells[index] = ycell
 
-    def get(self) -> dict:
+    def get(self, deduplicate: bool = True) -> dict:
         """
         Returns the content of the document.
 
@@ -218,7 +218,7 @@ class YNotebook(YBaseDoc):
             cell = self._cell_to_py(self._ycells[i], meta)
             cell_id = cell.get("id")
 
-            if cell_id and cell_id in seen_ids:
+            if deduplicate and cell_id and cell_id in seen_ids:
                 prev_index, prev_cell = seen_ids[cell_id]
                 # Check if it's an exact duplicate
                 if cell == prev_cell:
@@ -249,7 +249,7 @@ class YNotebook(YBaseDoc):
 
                     seen_ids[new_id] = (i, cell)
             else:
-                if cell_id:
+                if deduplicate and cell_id:
                     seen_ids[cell_id] = (i, cell)
 
             cells.append(cell)

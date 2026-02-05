@@ -293,7 +293,7 @@ def test_set_reorder_does_not_duplicate_cells():
     )
 
     # Get the model as Python object
-    model = nb.get()
+    model = nb.get(deduplicate=False)
     cells = model["cells"]
 
     # Reorder to C, B, A (same cells, different order)
@@ -302,7 +302,7 @@ def test_set_reorder_does_not_duplicate_cells():
     nb.set(model)
 
     # Should have exactly 3 cells with no duplicates
-    ids = [cell["id"] for cell in nb.get()["cells"]]
+    ids = [cell["id"] for cell in nb.get(deduplicate=False)["cells"]]
     assert ids == ["cell-C", "cell-B", "cell-A"]
 
 
@@ -341,7 +341,7 @@ def test_set_removes_preexisting_duplicate_ids():
     nb.set(model)
 
     # Should have exactly 3 cells with no duplicates
-    ids = [cell["id"] for cell in nb.get()["cells"]]
+    ids = [cell["id"] for cell in nb.get(deduplicate=False)["cells"]]
     assert ids == ["cell-A", "cell-B", "cell-C"]
 
 
