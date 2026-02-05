@@ -70,14 +70,16 @@ async def test_set_populates_metadata(do):
 
 async def test_set_preserves_cells_with_insert_and_remove(do):
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 make_code_cell("print('a')\n"),  # original 0
                 make_code_cell("print('b')\n"),  # original 1 (will remove)
                 make_code_cell("print('c')\n"),  # original 2
             ]
-        }
+        },
     )
 
     # Capture textual content for sanity check
@@ -169,7 +171,9 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
 )
 async def test_modify_single_cell(modifications, expected_events, do):
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {
@@ -181,7 +185,7 @@ async def test_modify_single_cell(modifications, expected_events, do):
                     "execution_count": 1,
                 },
             ]
-        }
+        },
     )
 
     # Get the model as Python object
@@ -219,13 +223,15 @@ async def test_modify_single_cell(modifications, expected_events, do):
 async def test_get_merges_exact_duplicates(do):
     """Test that identical cells with the same IDs get merged on get()."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
                 {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Manually inject a duplicate ID to simulate corrupted state
@@ -250,13 +256,15 @@ async def test_get_merges_exact_duplicates(do):
 async def test_get_resolves_cell_id_duplicates(do):
     """Test that non-identical cells with the same IDs get different IDs on get()."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
                 {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Manually inject a cell with duplicate ID to simulate corrupted state
@@ -291,14 +299,16 @@ async def test_get_resolves_cell_id_duplicates(do):
 async def test_set_reorder_does_not_duplicate_cells(do):
     """Test that reordering cells with the same IDs doesn't create duplicates."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
                 {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
                 {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Get the model as Python object
@@ -318,14 +328,16 @@ async def test_set_reorder_does_not_duplicate_cells(do):
 async def test_set_removes_preexisting_duplicate_ids(do):
     """Test that set() cleans up pre-existing duplicate cell IDs."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
                 {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
                 {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Manually inject a duplicate ID to simulate corrupted state
@@ -357,7 +369,9 @@ async def test_set_removes_preexisting_duplicate_ids(do):
 async def test_set_reorder_with_mixed_operations(do):
     """Test reordering cells while also adding and removing cells."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -365,7 +379,7 @@ async def test_set_reorder_with_mixed_operations(do):
                 {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
                 {"id": "cell-D", "cell_type": "markdown", "source": "d", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Get the model as Python object
@@ -390,14 +404,16 @@ async def test_set_reorder_with_mixed_operations(do):
 async def test_set_simple_adjacent_swap(do):
     """Test swapping two adjacent cells (common operation)."""
     nb = YNotebook()
-    await do(nb, "set",
+    await do(
+        nb,
+        "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
                 {"id": "cell-B", "cell_type": "markdown", "source": "b", "metadata": {}},
                 {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
             ]
-        }
+        },
     )
 
     # Get the model as Python object
