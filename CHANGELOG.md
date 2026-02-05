@@ -2,6 +2,29 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.3.6
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.5...36d50a2698e4640e96308fde5f344bcc549c2641))
+
+### Enhancements made
+
+- Slightly optimize `YNotebook.get` (do not convert meta for each cell) [#382](https://github.com/jupyter-server/jupyter_ydoc/pull/382) ([@krassowski](https://github.com/krassowski), [@davidbrochart](https://github.com/davidbrochart))
+
+### Bugs fixed
+
+- Deduplicate on `YNotebook.get` call [#386](https://github.com/jupyter-server/jupyter_ydoc/pull/386) ([@krassowski](https://github.com/krassowski), [@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-02-03&to=2026-02-05&type=c))
+
+@davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-02-03..2026-02-05&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-02-03..2026-02-05&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.3.5
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.3.4...e121b11000f5c32c7b439f24e019ac8b2111d19e))
@@ -20,8 +43,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-01-09&to=2026-02-03&type=c))
 
 @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-01-09..2026-02-03&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-01-09..2026-02-03&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.3.4
 
