@@ -22,6 +22,10 @@ NBFORMAT_MINOR_VERSION = 5
 _CELL_KEY_TYPE_MAP = {"metadata": Map, "source": Text, "outputs": Array}
 
 
+class O:  # noqa: E742
+    pass
+
+
 class YNotebook(YBaseDoc):
     """
     Extends :class:`YBaseDoc`, and represents a Notebook document.
@@ -601,7 +605,3 @@ class YNotebook(YBaseDoc):
             else:
                 old_ycell[key] = new_cell[key]
         return True
-
-
-class O:
-    pass
