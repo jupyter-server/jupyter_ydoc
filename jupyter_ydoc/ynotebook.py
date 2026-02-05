@@ -2,6 +2,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 import copy
+import warnings
 from collections.abc import Callable
 from functools import partial
 from typing import Any
@@ -108,12 +109,17 @@ class YNotebook(YBaseDoc):
         """
         return self._cell_to_py(self._ycells[index])
 
-    def _cell_to_py(self, ycell: Map) -> dict[str, Any]:
-        meta = self._ymeta.to_py()
+    def _cell_to_py(self, ycell: Map, meta: dict[str, Any] | None = None) -> dict[str, Any]:
+        if meta is None:
+            meta = self._ymeta.to_py()
         cell = ycell.to_py()
         cell.pop("execution_state", None)
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
-        if "id" in cell and meta["nbformat"] == 4 and meta["nbformat_minor"] <= 4:
+        if (
+            "id" in cell
+            and int(meta.get("nbformat", 0)) == 4
+            and int(meta.get("nbformat_minor", 0)) <= 4
+        ):
             # strip cell IDs if we have notebook format 4.0-4.4
             del cell["id"]
         if (
@@ -197,7 +203,7 @@ class YNotebook(YBaseDoc):
         """
         self._ycells[index] = ycell
 
-    def get(self) -> dict:
+    def get(self, deduplicate: bool = True) -> dict:
         """
         Returns the content of the document.
 
@@ -207,21 +213,46 @@ class YNotebook(YBaseDoc):
         meta = self._ymeta.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
+        seen_ids = {}  # maps cell_id -> (index, cell converted to Python dict)
+
         for i in range(len(self._ycells)):
-            cell = self.get_cell(i)
-            if (
-                "id" in cell
-                and int(meta.get("nbformat", 0)) == 4
-                and int(meta.get("nbformat_minor", 0)) <= 4
-            ):
-                # strip cell IDs if we have notebook format 4.0-4.4
-                del cell["id"]
-            if (
-                "attachments" in cell
-                and cell["cell_type"] in ["raw", "markdown"]
-                and not cell["attachments"]
-            ):
-                del cell["attachments"]
+            cell = self._cell_to_py(self._ycells[i], meta)
+            cell_id = cell.get("id")
+
+            if deduplicate and cell_id and cell_id in seen_ids:
+                prev_index, prev_cell = seen_ids[cell_id]
+                # Check if it's an exact duplicate
+                if cell == prev_cell:
+                    # Skip exact duplicates
+                    continue
+                else:
+                    # Non-identical duplicate: assign a new ID
+                    new_id = str(uuid4())
+                    cell["id"] = new_id
+
+                    # Update the ycell to persist the new ID for stable results
+                    self._ycells[i]["id"] = new_id
+
+                    # Find which fields differ
+                    differing_fields = []
+                    all_keys = set(cell.keys()) | set(prev_cell.keys())
+                    for key in sorted(all_keys):
+                        if cell.get(key) != prev_cell.get(key):
+                            differing_fields.append(key)
+
+                    # Emit warning
+                    warnings.warn(
+                        f"Non-unique cell ID '{cell_id}' used by non-identical cells detected. "
+                        f"Corrected to '{new_id}'. Cells differ in {differing_fields}.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+
+                    seen_ids[new_id] = (i, cell)
+            else:
+                if deduplicate and cell_id:
+                    seen_ids[cell_id] = (i, cell)
+
             cells.append(cell)
 
         return dict(
@@ -241,6 +272,9 @@ class YNotebook(YBaseDoc):
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
+
+        meta = self._ymeta.to_py()
+
         new_cells = value["cells"] or [
             {
                 "cell_type": "code",
@@ -268,7 +302,7 @@ class YNotebook(YBaseDoc):
             for new_cell in new_cells:
                 cell_id = new_cell.get("id")
                 if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
-                    old_cell = self._cell_to_py(old_ycell)
+                    old_cell = self._cell_to_py(old_ycell, meta)
                     updated_granularly = self._update_cell(
                         old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
                     )
@@ -332,14 +366,13 @@ class YNotebook(YBaseDoc):
             nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
             nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
 
-            if self._ymeta.get("nbformat") != nbformat_major:
+            if meta.get("nbformat") != nbformat_major:
                 self._ymeta["nbformat"] = nbformat_major
 
-            if self._ymeta.get("nbformat_minor") != nbformat_minor:
+            if meta.get("nbformat_minor") != nbformat_minor:
                 self._ymeta["nbformat_minor"] = nbformat_minor
 
-            old_y_metadata = self._ymeta.get("metadata")
-            old_metadata = old_y_metadata.to_py() if old_y_metadata else None
+            old_metadata = meta.get("metadata")
             metadata = nb.get("metadata", {})
 
             if metadata != old_metadata:

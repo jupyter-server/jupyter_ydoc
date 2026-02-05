@@ -62,6 +62,7 @@ class YBaseDoc(ABC):
         """
         return self._undo_manager
 
+    @property
     def ystate(self) -> Map:
         """
         A :class:`pycrdt.Map` containing the state of the document.
