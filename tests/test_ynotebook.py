@@ -36,12 +36,12 @@ class AnyInstanceOf:
         return isinstance(other, self.cls)
 
 
-def test_set_preserves_cells_when_unchanged():
+async def test_set_preserves_cells_when_unchanged(do):
     nb = YNotebook()
 
     assert nb.version == "2.0.0"
 
-    nb.set({"cells": [make_code_cell("print('a')\n"), make_code_cell("print('b')\n")]})
+    await do(nb, "set", {"cells": [make_code_cell("print('a')\n"), make_code_cell("print('b')\n")]})
 
     changes = []
 
@@ -50,27 +50,27 @@ def test_set_preserves_cells_when_unchanged():
 
     nb.observe(record_changes)
 
-    model = nb.get()
+    model = await do(nb, "get")
 
     # Call set with identical structure
-    nb.set(model)
+    await do(nb, "set", model)
 
     # No changes should be observed at all
     assert changes == []
 
 
-def test_set_populates_metadata():
+async def test_set_populates_metadata(do):
     nb = YNotebook()
-    nb.set({"cells": []})
-    assert nb.get()["metadata"] == {
+    await do(nb, "set", {"cells": []})
+    assert (await do(nb, "get"))["metadata"] == {
         "kernelspec": {"display_name": "", "name": ""},
         "language_info": {"name": ""},
     }
 
 
-def test_set_preserves_cells_with_insert_and_remove():
+async def test_set_preserves_cells_with_insert_and_remove(do):
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 make_code_cell("print('a')\n"),  # original 0
@@ -85,7 +85,7 @@ def test_set_preserves_cells_with_insert_and_remove():
     cell2_source_text = str(nb.ycells[2]["source"])
 
     # Get the model as Python object
-    model = nb.get()
+    model = await do(nb, "get")
 
     # Remove the middle cell and insert a new one between the retained cells
     cells = model["cells"]
@@ -105,7 +105,7 @@ def test_set_preserves_cells_with_insert_and_remove():
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    nb.set(model)
+    await do(nb, "set", model)
 
     assert nb.cell_number == 3
 
@@ -167,9 +167,9 @@ def test_set_preserves_cells_with_insert_and_remove():
         ),
     ],
 )
-def test_modify_single_cell(modifications, expected_events):
+async def test_modify_single_cell(modifications, expected_events, do):
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {
@@ -185,7 +185,7 @@ def test_modify_single_cell(modifications, expected_events):
     )
 
     # Get the model as Python object
-    model = nb.get()
+    model = await do(nb, "get")
 
     # Make changes
     for modification in modifications:
@@ -198,7 +198,7 @@ def test_modify_single_cell(modifications, expected_events):
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    nb.set(model)
+    await do(nb, "set", model)
 
     for modification in modifications:
         key, new_value = modification
@@ -216,10 +216,10 @@ def test_modify_single_cell(modifications, expected_events):
     assert events == expected_events
 
 
-def test_get_merges_exact_duplicates():
+async def test_get_merges_exact_duplicates(do):
     """Test that identical cells with the same IDs get merged on get()."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -239,7 +239,7 @@ def test_get_merges_exact_duplicates():
     assert len(nb.ycells) == 3
 
     # Get the model as Python object
-    model = nb.get()
+    model = await do(nb, "get")
     cells = model["cells"]
 
     # Should have exactly 2 cells with no duplicates
@@ -247,10 +247,10 @@ def test_get_merges_exact_duplicates():
     assert ids == ["cell-A", "cell-B"]
 
 
-def test_get_resolves_cell_id_duplicates():
+async def test_get_resolves_cell_id_duplicates(do):
     """Test that non-identical cells with the same IDs get different IDs on get()."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -273,7 +273,7 @@ def test_get_resolves_cell_id_duplicates():
     with pytest.warns(
         UserWarning, match=r"Non-unique cell ID 'cell-B'.*Corrected to.*Cells differ in.*source"
     ):
-        model = nb.get()
+        model = await do(nb, "get")
 
     cells = model["cells"]
 
@@ -282,16 +282,16 @@ def test_get_resolves_cell_id_duplicates():
     assert len(set(ids)) == 3  # all IDs are unique
 
     # Call get again to ensure stable IDs
-    model2 = nb.get()
+    model2 = await do(nb, "get")
     cells2 = model2["cells"]
     ids2 = [cell["id"] for cell in cells2]
     assert ids2 == ids
 
 
-def test_set_reorder_does_not_duplicate_cells():
+async def test_set_reorder_does_not_duplicate_cells(do):
     """Test that reordering cells with the same IDs doesn't create duplicates."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -302,23 +302,23 @@ def test_set_reorder_does_not_duplicate_cells():
     )
 
     # Get the model as Python object
-    model = nb.get(deduplicate=False)
+    model = await do(nb, "get", deduplicate=False)
     cells = model["cells"]
 
     # Reorder to C, B, A (same cells, different order)
     model["cells"] = [cells[2], cells[1], cells[0]]
 
-    nb.set(model)
+    await do(nb, "set", model)
 
     # Should have exactly 3 cells with no duplicates
-    ids = [cell["id"] for cell in nb.get(deduplicate=False)["cells"]]
+    ids = [cell["id"] for cell in (await do(nb, "get", deduplicate=False))["cells"]]
     assert ids == ["cell-C", "cell-B", "cell-A"]
 
 
-def test_set_removes_preexisting_duplicate_ids():
+async def test_set_removes_preexisting_duplicate_ids(do):
     """Test that set() cleans up pre-existing duplicate cell IDs."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -347,17 +347,17 @@ def test_set_removes_preexisting_duplicate_ids():
             {"id": "cell-C", "cell_type": "markdown", "source": "c", "metadata": {}},
         ]
     }
-    nb.set(model)
+    await do(nb, "set", model)
 
     # Should have exactly 3 cells with no duplicates
-    ids = [cell["id"] for cell in nb.get(deduplicate=False)["cells"]]
+    ids = [cell["id"] for cell in (await do(nb, "get", deduplicate=False))["cells"]]
     assert ids == ["cell-A", "cell-B", "cell-C"]
 
 
-def test_set_reorder_with_mixed_operations():
+async def test_set_reorder_with_mixed_operations(do):
     """Test reordering cells while also adding and removing cells."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -369,7 +369,7 @@ def test_set_reorder_with_mixed_operations():
     )
 
     # Get the model as Python object
-    model = nb.get()
+    model = await do(nb, "get")
     cells = model["cells"]
 
     # Keep A and C from original cells
@@ -381,16 +381,16 @@ def test_set_reorder_with_mixed_operations():
 
     # Target: C, NEW, A (delete B and D, reorder C and A, insert NEW)
     model["cells"] = [cell_c, new_cell, cell_a]
-    nb.set(model)
+    await do(nb, "set", model)
 
-    ids = [cell["id"] for cell in nb.get()["cells"]]
+    ids = [cell["id"] for cell in (await do(nb, "get"))["cells"]]
     assert ids == ["cell-C", "cell-NEW", "cell-A"]
 
 
-def test_set_simple_adjacent_swap():
+async def test_set_simple_adjacent_swap(do):
     """Test swapping two adjacent cells (common operation)."""
     nb = YNotebook()
-    nb.set(
+    await do(nb, "set",
         {
             "cells": [
                 {"id": "cell-A", "cell_type": "markdown", "source": "a", "metadata": {}},
@@ -401,14 +401,14 @@ def test_set_simple_adjacent_swap():
     )
 
     # Get the model as Python object
-    model = nb.get()
+    model = await do(nb, "get")
     cells = model["cells"]
 
     # Swap B and C: A, C, B
     model["cells"] = [cells[0], cells[2], cells[1]]
-    nb.set(model)
+    await do(nb, "set", model)
 
-    ids = [cell["id"] for cell in nb.get()["cells"]]
+    ids = [cell["id"] for cell in (await do(nb, "get"))["cells"]]
     assert ids == ["cell-A", "cell-C", "cell-B"]
 
 

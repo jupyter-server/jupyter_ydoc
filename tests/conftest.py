@@ -64,3 +64,32 @@ def yjs_client(request):
         p.wait(timeout=10)
     except Exception:  # pragma: nocover
         p.kill()
+
+
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(params=["sync", "async"])
+async def do(request):
+    async def doc_set(doc, *args, **kwargs):
+        if request.param == "async":
+            return await doc.aset(*args, **kwargs)
+        else:
+            return doc.set(*args, **kwargs)
+
+    async def doc_get(doc, *args, **kwargs):
+        if request.param == "async":
+            return await doc.aget(*args, **kwargs)
+        else:
+            return doc.get(*args, **kwargs)
+
+    async def _(doc, action, *args, **kwargs):
+        if action == "get":
+            return await doc_get(doc, *args, **kwargs)
+        if action == "set":
+            return await doc_set(doc, *args, **kwargs)
+        raise f'Action can be "get" or "set", not: "{action}"'
+
+    return _

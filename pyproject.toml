@@ -33,7 +33,6 @@ test = [
     "anycorn",
     "pycrdt-websocket >=0.16.0,<0.17.0",
     "coverage",
-    "trio",
 ]
 docs = [
     "sphinx",
