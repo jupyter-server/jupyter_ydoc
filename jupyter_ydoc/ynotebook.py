@@ -5,7 +5,7 @@ import copy
 import warnings
 from collections.abc import Callable
 from functools import partial
-from typing import Any
+from typing import Any, Iterator
 from uuid import uuid4
 
 from anyio import lowlevel
@@ -113,6 +113,7 @@ class YNotebook(YBaseDoc):
         if meta is None:
             meta = self._ymeta.to_py()
         cell = ycell.to_py()
+        assert cell is not None
         cell.pop("execution_state", None)
         cast_all(cell, float, int)  # cells coming from Yjs have e.g. execution_count as float
         if (
@@ -210,20 +211,25 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        gen = self._get(deduplicate)
-        for val in gen:
+        # YNotebook._get is a generator that yields while processing cells.
+        # It is used in YNotebook.get and YNotebook.aget, the former just
+        # runs it until completion and the latter inserts async checkpoints
+        # in order to not block the event loop for too long for notebooks
+        # with a lot of cells.
+        for val in self._get(deduplicate):
             pass
 
+        assert val is not None
         return val
 
-    def _get(self, deduplicate: bool) -> dict:
+    def _get(self, deduplicate: bool) -> Iterator[dict | None]:
         meta = self._ymeta.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
-        seen_ids = {}  # maps cell_id -> (index, cell converted to Python dict)
+        seen_ids: dict[str, tuple[int, dict]] = {}  # maps cell_id -> (index, cell converted to Python dict)
 
         for i in range(len(self._ycells)):
-            yield
+            yield None
             cell = self._cell_to_py(self._ycells[i], meta)
             cell_id = cell.get("id")
 
@@ -277,11 +283,15 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
-        gen = self._set(value)
-        for val in gen:
+        # YNotebook._set is a generator that yields while processing cells.
+        # It is used in YNotebook.set and YNotebook.aset, the former just
+        # runs it until completion and the latter inserts async checkpoints
+        # in order to not block the event loop for too long for notebooks
+        # with a lot of cells.
+        for _ in self._set(value):
             pass
 
-    def _set(self, value: dict) -> None:
+    def _set(self, value: dict) -> Iterator[None]:
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
@@ -408,10 +418,10 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        gen = self._get(deduplicate)
-        for val in gen:
+        for val in self._get(deduplicate):
             await lowlevel.checkpoint()
 
+        assert val is not None
         return val
 
     async def aset(self, value: dict) -> None:
@@ -422,8 +432,7 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
-        gen = self._set(value)
-        for val in gen:
+        for val in self._set(value):
             await lowlevel.checkpoint()
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
@@ -470,17 +479,17 @@ class YNotebook(YBaseDoc):
                         return False
 
                     if kind == Text:
-                        old: Text = old_ycell[key]
-                        old.clear()
-                        old += value
+                        old_text: Text = old_ycell[key]
+                        old_text.clear()
+                        old_text += value
                     elif kind == Array:
-                        old: Array = old_ycell[key]
-                        old.clear()
-                        old.extend(value)
+                        old_array: Array = old_ycell[key]
+                        old_array.clear()
+                        old_array.extend(value)
                     elif kind == Map:
-                        old: Map = old_ycell[key]
-                        old.clear()
-                        old.update(value)
+                        old_map: Map = old_ycell[key]
+                        old_map.clear()
+                        old_map.update(value)
                 else:
                     old_ycell[key] = new_cell[key]
 

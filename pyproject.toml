@@ -30,9 +30,10 @@ test = [
     "pre-commit",
     "pytest",
     "httpx-ws >=0.5.2",
-    "anycorn",
+    "hypercorn >=0.16.0",
     "pycrdt-websocket >=0.16.0,<0.17.0",
     "coverage",
+    "mypy",
 ]
 docs = [
     "sphinx",

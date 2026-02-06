@@ -7,8 +7,9 @@ from functools import partial
 from pathlib import Path
 
 import pytest
-from anycorn import Config, serve
 from anyio import Event, create_task_group
+from hypercorn import Config
+from hypercorn.asyncio import serve
 from pycrdt.websocket import ASGIServer, WebsocketServer
 from utils import ensure_server_running
 
@@ -90,6 +91,6 @@ async def do(request):
             return await doc_get(doc, *args, **kwargs)
         if action == "set":
             return await doc_set(doc, *args, **kwargs)
-        raise f'Action can be "get" or "set", not: "{action}"'
+        raise ValueError(f'Action can be "get" or "set", not: "{action}"')
 
     return _
