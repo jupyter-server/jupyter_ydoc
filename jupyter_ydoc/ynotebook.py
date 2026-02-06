@@ -3,9 +3,9 @@
 
 import copy
 import warnings
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from functools import partial
-from typing import Any, Iterator
+from typing import Any
 from uuid import uuid4
 
 from anyio import lowlevel
@@ -226,7 +226,9 @@ class YNotebook(YBaseDoc):
         meta = self._ymeta.to_py()
         cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
         cells = []
-        seen_ids: dict[str, tuple[int, dict]] = {}  # maps cell_id -> (index, cell converted to Python dict)
+        seen_ids: dict[
+            str, tuple[int, dict]
+        ] = {}  # maps cell_id -> (index, cell converted to Python dict)
 
         for i in range(len(self._ycells)):
             yield None
