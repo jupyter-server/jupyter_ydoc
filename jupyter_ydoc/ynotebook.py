@@ -22,10 +22,6 @@ NBFORMAT_MINOR_VERSION = 5
 _CELL_KEY_TYPE_MAP = {"metadata": Map, "source": Text, "outputs": Array}
 
 
-class O:  # noqa: E742
-    pass
-
-
 class YNotebook(YBaseDoc):
     """
     Extends :class:`YBaseDoc`, and represents a Notebook document.
@@ -214,65 +210,64 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        o = O()
-        o.deduplicate = deduplicate
-        self._get0(o)
-        for o.i in range(len(self._ycells)):
-            self._get1(o)
-        return self._get2(o)
+        gen = self._get(deduplicate)
+        for val in gen:
+            pass
 
-    def _get0(self, o: O) -> None:
-        o.meta = self._ymeta.to_py()
-        cast_all(o.meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
-        o.cells = []
-        o.seen_ids = {}  # maps cell_id -> (index, cell converted to Python dict)
+        return val
 
-    def _get1(self, o: O) -> None:
-        o.cell = self._cell_to_py(self._ycells[o.i], o.meta)
-        o.cell_id = o.cell.get("id")
+    def _get(self, deduplicate: bool) -> dict:
+        meta = self._ymeta.to_py()
+        cast_all(meta, float, int)  # notebook coming from Yjs has e.g. nbformat as float
+        cells = []
+        seen_ids = {}  # maps cell_id -> (index, cell converted to Python dict)
 
-        if o.deduplicate and o.cell_id and o.cell_id in o.seen_ids:
-            o.prev_index, o.prev_cell = o.seen_ids[o.cell_id]
-            # Check if it's an exact duplicate
-            if o.cell == o.prev_cell:
-                # Skip exact duplicates
-                return
+        for i in range(len(self._ycells)):
+            yield
+            cell = self._cell_to_py(self._ycells[i], meta)
+            cell_id = cell.get("id")
+
+            if deduplicate and cell_id and cell_id in seen_ids:
+                prev_index, prev_cell = seen_ids[cell_id]
+                # Check if it's an exact duplicate
+                if cell == prev_cell:
+                    # Skip exact duplicates
+                    continue
+                else:
+                    # Non-identical duplicate: assign a new ID
+                    new_id = str(uuid4())
+                    cell["id"] = new_id
+
+                    # Update the ycell to persist the new ID for stable results
+                    self._ycells[i]["id"] = new_id
+
+                    # Find which fields differ
+                    differing_fields = []
+                    all_keys = set(cell.keys()) | set(prev_cell.keys())
+                    for key in sorted(all_keys):
+                        if cell.get(key) != prev_cell.get(key):
+                            differing_fields.append(key)
+
+                    # Emit warning
+                    warnings.warn(
+                        f"Non-unique cell ID '{cell_id}' used by non-identical cells detected. "
+                        f"Corrected to '{new_id}'. Cells differ in {differing_fields}.",
+                        UserWarning,
+                        stacklevel=2,
+                    )
+
+                    seen_ids[new_id] = (i, cell)
             else:
-                # Non-identical duplicate: assign a new ID
-                o.new_id = str(uuid4())
-                o.cell["id"] = o.new_id
+                if deduplicate and cell_id:
+                    seen_ids[cell_id] = (i, cell)
 
-                # Update the ycell to persist the new ID for stable results
-                self._ycells[o.i]["id"] = o.new_id
+            cells.append(cell)
 
-                # Find which fields differ
-                o.differing_fields = []
-                o.all_keys = set(o.cell.keys()) | set(o.prev_cell.keys())
-                for o.key in sorted(o.all_keys):
-                    if o.cell.get(o.key) != o.prev_cell.get(o.key):
-                        o.differing_fields.append(o.key)
-
-                # Emit warning
-                warnings.warn(
-                    f"Non-unique cell ID '{o.cell_id}' used by non-identical cells detected. "
-                    f"Corrected to '{o.new_id}'. Cells differ in {o.differing_fields}.",
-                    UserWarning,
-                    stacklevel=2,
-                )
-
-                o.seen_ids[o.new_id] = (o.i, o.cell)
-        else:
-            if o.deduplicate and o.cell_id:
-                o.seen_ids[o.cell_id] = (o.i, o.cell)
-
-        o.cells.append(o.cell)
-
-    def _get2(self, o: O) -> dict:
-        return dict(
-            cells=o.cells,
-            metadata=o.meta.get("metadata", {}),
-            nbformat=int(o.meta.get("nbformat", 0)),
-            nbformat_minor=int(o.meta.get("nbformat_minor", 0)),
+        yield dict(
+            cells=cells,
+            metadata=meta.get("metadata", {}),
+            nbformat=int(meta.get("nbformat", 0)),
+            nbformat_minor=int(meta.get("nbformat_minor", 0)),
         )
 
     def set(self, value: dict) -> None:
@@ -282,6 +277,11 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
+        gen = self._set(value)
+        for val in gen:
+            pass
+
+    def _set(self, value: dict) -> None:
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
@@ -303,6 +303,7 @@ class YNotebook(YBaseDoc):
         # to handle the case where the stored doc already has duplicate IDs.
         old_ycells_by_id: dict[str, Map] = {}
         for ycell in self._ycells:
+            yield
             cell_id = ycell.get("id")
             if cell_id is not None and cell_id not in old_ycells_by_id:
                 old_ycells_by_id[cell_id] = ycell
@@ -313,6 +314,7 @@ class YNotebook(YBaseDoc):
 
             # Determine cells to be retained
             for new_cell in new_cells:
+                yield
                 cell_id = new_cell.get("id")
                 if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
                     old_cell = self._cell_to_py(old_ycell, meta)
@@ -335,6 +337,7 @@ class YNotebook(YBaseDoc):
                 index = 0
                 seen: set[str] = set()
                 while True:
+                    yield
                     if index == len(self._ycells):
                         break
                     old_ycell = self._ycells[index]
@@ -347,6 +350,7 @@ class YNotebook(YBaseDoc):
 
             # Now reorder/insert cells to match new_cell_list
             for index, new_cell in enumerate(new_cell_list):
+                yield
                 new_id = new_cell.get("id")
 
                 # Fast path: correct cell already at this position
@@ -357,6 +361,7 @@ class YNotebook(YBaseDoc):
                 if new_id is not None and new_id in retained_cells:
                     # Linear scan to find the cell (O(n) per retained cell)
                     for cur in range(index + 1, len(self._ycells)):
+                        yield
                         if self._ycells[cur].get("id") == new_id:
                             # Use delete+recreate instead of move() for yjs 13.x compatibility
                             # (yjs 13.x doesn't support the move operation that pycrdt generates)
@@ -403,13 +408,11 @@ class YNotebook(YBaseDoc):
         :return: Document's content.
         :rtype: Dict
         """
-        o = O()
-        o.deduplicate = deduplicate
-        self._get0(o)
-        for o.i in range(len(self._ycells)):
-            self._get1(o)
+        gen = self._get(deduplicate)
+        for val in gen:
             await lowlevel.checkpoint()
-        return self._get2(o)
+
+        return val
 
     async def aset(self, value: dict) -> None:
         """
@@ -419,121 +422,9 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
-        nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
-        nb = copy.deepcopy(nb_without_cells)
-        cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
-
-        meta = self._ymeta.to_py()
-
-        new_cells = value["cells"] or [
-            {
-                "cell_type": "code",
-                "execution_count": None,
-                # auto-created empty code cell without outputs ought be trusted
-                "metadata": {"trusted": True},
-                "outputs": [],
-                "source": "",
-                "id": str(uuid4()),
-            }
-        ]
-        # Build dict of old cells by ID, keeping only the first occurrence of each ID
-        # to handle the case where the stored doc already has duplicate IDs.
-        old_ycells_by_id: dict[str, Map] = {}
-        for ycell in self._ycells:
+        gen = self._set(value)
+        for val in gen:
             await lowlevel.checkpoint()
-            cell_id = ycell.get("id")
-            if cell_id is not None and cell_id not in old_ycells_by_id:
-                old_ycells_by_id[cell_id] = ycell
-
-        with self._ydoc.transaction():
-            new_cell_list: list[dict] = []
-            retained_cells = set()
-
-            # Determine cells to be retained
-            for new_cell in new_cells:
-                await lowlevel.checkpoint()
-                cell_id = new_cell.get("id")
-                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
-                    old_cell = self._cell_to_py(old_ycell, meta)
-                    updated_granularly = self._update_cell(
-                        old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
-                    )
-
-                    if updated_granularly:
-                        new_cell_list.append(new_cell)
-                        retained_cells.add(cell_id)
-                        continue
-                # New or changed cell
-                new_cell_list.append(new_cell)
-
-            # First delete all non-retained cells and duplicates
-            if not retained_cells:
-                # fast path if no cells were retained
-                self._ycells.clear()
-            else:
-                index = 0
-                seen: set[str] = set()
-                while True:
-                    await lowlevel.checkpoint()
-                    if index == len(self._ycells):
-                        break
-                    old_ycell = self._ycells[index]
-                    cell_id = old_ycell.get("id")
-                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
-                        self._ycells.pop(index)
-                    else:
-                        seen.add(cell_id)
-                        index += 1
-
-            # Now reorder/insert cells to match new_cell_list
-            for index, new_cell in enumerate(new_cell_list):
-                await lowlevel.checkpoint()
-                new_id = new_cell.get("id")
-
-                # Fast path: correct cell already at this position
-                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
-                    continue
-
-                # Retained cell: find and move it into position
-                if new_id is not None and new_id in retained_cells:
-                    # Linear scan to find the cell (O(n) per retained cell)
-                    for cur in range(index + 1, len(self._ycells)):
-                        await lowlevel.checkpoint()
-                        if self._ycells[cur].get("id") == new_id:
-                            # Use delete+recreate instead of move() for yjs 13.x compatibility
-                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
-                            del self._ycells[cur]
-                            self._ycells.insert(index, self.create_ycell(new_cell))
-                            break
-                    continue
-
-                # New cell: insert at position
-                self._ycells.insert(index, self.create_ycell(new_cell))
-
-            # Remove any extra cells at the end
-            del self._ycells[len(new_cell_list) :]
-
-            for key in [
-                k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
-            ]:
-                del self._ystate[key]
-
-            nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
-            nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
-
-            if meta.get("nbformat") != nbformat_major:
-                self._ymeta["nbformat"] = nbformat_major
-
-            if meta.get("nbformat_minor") != nbformat_minor:
-                self._ymeta["nbformat_minor"] = nbformat_minor
-
-            old_metadata = meta.get("metadata")
-            metadata = nb.get("metadata", {})
-
-            if metadata != old_metadata:
-                metadata.setdefault("language_info", {"name": ""})
-                metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
-                self._ymeta["metadata"] = Map(metadata)
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
