@@ -31,7 +31,7 @@ update_json_file(here.parent / "node_modules/y-websocket/package.json", d)
 
 
 @pytest.fixture
-async def yws_server(request, unused_tcp_port):
+async def yws_server(request, free_tcp_port):
     try:
         async with create_task_group() as tg:
             try:
@@ -41,15 +41,15 @@ async def yws_server(request, unused_tcp_port):
             websocket_server = WebsocketServer(**kwargs)
             app = ASGIServer(websocket_server)
             config = Config()
-            config.bind = [f"localhost:{unused_tcp_port}"]
+            config.bind = [f"localhost:{free_tcp_port}"]
             shutdown_event = Event()
             async with websocket_server as websocket_server:
                 tg.start_soon(
                     partial(serve, app, config, shutdown_trigger=shutdown_event.wait, mode="asgi")
                 )
-                await ensure_server_running("localhost", unused_tcp_port)
-                pytest.port = unused_tcp_port
-                yield unused_tcp_port, websocket_server
+                await ensure_server_running("localhost", free_tcp_port)
+                pytest.port = free_tcp_port
+                yield free_tcp_port, websocket_server
                 shutdown_event.set()
     except Exception:
         pass
@@ -65,3 +65,32 @@ def yjs_client(request):
         p.wait(timeout=10)
     except Exception:  # pragma: nocover
         p.kill()
+
+
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(params=["sync", "async"])
+async def do(request):
+    async def doc_set(doc, *args, **kwargs):
+        if request.param == "async":
+            return await doc.aset(*args, **kwargs)
+        else:
+            return doc.set(*args, **kwargs)
+
+    async def doc_get(doc, *args, **kwargs):
+        if request.param == "async":
+            return await doc.aget(*args, **kwargs)
+        else:
+            return doc.get(*args, **kwargs)
+
+    async def _(doc, action, *args, **kwargs):
+        if action == "get":
+            return await doc_get(doc, *args, **kwargs)
+        if action == "set":
+            return await doc_set(doc, *args, **kwargs)
+        raise ValueError(f'Action can be "get" or "set", not: "{action}"')
+
+    return _

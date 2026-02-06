@@ -76,6 +76,10 @@ jobs:
         run: |
           yarn build:test
           yarn test:cov
+      - name: Check Python types
+        if: ${{ matrix.os == 'ubuntu' }}
+        run: |
+          mypy jupyter_ydoc
       - name: Run Python tests
         if: ${{ !((matrix.python-version == '3.14') && (matrix.os == 'ubuntu')) }}
         run: |

@@ -14,6 +14,7 @@ from jupyter_ydoc import YNotebook
 from jupyter_ydoc.utils import cast_all
 
 files_dir = Path(__file__).parent / "files"
+pytestmark = pytest.mark.anyio
 
 
 def stringify_source(nb: dict) -> dict:
@@ -58,7 +59,6 @@ class YTest:
         return cast_all(self.ytest["source"], float, int)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("yjs_client", "0", indirect=True)
 async def test_ypy_yjs_0(yws_server, yjs_client):
     port, _ = yws_server
@@ -77,7 +77,6 @@ async def test_ypy_yjs_0(yws_server, yjs_client):
         assert ytest.source == nb
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("yjs_client", "1", indirect=True)
 async def test_ypy_yjs_1(yws_server, yjs_client):
     port, _ = yws_server
