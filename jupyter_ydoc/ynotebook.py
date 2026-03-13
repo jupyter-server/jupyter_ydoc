@@ -290,8 +290,9 @@ class YNotebook(YBaseDoc):
         # runs it until completion and the latter inserts async checkpoints
         # in order to not block the event loop for too long for notebooks
         # with a lot of cells.
-        for _ in self._set(value):
-            pass
+        with self._ydoc.transaction():
+            for _ in self._set(value):
+                pass
 
     def _set(self, value: dict) -> Iterator[None]:
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
@@ -320,95 +321,94 @@ class YNotebook(YBaseDoc):
             if cell_id is not None and cell_id not in old_ycells_by_id:
                 old_ycells_by_id[cell_id] = ycell
 
-        with self._ydoc.transaction():
-            new_cell_list: list[dict] = []
-            retained_cells = set()
+        new_cell_list: list[dict] = []
+        retained_cells = set()
 
-            # Determine cells to be retained
-            for new_cell in new_cells:
+        # Determine cells to be retained
+        for new_cell in new_cells:
+            yield
+            cell_id = new_cell.get("id")
+            if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
+                old_cell = self._cell_to_py(old_ycell, meta)
+                updated_granularly = self._update_cell(
+                    old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
+                )
+
+                if updated_granularly:
+                    new_cell_list.append(new_cell)
+                    retained_cells.add(cell_id)
+                    continue
+            # New or changed cell
+            new_cell_list.append(new_cell)
+
+        # First delete all non-retained cells and duplicates
+        if not retained_cells:
+            # fast path if no cells were retained
+            self._ycells.clear()
+        else:
+            index = 0
+            seen: set[str] = set()
+            while True:
                 yield
-                cell_id = new_cell.get("id")
-                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
-                    old_cell = self._cell_to_py(old_ycell, meta)
-                    updated_granularly = self._update_cell(
-                        old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
-                    )
+                if index == len(self._ycells):
+                    break
+                old_ycell = self._ycells[index]
+                cell_id = old_ycell.get("id")
+                if cell_id is None or cell_id not in retained_cells or cell_id in seen:
+                    self._ycells.pop(index)
+                else:
+                    seen.add(cell_id)
+                    index += 1
 
-                    if updated_granularly:
-                        new_cell_list.append(new_cell)
-                        retained_cells.add(cell_id)
-                        continue
-                # New or changed cell
-                new_cell_list.append(new_cell)
+        # Now reorder/insert cells to match new_cell_list
+        for index, new_cell in enumerate(new_cell_list):
+            yield
+            new_id = new_cell.get("id")
 
-            # First delete all non-retained cells and duplicates
-            if not retained_cells:
-                # fast path if no cells were retained
-                self._ycells.clear()
-            else:
-                index = 0
-                seen: set[str] = set()
-                while True:
+            # Fast path: correct cell already at this position
+            if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
+                continue
+
+            # Retained cell: find and move it into position
+            if new_id is not None and new_id in retained_cells:
+                # Linear scan to find the cell (O(n) per retained cell)
+                for cur in range(index + 1, len(self._ycells)):
                     yield
-                    if index == len(self._ycells):
+                    if self._ycells[cur].get("id") == new_id:
+                        # Use delete+recreate instead of move() for yjs 13.x compatibility
+                        # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                        del self._ycells[cur]
+                        self._ycells.insert(index, self.create_ycell(new_cell))
                         break
-                    old_ycell = self._ycells[index]
-                    cell_id = old_ycell.get("id")
-                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
-                        self._ycells.pop(index)
-                    else:
-                        seen.add(cell_id)
-                        index += 1
+                continue
 
-            # Now reorder/insert cells to match new_cell_list
-            for index, new_cell in enumerate(new_cell_list):
-                yield
-                new_id = new_cell.get("id")
+            # New cell: insert at position
+            self._ycells.insert(index, self.create_ycell(new_cell))
 
-                # Fast path: correct cell already at this position
-                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
-                    continue
+        # Remove any extra cells at the end
+        del self._ycells[len(new_cell_list) :]
 
-                # Retained cell: find and move it into position
-                if new_id is not None and new_id in retained_cells:
-                    # Linear scan to find the cell (O(n) per retained cell)
-                    for cur in range(index + 1, len(self._ycells)):
-                        yield
-                        if self._ycells[cur].get("id") == new_id:
-                            # Use delete+recreate instead of move() for yjs 13.x compatibility
-                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
-                            del self._ycells[cur]
-                            self._ycells.insert(index, self.create_ycell(new_cell))
-                            break
-                    continue
+        for key in [
+            k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
+        ]:
+            del self._ystate[key]
 
-                # New cell: insert at position
-                self._ycells.insert(index, self.create_ycell(new_cell))
+        nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
+        nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
 
-            # Remove any extra cells at the end
-            del self._ycells[len(new_cell_list) :]
+        if meta.get("nbformat") != nbformat_major:
+            self._ymeta["nbformat"] = nbformat_major
 
-            for key in [
-                k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
-            ]:
-                del self._ystate[key]
+        if meta.get("nbformat_minor") != nbformat_minor:
+            self._ymeta["nbformat_minor"] = nbformat_minor
 
-            nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
-            nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
+        old_metadata = meta.get("metadata")
+        metadata = nb.get("metadata", {})
 
-            if meta.get("nbformat") != nbformat_major:
-                self._ymeta["nbformat"] = nbformat_major
-
-            if meta.get("nbformat_minor") != nbformat_minor:
-                self._ymeta["nbformat_minor"] = nbformat_minor
-
-            old_metadata = meta.get("metadata")
-            metadata = nb.get("metadata", {})
-
-            if metadata != old_metadata:
-                metadata.setdefault("language_info", {"name": ""})
-                metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
-                self._ymeta["metadata"] = Map(metadata)
+        if metadata != old_metadata:
+            metadata.setdefault("language_info", {"name": ""})
+            metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
+            self._ymeta["metadata"] = Map(metadata)
 
     async def aget(self, deduplicate: bool = True) -> dict:
         """
@@ -434,8 +434,13 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
-        for val in self._set(value):
-            await lowlevel.checkpoint()
+        gen = self._set(value)
+        while True:
+            async with self._ydoc.transaction():
+                try:
+                    next(gen)
+                except StopIteration:
+                    break
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
