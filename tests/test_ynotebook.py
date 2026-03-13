@@ -110,7 +110,10 @@ async def test_set_preserves_cells_with_insert_and_remove(doc_action):
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    await do(nb, "set", model)
+    kwargs = {}
+    if is_async:
+        kwargs = {"progressive": True}
+    await do(nb, "set", model, **kwargs)
 
     assert nb.cell_number == 3
 
@@ -189,9 +192,6 @@ async def test_set_preserves_cells_with_insert_and_remove(doc_action):
 )
 async def test_modify_single_cell(modifications, expected_events, doc_action):
     do, is_async = doc_action
-    if is_async:
-        pytest.skip(reason="FIXME: check progressive updates")
-
     nb = YNotebook()
     await do(
         nb,

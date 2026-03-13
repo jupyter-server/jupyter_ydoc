@@ -424,21 +424,29 @@ class YNotebook(YBaseDoc):
         assert val is not None
         return val
 
-    async def aset(self, value: dict) -> None:
+    async def aset(self, value: dict, progressive: bool = False) -> None:
         """
         Sets the content of the document, yielding to the event loop often enough
         to not block it for too long.
 
         :param value: The content of the document.
         :type value: Dict
+        :param progressive: Whether to progressively update the notebook or update it
+                            in a single transaction.
+        :type progressive: bool
         """
-        gen = self._set(value)
-        while True:
-            async with self._ydoc.transaction():
-                try:
-                    next(gen)
-                except StopIteration:
-                    break
+        if progressive:
+            gen = self._set(value)
+            while True:
+                async with self._ydoc.transaction():
+                    try:
+                        next(gen)
+                    except StopIteration:
+                        break
+        else:
+            with self._ydoc.transaction():
+                for _ in self._set(value):
+                    await lowlevel.checkpoint()
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
