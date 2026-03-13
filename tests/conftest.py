@@ -75,6 +75,7 @@ def anyio_backend():
 @pytest.fixture(params=["sync", "async"])
 async def doc_action(request):
     is_async = request.param == "async"
+
     async def doc_set(doc, *args, **kwargs):
         if is_async:
             return await doc.aset(*args, **kwargs)
