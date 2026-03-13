@@ -388,9 +388,7 @@ class YNotebook(YBaseDoc):
         # Remove any extra cells at the end
         del self._ycells[len(new_cell_list) :]
 
-        for key in [
-            k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
-        ]:
+        for key in [k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")]:
             del self._ystate[key]
 
         nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
