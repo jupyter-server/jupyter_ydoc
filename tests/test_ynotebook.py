@@ -36,7 +36,8 @@ class AnyInstanceOf:
         return isinstance(other, self.cls)
 
 
-async def test_set_preserves_cells_when_unchanged(do):
+async def test_set_preserves_cells_when_unchanged(doc_action):
+    do, is_async = doc_action
     nb = YNotebook()
 
     assert nb.version == "2.0.0"
@@ -59,7 +60,8 @@ async def test_set_preserves_cells_when_unchanged(do):
     assert changes == []
 
 
-async def test_set_populates_metadata(do):
+async def test_set_populates_metadata(doc_action):
+    do, is_async = doc_action
     nb = YNotebook()
     await do(nb, "set", {"cells": []})
     assert (await do(nb, "get"))["metadata"] == {
@@ -68,7 +70,8 @@ async def test_set_populates_metadata(do):
     }
 
 
-async def test_set_preserves_cells_with_insert_and_remove(do):
+async def test_set_preserves_cells_with_insert_and_remove(doc_action):
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -107,7 +110,10 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    await do(nb, "set", model)
+    kwargs = {}
+    if is_async:
+        kwargs = {"progressive": True}
+    await do(nb, "set", model, **kwargs)
 
     assert nb.cell_number == 3
 
@@ -118,16 +124,31 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
     # The middle cell should have a different source now
     assert str(nb.ycells[1]["source"]) == "print('x')\n"
 
-    # We should have one cell event
     cell_events = [e for t, e in changes if t == "cells"]
-    assert len(cell_events) == 1
-    event_transactions = cell_events[0]
-    assert len(event_transactions) == 1
-    assert event_transactions[0].delta == [
-        {"retain": 1},
-        {"delete": 1},
-        {"insert": [AnyInstanceOf(Map)]},
-    ]
+    if is_async:
+        assert len(cell_events) == 2
+        event_transactions = cell_events[0]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"delete": 1},
+        ]
+        event_transactions = cell_events[1]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"insert": [AnyInstanceOf(Map)]},
+        ]
+    else:
+        # We should have one cell event
+        assert len(cell_events) == 1
+        event_transactions = cell_events[0]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"delete": 1},
+            {"insert": [AnyInstanceOf(Map)]},
+        ]
 
 
 @mark.parametrize(
@@ -169,7 +190,8 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
         ),
     ],
 )
-async def test_modify_single_cell(modifications, expected_events, do):
+async def test_modify_single_cell(modifications, expected_events, doc_action):
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -220,8 +242,9 @@ async def test_modify_single_cell(modifications, expected_events, do):
     assert events == expected_events
 
 
-async def test_get_merges_exact_duplicates(do):
+async def test_get_merges_exact_duplicates(doc_action):
     """Test that identical cells with the same IDs get merged on get()."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -253,8 +276,9 @@ async def test_get_merges_exact_duplicates(do):
     assert ids == ["cell-A", "cell-B"]
 
 
-async def test_get_resolves_cell_id_duplicates(do):
+async def test_get_resolves_cell_id_duplicates(doc_action):
     """Test that non-identical cells with the same IDs get different IDs on get()."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -296,8 +320,9 @@ async def test_get_resolves_cell_id_duplicates(do):
     assert ids2 == ids
 
 
-async def test_set_reorder_does_not_duplicate_cells(do):
+async def test_set_reorder_does_not_duplicate_cells(doc_action):
     """Test that reordering cells with the same IDs doesn't create duplicates."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -325,8 +350,9 @@ async def test_set_reorder_does_not_duplicate_cells(do):
     assert ids == ["cell-C", "cell-B", "cell-A"]
 
 
-async def test_set_removes_preexisting_duplicate_ids(do):
+async def test_set_removes_preexisting_duplicate_ids(doc_action):
     """Test that set() cleans up pre-existing duplicate cell IDs."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -366,8 +392,9 @@ async def test_set_removes_preexisting_duplicate_ids(do):
     assert ids == ["cell-A", "cell-B", "cell-C"]
 
 
-async def test_set_reorder_with_mixed_operations(do):
+async def test_set_reorder_with_mixed_operations(doc_action):
     """Test reordering cells while also adding and removing cells."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
@@ -401,8 +428,9 @@ async def test_set_reorder_with_mixed_operations(do):
     assert ids == ["cell-C", "cell-NEW", "cell-A"]
 
 
-async def test_set_simple_adjacent_swap(do):
+async def test_set_simple_adjacent_swap(doc_action):
     """Test swapping two adjacent cells (common operation)."""
+    do, is_async = doc_action
     nb = YNotebook()
     await do(
         nb,
