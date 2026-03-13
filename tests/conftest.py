@@ -73,24 +73,25 @@ def anyio_backend():
 
 
 @pytest.fixture(params=["sync", "async"])
-async def do(request):
+async def doc_action(request):
+    is_async = request.param == "async"
     async def doc_set(doc, *args, **kwargs):
-        if request.param == "async":
+        if is_async:
             return await doc.aset(*args, **kwargs)
         else:
             return doc.set(*args, **kwargs)
 
     async def doc_get(doc, *args, **kwargs):
-        if request.param == "async":
+        if is_async:
             return await doc.aget(*args, **kwargs)
         else:
             return doc.get(*args, **kwargs)
 
-    async def _(doc, action, *args, **kwargs):
+    async def _action(doc, action, *args, **kwargs):
         if action == "get":
             return await doc_get(doc, *args, **kwargs)
         if action == "set":
             return await doc_set(doc, *args, **kwargs)
         raise ValueError(f'Action can be "get" or "set", not: "{action}"')
 
-    return _
+    return _action, is_async
