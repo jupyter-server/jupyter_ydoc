@@ -70,8 +70,12 @@ async def test_set_populates_metadata(doc_action):
     }
 
 
-async def test_set_preserves_cells_with_insert_and_remove(doc_action):
+@pytest.mark.parametrize("progressive", [False, True], ids=["not progressive", "progressive"])
+async def test_set_preserves_cells_with_insert_and_remove(progressive, doc_action):
     do, is_async = doc_action
+    if progressive and not is_async:
+        pytest.skip(reason="Progressive setting can only be done asynchronously")
+
     nb = YNotebook()
     await do(
         nb,
@@ -111,7 +115,7 @@ async def test_set_preserves_cells_with_insert_and_remove(doc_action):
 
     nb.observe(record_changes)
     if is_async:
-        await do(nb, "set", model, progressive=True)
+        await do(nb, "set", model, progressive=progressive)
     else:
         await do(nb, "set", model)
 
@@ -125,7 +129,7 @@ async def test_set_preserves_cells_with_insert_and_remove(doc_action):
     assert str(nb.ycells[1]["source"]) == "print('x')\n"
 
     cell_events = [e for t, e in changes if t == "cells"]
-    if is_async:
+    if progressive:
         assert len(cell_events) == 2
         event_transactions = cell_events[0]
         assert len(event_transactions) == 1
