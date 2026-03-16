@@ -110,10 +110,10 @@ async def test_set_preserves_cells_with_insert_and_remove(doc_action):
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    kwargs = {}
     if is_async:
-        kwargs = {"progressive": True}
-    await do(nb, "set", model, **kwargs)
+        await do(nb, "set", model, progressive=True)
+    else:
+        await do(nb, "set", model)
 
     assert nb.cell_number == 3
 
