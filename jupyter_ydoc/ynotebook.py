@@ -1,7 +1,9 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 import copy
+import logging
 import warnings
 from collections.abc import Callable, Iterator
 from functools import partial
@@ -14,6 +16,7 @@ from pycrdt import Array, Awareness, Doc, Map, Text
 from .utils import cast_all
 from .ybasedoc import YBaseDoc
 
+logger = logging.getLogger(__name__)
 # The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
 # The default minor version of the notebook format.
@@ -437,6 +440,40 @@ class YNotebook(YBaseDoc):
         for val in self._set(value):
             await lowlevel.checkpoint()
 
+    def remove_duplicate_cells(self) -> int:
+        """
+        Removes cells with duplicate IDs, keeping the first occurrence.
+
+        This method allows callers (e.g. collaboration rooms) to trigger
+        deduplication without needing to know about cell internals.
+
+        :return: The number of duplicate cells removed.
+        :rtype: int
+        """
+        if len(self._ycells) == 0:
+            return 0
+
+        seen: set[str] = set()
+        to_delete: list[int] = []
+        for i, ycell in enumerate(self._ycells):
+            cell_id = ycell.get("id")
+            if cell_id is None:
+                continue
+            if cell_id in seen:
+                to_delete.append(i)
+            else:
+                seen.add(cell_id)
+
+        if not to_delete:
+            return 0
+
+        logger.warning("Removing %d duplicate cell(s)", len(to_delete))
+        with self._ydoc.transaction():
+            for i in reversed(to_delete):
+                del self._ycells[i]
+
+        return len(to_delete)
+
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
         Subscribes to document changes.
@@ -447,7 +484,17 @@ class YNotebook(YBaseDoc):
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
         self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
+
+        def _on_cells_change(event: Any) -> None:
+            callback("cells", event)
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self.remove_duplicate_cells()
+                return
+            loop.call_soon(self.remove_duplicate_cells)
+
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(_on_cells_change)
 
     def _update_cell(self, old_cell: dict, new_cell: dict, old_ycell: Map) -> bool:
         if old_cell == new_cell:
