@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 import copy
 import logging
 import warnings
@@ -483,7 +484,17 @@ class YNotebook(YBaseDoc):
         self.unobserve()
         self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
         self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
+
+        def _on_cells_change(event: Any) -> None:
+            callback("cells", event)
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                self.remove_duplicate_cells()
+                return
+            loop.call_soon(self.remove_duplicate_cells)
+
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(_on_cells_change)
 
     def _update_cell(self, old_cell: dict, new_cell: dict, old_ycell: Map) -> bool:
         if old_cell == new_cell:
