@@ -74,6 +74,14 @@ class YUnicode(YBaseDoc):
             # to avoid side-effects such as cursor jumping to the top
             return
 
+        # Fast path for first load: avoid expensive byte diffing when the
+        # document has no content yet (e.g. opening very large text files).
+        if not old_value:
+            with self._ydoc.transaction():
+                if value:
+                    self._ysource += value
+            return
+
         before_bytes = old_value.encode("utf-8")
         after_bytes = value.encode("utf-8")
 
