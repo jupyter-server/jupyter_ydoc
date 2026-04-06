@@ -191,6 +191,17 @@ def test_set_hard_reload_if_very_different():
     ]
 
 
+@pytest.mark.timeout(15)
+def test_set_fast_path_for_large_initial_content():
+    text = YUnicode()
+
+    # Simulate opening a large (1GB) text file from an empty document.
+    large_content = "a" * (1024 * 1024 * 1024)
+    text.set(large_content)
+
+    assert text.get() == large_content
+
+
 @pytest.mark.parametrize(
     "initial, updated, granular",
     [
