@@ -49,13 +49,17 @@ export type MapChanges = Map<
 export interface ISharedBase extends IObservableDisposable {
   /**
    * Undo an operation.
+   *
+   * @returns Whether a change was made.
    */
-  undo(): void;
+  undo(): boolean;
 
   /**
    * Redo an operation.
+   *
+   * @returns Whether a change was made.
    */
-  redo(): void;
+  redo(): boolean;
 
   /**
    * Whether the object can redo changes.

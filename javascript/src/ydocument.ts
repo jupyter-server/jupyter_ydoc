@@ -180,15 +180,15 @@ export abstract class YDocument<T extends DocumentChange>
   /**
    * Undo an operation.
    */
-  undo(): void {
-    this.undoManager.undo();
+  undo(): boolean {
+    return !!this.undoManager.undo();
   }
 
   /**
    * Redo an operation.
    */
-  redo(): void {
-    this.undoManager.redo();
+  redo(): boolean {
+    return !!this.undoManager.redo();
   }
 
   /**

@@ -322,15 +322,15 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Undo an operation.
    */
-  undo(): void {
-    this.undoManager?.undo();
+  undo(): boolean {
+    return !!this.undoManager?.undo();
   }
 
   /**
    * Redo an operation.
    */
-  redo(): void {
-    this.undoManager?.redo();
+  redo(): boolean {
+    return !!this.undoManager?.redo();
   }
 
   /**
