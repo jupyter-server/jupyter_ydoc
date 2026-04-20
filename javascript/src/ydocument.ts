@@ -146,6 +146,24 @@ export abstract class YDocument<T extends DocumentChange>
   }
 
   /**
+   * Set the dirty state
+   */
+  setDirty(): void {
+    this.transact(() => {
+      this.setState('dirty', true);
+    }, false);
+  }
+
+  /**
+   * Clear the dirty state
+   */
+  clearDirty(): void {
+    this.transact(() => {
+      this.setState('dirty', false);
+    }, false);
+  }
+
+  /**
    * Get the document source
    *
    * @returns The source
@@ -181,14 +199,22 @@ export abstract class YDocument<T extends DocumentChange>
    * Undo an operation.
    */
   undo(): boolean {
-    return !!this.undoManager.undo();
+    const undone = !!this.undoManager.undo();
+    if (undone) {
+      this.setDirty();
+    }
+    return undone;
   }
 
   /**
    * Redo an operation.
    */
   redo(): boolean {
-    return !!this.undoManager.redo();
+    const redone = !!this.undoManager.redo();
+    if (redone) {
+      this.setDirty();
+    }
+    return redone;
   }
 
   /**

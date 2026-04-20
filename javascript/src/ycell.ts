@@ -271,6 +271,29 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
+   * Set the dirty state of the notebook
+   */
+  setDirty(): void {
+    if (this.notebook !== null) {
+      this.notebook!.transact(() => {
+        this.notebook!.setState('dirty', true);
+      }, false);
+    }
+  }
+
+  /**
+   * Clear the dirty state of the notebook
+   */
+  clearDirty(): void {
+    if (this.notebook !== null) {
+      this.notebook!.transact(() => {
+        this.notebook!.setState('dirty', false);
+      }, false);
+    }
+  }
+
+
+  /**
    * Cell input content.
    */
   get source(): string {

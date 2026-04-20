@@ -212,7 +212,8 @@ export class YNotebook
    */
   insertCells(
     index: number,
-    cells: SharedCell.Cell[]
+    cells: SharedCell.Cell[],
+    setDirty: boolean = true
   ): YBaseCell<nbformat.IBaseCellMetadata>[] {
     const yCells = cells.map(c => {
       const cell = createCell(c, this);
@@ -226,6 +227,10 @@ export class YNotebook
         yCells.map(cell => cell.ymodel)
       );
     });
+
+    if (setDirty) {
+      this.setDirty();
+    }
 
     return yCells;
   }
@@ -259,6 +264,8 @@ export class YNotebook
         clones.map(clone => createCell(clone, this).ymodel)
       );
     });
+
+    this.setDirty();
   }
 
   /**
@@ -276,11 +283,15 @@ export class YNotebook
    * @param from: The start index of the range to remove (inclusive).
    * @param to: The end index of the range to remove (exclusive).
    */
-  deleteCellRange(from: number, to: number): void {
+  deleteCellRange(from: number, to: number, setDirty: boolean = true): void {
     // Cells will be removed from the mapping in the model event listener.
     this.transact(() => {
       this._ycells.delete(from, to - from);
     });
+
+    if (setDirty) {
+      this.setDirty();
+    }
   }
 
   /**
@@ -374,6 +385,8 @@ export class YNotebook
             ymetadata.set(key, value);
           }
         });
+
+        this.setDirty();
       }
     }
   }
@@ -398,6 +411,8 @@ export class YNotebook
         ymetadata.set(key, value);
       }
     });
+
+    this.setDirty();
   }
 
   /**
@@ -450,8 +465,8 @@ export class YNotebook
         }
         return cell;
       });
-      this.insertCells(this.cells.length, ycells);
-      this.deleteCellRange(0, this.cells.length);
+      this.insertCells(this.cells.length, ycells, false);
+      this.deleteCellRange(0, this.cells.length, false);
     });
   }
 
