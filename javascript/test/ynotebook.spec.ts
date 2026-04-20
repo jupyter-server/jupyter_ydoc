@@ -379,7 +379,7 @@ describe('@jupyter/ydoc', () => {
         });
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
 
-        expect(changes).toHaveLength(1);
+        expect(changes).toHaveLength(2);
         expect(changes[0].cellsChange).toEqual([
           {
             insert: [codeCell]
