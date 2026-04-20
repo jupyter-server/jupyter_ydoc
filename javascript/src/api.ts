@@ -326,7 +326,11 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @returns The inserted cells.
    */
-  insertCells(index: number, cells: Array<SharedCell.Cell>, setDirty: boolean): ISharedCell[];
+  insertCells(
+    index: number,
+    cells: Array<SharedCell.Cell>,
+    setDirty: boolean
+  ): ISharedCell[];
 
   /**
    * Move a cell.

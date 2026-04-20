@@ -292,7 +292,6 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     }
   }
 
-
   /**
    * Cell input content.
    */
