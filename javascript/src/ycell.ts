@@ -499,7 +499,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     value?: PartialJSONValue,
     dirty?: boolean
   ): void {
-    const _dirty = typeof dirty === 'undefined' ? true : dirty;
+    const _dirty = dirty ?? true;
     if (typeof metadata === 'string') {
       if (typeof value === 'undefined') {
         throw new TypeError(
