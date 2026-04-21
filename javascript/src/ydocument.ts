@@ -169,7 +169,7 @@ export abstract class YDocument<T extends DocumentChange>
   setDirty(value: boolean): void {
     this.transact(() => {
       this.setState('dirty', value);
-    }, false);  // This change is not be undoable.
+    }, false); // This change is not be undoable.
   }
 
   /**

@@ -405,9 +405,9 @@ describe('@jupyter/ydoc', () => {
         expect(changes).toHaveLength(2);
         expect(changes[0].stateChange).toEqual([
           {
-            name: "dirty",
+            name: 'dirty',
             oldValue: false,
-            newValue: true,
+            newValue: true
           }
         ]);
         expect(changes[1].cellsChange).toEqual([

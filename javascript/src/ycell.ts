@@ -115,7 +115,8 @@ export const createCell = (
   }
   if (cell.source != null) {
     ycell.setSource(
-      typeof cell.source === 'string' ? cell.source : cell.source.join(''), dirty
+      typeof cell.source === 'string' ? cell.source : cell.source.join(''),
+      dirty
     );
   }
   return ycell;
@@ -500,7 +501,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
     value?: PartialJSONValue,
     dirty?: boolean
   ): void {
-    const _dirty = (typeof dirty === 'undefined') ? true : dirty;
+    const _dirty = typeof dirty === 'undefined' ? true : dirty;
     if (typeof metadata === 'string') {
       if (typeof value === 'undefined') {
         throw new TypeError(
@@ -1009,7 +1010,10 @@ class YAttachmentCell
    * @param attachments: The cell attachments.
    * @param dirty: The dirty state to set.
    */
-  setAttachments(attachments: nbformat.IAttachments | undefined, dirty: boolean = true): void {
+  setAttachments(
+    attachments: nbformat.IAttachments | undefined,
+    dirty: boolean = true
+  ): void {
     this.transact(() => {
       if (attachments == null) {
         this.ymodel.delete('attachments');
