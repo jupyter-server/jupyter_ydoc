@@ -102,6 +102,11 @@ interface ISharedDocumentNoSource extends ISharedBase {
   readonly state: JSONObject;
 
   /**
+   * Document dirty state
+   */
+  dirty: boolean;
+
+  /**
    * Document awareness
    */
   readonly awareness: IAwareness;
@@ -123,13 +128,10 @@ interface ISharedDocumentNoSource extends ISharedBase {
 
   /**
    * Set the dirty state
+   *
+   * @param value New dirty state value
    */
-  setDirty(): void;
-
-  /**
-   * Clear the dirty state
-   */
-  clearDirty(): void;
+  setDirty(value: boolean): void;
 
   /**
    * The changed signal.
@@ -322,14 +324,14 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @param index Position to insert the cells.
    * @param cells Array of shared cells to insert.
-   * @param setDirty Whether to set the dirty state.
+   * @param dirty The dirty state to set.
    *
    * @returns The inserted cells.
    */
   insertCells(
     index: number,
     cells: Array<SharedCell.Cell>,
-    setDirty: boolean
+    dirty: boolean
   ): ISharedCell[];
 
   /**
@@ -363,9 +365,9 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @param to: The end index of the range to remove (exclusive).
    *
-   * @param setDirty: Whether to set the dirty state.
+   * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number, setDirty: boolean): void;
+  deleteCellRange(from: number, to: number, dirty: boolean): void;
 
   /**
    * Override the notebook with a JSON-serialized document.
@@ -541,14 +543,11 @@ export interface ISharedBaseCell<
   toJSON(): nbformat.IBaseCell;
 
   /**
-   * Set the dirty state of the notebook
+   * Set the dirty state of the notebook the cell belongs to, if any.
+   *
+   * @param value New dirty state value
    */
-  setDirty(): void;
-
-  /**
-   * Clear the dirty state of the notebook
-   */
-  clearDirty(): void;
+  setDirty(value: boolean): void;
 }
 
 export type IExecutionState = 'running' | 'idle';

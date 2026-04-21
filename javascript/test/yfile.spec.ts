@@ -9,6 +9,7 @@ describe('@jupyter/ydoc', () => {
       test('should create a document without arguments', () => {
         const file = new YFile();
         expect(file.source.length).toBe(0);
+        expect(file.dirty).toBe(false);
         file.dispose();
       });
     });
@@ -30,9 +31,10 @@ describe('@jupyter/ydoc', () => {
         const file = new YFile();
 
         const source = 'foo';
-        file.setSource(source);
+        file.source = source;
 
         expect(file.source).toEqual(source);
+        expect(file.dirty).toEqual(false);
         file.dispose();
       });
 
@@ -40,9 +42,9 @@ describe('@jupyter/ydoc', () => {
         const file = new YFile();
 
         const source = 'foo';
-        file.setSource(source);
+        file.source = source;
 
-        expect(file.getSource()).toEqual(source);
+        expect(file.source).toEqual(source);
         file.dispose();
       });
 
@@ -50,11 +52,13 @@ describe('@jupyter/ydoc', () => {
         const file = new YFile();
 
         const source = 'fooo bar';
-        file.setSource(source);
+        file.source = source;
         expect(file.source).toBe(source);
+        expect(file.dirty).toEqual(false);
 
         file.updateSource(3, 5, '/');
         expect(file.source).toBe('foo/bar');
+        expect(file.dirty).toEqual(true);
         file.dispose();
       });
 
@@ -67,7 +71,7 @@ describe('@jupyter/ydoc', () => {
           changes.push(c.sourceChange!);
         });
         const source = 'foo';
-        file.setSource(source);
+        file.source = source;
 
         expect(changes).toHaveLength(1);
         expect(changes).toEqual([
@@ -84,14 +88,14 @@ describe('@jupyter/ydoc', () => {
       test('should emit a delete source change', () => {
         const file = new YFile();
         const source = 'foo';
-        file.setSource(source);
+        file.source = source;
         expect(file.source).toBe(source);
 
         const changes: Delta<string>[] = [];
         file.changed.connect((_, c) => {
           changes.push(c.sourceChange!);
         });
-        file.setSource('');
+        file.source = '';
 
         expect(changes).toHaveLength(1);
         expect(changes).toEqual([
@@ -108,7 +112,7 @@ describe('@jupyter/ydoc', () => {
       test('should emit an update source change', () => {
         const file = new YFile();
         const source1 = 'foo';
-        file.setSource(source1);
+        file.source = source1;
         expect(file.source).toBe(source1);
 
         const changes: Delta<string>[] = [];
@@ -116,7 +120,7 @@ describe('@jupyter/ydoc', () => {
           changes.push(c.sourceChange!);
         });
         const source = 'bar';
-        file.setSource(source);
+        file.source = source;
 
         expect(changes).toHaveLength(1);
         expect(changes).toEqual([

@@ -92,6 +92,22 @@ export abstract class YDocument<T extends DocumentChange>
   }
 
   /**
+   * Document dirty state
+   */
+  get dirty(): boolean {
+    return this.ystate.get('dirty') === true;
+  }
+
+  /**
+   * Set the document dirty state
+   *
+   * @param value The dirty state to set
+   */
+  set dirty(value: boolean) {
+    this.setDirty(value);
+  }
+
+  /**
    * Whether the object can undo changes.
    */
   canUndo(): boolean {
@@ -147,20 +163,13 @@ export abstract class YDocument<T extends DocumentChange>
 
   /**
    * Set the dirty state
+   *
+   * @param value New dirty state value
    */
-  setDirty(): void {
+  setDirty(value: boolean): void {
     this.transact(() => {
-      this.setState('dirty', true);
-    }, false);
-  }
-
-  /**
-   * Clear the dirty state
-   */
-  clearDirty(): void {
-    this.transact(() => {
-      this.setState('dirty', false);
-    }, false);
+      this.setState('dirty', value);
+    }, false);  // This change is not be undoable.
   }
 
   /**
@@ -201,7 +210,7 @@ export abstract class YDocument<T extends DocumentChange>
   undo(): boolean {
     const undone = !!this.undoManager.undo();
     if (undone) {
-      this.setDirty();
+      this.setDirty(true);
     }
     return undone;
   }
@@ -212,7 +221,7 @@ export abstract class YDocument<T extends DocumentChange>
   redo(): boolean {
     const redone = !!this.undoManager.redo();
     if (redone) {
-      this.setDirty();
+      this.setDirty(true);
     }
     return redone;
   }
