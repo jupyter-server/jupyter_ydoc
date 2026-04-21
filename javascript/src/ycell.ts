@@ -276,7 +276,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * The dirty state of the notebook the cell belongs to, if any.
    */
   get dirty(): boolean {
-     return this.notebook?.dirty === true;
+    return this.notebook?.dirty === true;
   }
 
   /**
