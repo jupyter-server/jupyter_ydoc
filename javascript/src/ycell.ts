@@ -273,12 +273,21 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
+   * The dirty state of the notebook the cell belongs to, if any.
+   */
+  get dirty(): boolean {
+     return this.notebook?.dirty === true;
+  }
+
+  /**
    * Set the dirty state of the notebook the cell belongs to, if any.
    *
    * @param value New dirty state value
    */
-  setDirty(value: boolean): void {
-     this.notebook?.setDirty(value);
+  set dirty(value: boolean) {
+    if (this.notebook) {
+      this.notebook.dirty = value;
+    }
   }
 
   /**
@@ -399,7 +408,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       this.ysource.delete(0, this.ysource.length);
       this.ysource.insert(0, value);
     });
-    this.setDirty(dirty);
+    this.dirty = dirty;
     // @todo Do we need proper replace semantic? This leads to issues in editor bindings because they don't switch source.
     // this.ymodel.set('source', new Y.Text(value));
   }
@@ -421,7 +430,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
       ysource.insert(start, value);
       ysource.delete(start + value.length, end - start);
     });
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -451,7 +460,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
         this._ymetadata.delete('collapsed');
       }
     }, false);
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -536,7 +545,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
           }
         }
       }, false);
-      this.setDirty(_dirty);
+      this.dirty = _dirty;
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
       if (clone.collapsed != null) {
@@ -551,7 +560,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             this._ymetadata.set(key, value);
           }
         }, false);
-        this.setDirty(_dirty);
+        this.dirty = _dirty;
       }
     }
   }
@@ -761,7 +770,7 @@ export class YCodeCell
       this.transact(() => {
         this.ymodel.set('execution_count', count);
       }, false);
-      this.setDirty(dirty);
+      this.dirty = dirty;
     }
   }
 
@@ -776,7 +785,7 @@ export class YCodeCell
       this.transact(() => {
         this.ymodel.set('execution_state', state);
       }, false);
-      this.setDirty(true);
+      this.dirty = true;
     }
   }
 
@@ -834,7 +843,7 @@ export class YCodeCell
       const newOutputs = this.createOutputs(outputs);
       this._youtputs.insert(0, newOutputs);
     }, false);
-    this.setDirty(dirty);
+    this.dirty = dirty;
   }
 
   /**
@@ -851,7 +860,7 @@ export class YCodeCell
       false,
       origin
     );
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -867,7 +876,7 @@ export class YCodeCell
       false,
       origin
     );
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -896,7 +905,7 @@ export class YCodeCell
       false,
       origin
     );
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -910,7 +919,7 @@ export class YCodeCell
       false,
       origin
     );
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -1019,7 +1028,7 @@ class YAttachmentCell
         this.ymodel.set('attachments', attachments);
       }
     }, false);
-    this.setDirty(dirty);
+    this.dirty = dirty;
   }
 
   /**

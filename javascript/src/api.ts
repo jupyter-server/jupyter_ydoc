@@ -127,13 +127,6 @@ interface ISharedDocumentNoSource extends ISharedBase {
   setState(key: string, value: JSONValue): void;
 
   /**
-   * Set the dirty state
-   *
-   * @param value New dirty state value
-   */
-  setDirty(value: boolean): void;
-
-  /**
    * The changed signal.
    */
   readonly changed: ISignal<this, DocumentChange>;
@@ -494,6 +487,11 @@ export interface ISharedBaseCell<
   readonly notebook: ISharedNotebook | null;
 
   /**
+   * The dirty state of the notebook that the cell belongs to, if any.
+   */
+  dirty: boolean;
+
+  /**
    * Get Cell id.
    *
    * @returns Cell id.
@@ -541,13 +539,6 @@ export interface ISharedBaseCell<
    * Serialize the model to JSON.
    */
   toJSON(): nbformat.IBaseCell;
-
-  /**
-   * Set the dirty state of the notebook the cell belongs to, if any.
-   *
-   * @param value New dirty state value
-   */
-  setDirty(value: boolean): void;
 }
 
 export type IExecutionState = 'running' | 'idle';

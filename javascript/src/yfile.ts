@@ -102,7 +102,7 @@ export class YFile
       ysource.insert(start, value);
       ysource.delete(start + value.length, end - start);
     });
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**

@@ -229,7 +229,7 @@ export class YNotebook
       );
     });
 
-    this.setDirty(dirty);
+    this.dirty = dirty;
 
     return yCells;
   }
@@ -264,7 +264,7 @@ export class YNotebook
       );
     });
 
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
@@ -288,7 +288,7 @@ export class YNotebook
     this.transact(() => {
       this._ycells.delete(from, to - from);
     });
-    this.setDirty(dirty);
+    this.dirty = dirty;
   }
 
   /**
@@ -383,7 +383,7 @@ export class YNotebook
           }
         });
 
-        this.setDirty(true);
+        this.dirty = true;
       }
     }
   }
@@ -409,7 +409,7 @@ export class YNotebook
       }
     });
 
-    this.setDirty(true);
+    this.dirty = true;
   }
 
   /**
