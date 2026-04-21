@@ -278,9 +278,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param value New dirty state value
    */
   setDirty(value: boolean): void {
-    if (this.notebook !== null) {
-      this.notebook!.setDirty(value);
-    }
+     this.notebook?.setDirty(value);
   }
 
   /**
