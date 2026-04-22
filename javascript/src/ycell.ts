@@ -513,10 +513,9 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   setMetadata(metadata: string, value: PartialJSONValue, dirty: boolean): void;
   setMetadata(
     metadata: Partial<Metadata> | string,
-    value?: PartialJSONValue,
+    value?: PartialJSONValue | boolean,
     dirty?: boolean
   ): void {
-    const _dirty = dirty ?? true;
     if (typeof metadata === 'string') {
       if (typeof value === 'undefined') {
         throw new TypeError(
@@ -553,7 +552,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
           }
         }
       }, false);
-      this.dirty = _dirty;
+      this.dirty = dirty ?? true;
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
       if (clone.collapsed != null) {
@@ -568,7 +567,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             this._ymetadata.set(key, value);
           }
         }, false);
-        this.dirty = _dirty;
+        this.dirty = (value as boolean | undefined) ?? true;
       }
     }
   }
