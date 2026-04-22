@@ -793,7 +793,6 @@ export class YCodeCell
       this.transact(() => {
         this.ymodel.set('execution_state', state);
       }, false);
-      this.dirty = true;
     }
   }
 
