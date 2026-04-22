@@ -259,7 +259,7 @@ describe('@jupyter/ydoc', () => {
         collapsed: true,
         editable: false,
         name: 'cell-name0',
-        test: "foo"
+        test: 'foo'
       };
       cell.setMetadata(metadata0, false);
       expect(notebook.dirty).toBe(false);
@@ -267,7 +267,7 @@ describe('@jupyter/ydoc', () => {
         collapsed: true,
         editable: false,
         name: 'cell-name1',
-        test: "bar"
+        test: 'bar'
       };
       cell.setMetadata(metadata1);
       expect(notebook.dirty).toBe(true);
