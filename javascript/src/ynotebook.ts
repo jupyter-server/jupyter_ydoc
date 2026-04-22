@@ -89,7 +89,7 @@ export class YNotebook
       metadata: options.data?.metadata ?? {}
     };
 
-    ynotebook.fromJSON(data);
+    ynotebook.fromJSON(data, false);
     return ynotebook;
   }
 
@@ -207,15 +207,17 @@ export class YNotebook
    *
    * @param index: Position to insert the cells.
    * @param cells: Array of shared cells to insert.
+   * @param dirty: The dirty state to set.
    *
    * @returns The inserted cells.
    */
   insertCells(
     index: number,
-    cells: SharedCell.Cell[]
+    cells: SharedCell.Cell[],
+    dirty: boolean = true
   ): YBaseCell<nbformat.IBaseCellMetadata>[] {
     const yCells = cells.map(c => {
-      const cell = createCell(c, this);
+      const cell = createCell(c, this, dirty);
       this._ycellMapping.set(cell.ymodel, cell);
       return cell;
     });
@@ -226,6 +228,8 @@ export class YNotebook
         yCells.map(cell => cell.ymodel)
       );
     });
+
+    this.dirty = dirty;
 
     return yCells;
   }
@@ -259,6 +263,8 @@ export class YNotebook
         clones.map(clone => createCell(clone, this).ymodel)
       );
     });
+
+    this.dirty = true;
   }
 
   /**
@@ -275,12 +281,14 @@ export class YNotebook
    *
    * @param from: The start index of the range to remove (inclusive).
    * @param to: The end index of the range to remove (exclusive).
+   * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number): void {
+  deleteCellRange(from: number, to: number, dirty: boolean = true): void {
     // Cells will be removed from the mapping in the model event listener.
     this.transact(() => {
       this._ycells.delete(from, to - from);
     });
+    this.dirty = dirty;
   }
 
   /**
@@ -374,6 +382,8 @@ export class YNotebook
             ymetadata.set(key, value);
           }
         });
+
+        this.dirty = true;
       }
     }
   }
@@ -398,6 +408,8 @@ export class YNotebook
         ymetadata.set(key, value);
       }
     });
+
+    this.dirty = true;
   }
 
   /**
@@ -415,7 +427,7 @@ export class YNotebook
    * @param value The notebook
    */
   setSource(value: JSONValue): void {
-    this.fromJSON(value as nbformat.INotebookContent);
+    this.fromJSON(value as nbformat.INotebookContent, false);
   }
 
   /**
@@ -423,7 +435,7 @@ export class YNotebook
    *
    * @param value The notebook
    */
-  fromJSON(value: nbformat.INotebookContent): void {
+  fromJSON(value: nbformat.INotebookContent, dirty: boolean = true): void {
     this.transact(() => {
       this.nbformat = value.nbformat;
       this.nbformat_minor = value.nbformat_minor;
@@ -450,8 +462,8 @@ export class YNotebook
         }
         return cell;
       });
-      this.insertCells(this.cells.length, ycells);
-      this.deleteCellRange(0, this.cells.length);
+      this.insertCells(this.cells.length, ycells, dirty);
+      this.deleteCellRange(0, this.cells.length, dirty);
     });
   }
 

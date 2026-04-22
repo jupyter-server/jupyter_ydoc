@@ -102,6 +102,11 @@ interface ISharedDocumentNoSource extends ISharedBase {
   readonly state: JSONObject;
 
   /**
+   * Document dirty state
+   */
+  dirty: boolean;
+
+  /**
    * Document awareness
    */
   readonly awareness: IAwareness;
@@ -312,10 +317,15 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @param index Position to insert the cells.
    * @param cells Array of shared cells to insert.
+   * @param dirty The dirty state to set.
    *
    * @returns The inserted cells.
    */
-  insertCells(index: number, cells: Array<SharedCell.Cell>): ISharedCell[];
+  insertCells(
+    index: number,
+    cells: Array<SharedCell.Cell>,
+    dirty?: boolean
+  ): ISharedCell[];
 
   /**
    * Move a cell.
@@ -347,8 +357,10 @@ export interface ISharedNotebook extends ISharedDocument {
    * @param from: The start index of the range to remove (inclusive).
    *
    * @param to: The end index of the range to remove (exclusive).
+   *
+   * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number): void;
+  deleteCellRange(from: number, to: number, dirty?: boolean): void;
 
   /**
    * Override the notebook with a JSON-serialized document.
@@ -473,6 +485,11 @@ export interface ISharedBaseCell<
    * The notebook that this cell belongs to.
    */
   readonly notebook: ISharedNotebook | null;
+
+  /**
+   * The dirty state of the notebook that the cell belongs to, if any.
+   */
+  dirty: boolean;
 
   /**
    * Get Cell id.

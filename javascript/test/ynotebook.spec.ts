@@ -18,6 +18,7 @@ describe('@jupyter/ydoc', () => {
       test('should create a notebook without arguments', () => {
         const notebook = YNotebook.create();
         expect(notebook.cells.length).toBe(0);
+        expect(notebook.dirty).toBe(false);
         notebook.dispose();
       });
     });
@@ -40,6 +41,7 @@ describe('@jupyter/ydoc', () => {
         });
         expect(notebook.cells).toHaveLength(1);
         expect(notebook.cells[0].toJSON()).toEqual(cell);
+        expect(notebook.dirty).toBe(false);
         notebook.dispose();
       });
 
@@ -62,6 +64,7 @@ describe('@jupyter/ydoc', () => {
         expect(notebook.nbformat).toEqual(1);
         expect(notebook.nbformat_minor).toEqual(0);
         expect(notebook.metadata).toEqual(metadata);
+        expect(notebook.dirty).toBe(false);
         notebook.dispose();
       });
     });
@@ -92,6 +95,7 @@ describe('@jupyter/ydoc', () => {
         notebook.setMetadata(metadata);
 
         expect(notebook.metadata).toEqual(metadata);
+        expect(notebook.dirty).toBe(true);
         notebook.dispose();
       });
 
@@ -173,12 +177,15 @@ describe('@jupyter/ydoc', () => {
           display_name: 'python',
           name: 'python'
         };
+        expect(notebook.dirty).toBe(false);
         notebook.setMetadata(metadata);
         {
           const metadata = notebook.getMetadata();
           expect(metadata.kernelspec!.name).toBe('python');
           expect(metadata.orig_nbformat).toBe(1);
         }
+        expect(notebook.dirty).toBe(true);
+        notebook.dirty = false;
         notebook.updateMetadata({
           orig_nbformat: 2
         });
@@ -187,6 +194,7 @@ describe('@jupyter/ydoc', () => {
           expect(metadata.kernelspec!.name).toBe('python');
           expect(metadata.orig_nbformat).toBe(2);
         }
+        expect(notebook.dirty).toBe(true);
         notebook.dispose();
       });
 
@@ -351,22 +359,37 @@ describe('@jupyter/ydoc', () => {
     describe('#insertCell', () => {
       test('should insert a cell', () => {
         const notebook = YNotebook.create();
+        expect(notebook.dirty).toBe(false);
         notebook.insertCell(0, { cell_type: 'code' });
         expect(notebook.cells.length).toBe(1);
+        expect(notebook.dirty).toBe(true);
         notebook.dispose();
       });
       test('should set cell source', () => {
         const notebook = YNotebook.create();
+        expect(notebook.dirty).toBe(false);
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
+        expect(notebook.dirty).toBe(true);
+        notebook.dirty = false;
+        expect(notebook.dirty).toBe(false);
         codeCell.setSource('test');
+        expect(notebook.dirty).toBe(true);
         expect(notebook.cells[0].getSource()).toBe('test');
         notebook.dispose();
       });
       test('should update source', () => {
         const notebook = YNotebook.create();
+        expect(notebook.dirty).toBe(false);
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
+        expect(notebook.dirty).toBe(true);
+        notebook.dirty = false;
+        expect(notebook.dirty).toBe(false);
         codeCell.setSource('test');
+        expect(notebook.dirty).toBe(true);
+        notebook.dirty = false;
+        expect(notebook.dirty).toBe(false);
         codeCell.updateSource(0, 0, 'hello');
+        expect(notebook.dirty).toBe(true);
         expect(codeCell.getSource()).toBe('hellotest');
         notebook.dispose();
       });
@@ -379,8 +402,15 @@ describe('@jupyter/ydoc', () => {
         });
         const codeCell = notebook.insertCell(0, { cell_type: 'code' });
 
-        expect(changes).toHaveLength(1);
-        expect(changes[0].cellsChange).toEqual([
+        expect(changes).toHaveLength(2);
+        expect(changes[0].stateChange).toEqual([
+          {
+            name: 'dirty',
+            oldValue: false,
+            newValue: true
+          }
+        ]);
+        expect(changes[1].cellsChange).toEqual([
           {
             insert: [codeCell]
           }
@@ -493,6 +523,28 @@ describe('@jupyter/ydoc', () => {
 
     describe('#undo', () => {
       describe('globally', () => {
+        test('should set dirty after undoing a change', () => {
+          const notebook = YNotebook.create();
+          expect(notebook.dirty).toBe(false);
+          notebook.addCell({ cell_type: 'code' });
+          expect(notebook.dirty).toBe(true);
+          notebook.dirty = false;
+          expect(notebook.dirty).toBe(false);
+
+          notebook.undo();
+
+          expect(notebook.dirty).toBe(true);
+        });
+
+        test('should not set dirty after undoing no change', () => {
+          const notebook = YNotebook.create();
+          expect(notebook.dirty).toBe(false);
+
+          notebook.undo();
+
+          expect(notebook.dirty).toBe(false);
+        });
+
         test('should undo cell addition', () => {
           const notebook = YNotebook.create();
           notebook.addCell({ cell_type: 'code' });
