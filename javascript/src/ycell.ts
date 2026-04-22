@@ -343,14 +343,22 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * Undo an operation.
    */
   undo(): boolean {
-    return !!this.undoManager?.undo();
+    const undone = !!this.undoManager?.undo();
+    if (undone) {
+      this.dirty = true;
+    }
+    return undone;
   }
 
   /**
    * Redo an operation.
    */
   redo(): boolean {
-    return !!this.undoManager?.redo();
+    const redone = !!this.undoManager?.redo();
+    if (redone) {
+      this.dirty = true;
+    }
+    return redone;
   }
 
   /**
