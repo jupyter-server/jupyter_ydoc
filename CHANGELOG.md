@@ -2,6 +2,27 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 4.0.0a0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.4.1...844604ab538528c5f54d5e0cc4e185bb8ee050d3))
+
+### API and Breaking Changes
+
+- Set dirty state on document change [#406](https://github.com/jupyter-server/jupyter_ydoc/pull/406) ([@davidbrochart](https://github.com/davidbrochart), [@SylvainCorlay](https://github.com/SylvainCorlay), [@brichet](https://github.com/brichet), [@jtpio](https://github.com/jtpio), [@krassowski](https://github.com/krassowski), [@trungleduc](https://github.com/trungleduc))
+
+### Maintenance and upkeep improvements
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-04-14&to=2026-04-22&type=c))
+
+@brichet ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2026-04-14..2026-04-22&type=Issues)) | @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-04-14..2026-04-22&type=Issues)) | @jtpio ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2026-04-14..2026-04-22&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-04-14..2026-04-22&type=Issues)) | @SylvainCorlay ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3ASylvainCorlay+updated%3A2026-04-14..2026-04-22&type=Issues)) | @trungleduc ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Atrungleduc+updated%3A2026-04-14..2026-04-22&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.4.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.4.0...1426b48e1da34bb2e0370ba6d06e06066144f0f1))
@@ -31,8 +52,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-02-06&to=2026-04-14&type=c))
 
 @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-02-06..2026-04-14&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-02-06..2026-04-14&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.4.0
 
