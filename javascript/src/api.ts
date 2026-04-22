@@ -324,7 +324,7 @@ export interface ISharedNotebook extends ISharedDocument {
   insertCells(
     index: number,
     cells: Array<SharedCell.Cell>,
-    dirty: boolean
+    dirty?: boolean
   ): ISharedCell[];
 
   /**
@@ -360,7 +360,7 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number, dirty: boolean): void;
+  deleteCellRange(from: number, to: number, dirty?: boolean): void;
 
   /**
    * Override the notebook with a JSON-serialized document.
