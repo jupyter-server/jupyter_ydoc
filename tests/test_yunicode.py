@@ -322,3 +322,19 @@ def test_multibyte_unicode(initial, updated, granular):
 
     assert len(source_events[0].delta) >= expected_min_delta_length
     assert text.get() == updated
+
+
+def test_observe_with_transaction():
+    text = YUnicode()
+    received = []
+
+    def cb(part, events, txn):
+        received.append((part, txn.origin))
+
+    text.observe(cb)
+
+    with text.ydoc.transaction(origin="my-origin"):
+        text.set("hello")
+
+    assert received
+    assert any(part == "source" and origin == "my-origin" for part, origin in received)

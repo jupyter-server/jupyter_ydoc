@@ -3,8 +3,7 @@
 
 import copy
 import warnings
-from collections.abc import Callable, Iterator
-from functools import partial
+from collections.abc import Iterator
 from typing import Any
 from uuid import uuid4
 
@@ -12,7 +11,12 @@ from anyio import lowlevel
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
-from .ybasedoc import YBaseDoc
+from .ybasedoc import (
+    ObserveCallback,
+    YBaseDoc,
+    _make_observe_adapter,
+    _observe_callback_param_count,
+)
 
 # The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
@@ -437,17 +441,26 @@ class YNotebook(YBaseDoc):
         for val in self._set(value):
             await lowlevel.checkpoint()
 
-    def observe(self, callback: Callable[[str, Any], None]) -> None:
+    def observe(self, callback: ObserveCallback) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[str, Any], None]
+            May accept either ``(part, events)`` or ``(part, events, txn)``. With the
+            3-argument form, the underlying pycrdt :class:`ReadTransaction` is forwarded.
+        :type callback: Callable[[str, Any], None] | Callable[[str, Any, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
-        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(partial(callback, "meta"))
-        self._subscriptions[self._ycells] = self._ycells.observe_deep(partial(callback, "cells"))
+        param_count = _observe_callback_param_count(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(
+            _make_observe_adapter(callback, "state", param_count)
+        )
+        self._subscriptions[self._ymeta] = self._ymeta.observe_deep(
+            _make_observe_adapter(callback, "meta", param_count)
+        )
+        self._subscriptions[self._ycells] = self._ycells.observe_deep(
+            _make_observe_adapter(callback, "cells", param_count)
+        )
 
     def _update_cell(self, old_cell: dict, new_cell: dict, old_ycell: Map) -> bool:
         if old_cell == new_cell:

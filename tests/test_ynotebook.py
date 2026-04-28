@@ -506,3 +506,19 @@ async def test_async_notebook():
     # check that the max blocking time is at least 20 times
     # smaller than if we did a blocking get:
     assert max_blocking_time < get_time / 20
+
+
+def test_observe_with_transaction():
+    nb = YNotebook()
+    received = []
+
+    def cb(part, events, txn):
+        received.append((part, txn.origin))
+
+    nb.observe(cb)
+
+    with nb.ydoc.transaction(origin="my-origin"):
+        nb.append_cell(make_code_cell("print('hello')"))
+
+    assert received
+    assert any(part == "cells" and origin == "my-origin" for part, origin in received)

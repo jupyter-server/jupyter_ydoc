@@ -1,13 +1,14 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-from collections.abc import Callable
-from functools import partial
-from typing import Any
-
 from pycrdt import Awareness, Doc, Map
 
-from .ybasedoc import YBaseDoc
+from .ybasedoc import (
+    ObserveCallback,
+    YBaseDoc,
+    _make_observe_adapter,
+    _observe_callback_param_count,
+)
 
 
 class YBlob(YBaseDoc):
@@ -70,13 +71,20 @@ class YBlob(YBaseDoc):
 
         self._ysource["bytes"] = value
 
-    def observe(self, callback: Callable[[str, Any], None]) -> None:
+    def observe(self, callback: ObserveCallback) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[str, Any], None]
+            May accept either ``(part, events)`` or ``(part, events, txn)``. With the
+            3-argument form, the underlying pycrdt :class:`ReadTransaction` is forwarded.
+        :type callback: Callable[[str, Any], None] | Callable[[str, Any, Any], None]
         """
         self.unobserve()
-        self._subscriptions[self._ystate] = self._ystate.observe(partial(callback, "state"))
-        self._subscriptions[self._ysource] = self._ysource.observe(partial(callback, "source"))
+        param_count = _observe_callback_param_count(callback)
+        self._subscriptions[self._ystate] = self._ystate.observe(
+            _make_observe_adapter(callback, "state", param_count)
+        )
+        self._subscriptions[self._ysource] = self._ysource.observe(
+            _make_observe_adapter(callback, "source", param_count)
+        )

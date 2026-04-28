@@ -3,10 +3,38 @@
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any
+from functools import partial
+from inspect import signature
+from typing import Any, Union
 
 from anyio import lowlevel
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
+
+TwoArgObserveCallback = Callable[[str, Any], None]
+ThreeArgObserveCallback = Callable[[str, Any, Any], None]
+ObserveCallback = Union[TwoArgObserveCallback, ThreeArgObserveCallback]
+
+
+def _observe_callback_param_count(callback: ObserveCallback) -> int:
+    param_count = len(signature(callback).parameters)
+    if param_count not in (2, 3):
+        raise TypeError(
+            "observe() callback must accept (part, events) or (part, events, txn); "
+            f"got {param_count} parameters."
+        )
+    return param_count
+
+
+def _make_observe_adapter(
+    callback: ObserveCallback, part: str, param_count: int
+) -> Callable[..., None]:
+    if param_count == 2:
+        return partial(callback, part)
+
+    def adapter(events: Any, txn: Any) -> None:
+        callback(part, events, txn)
+
+    return adapter
 
 
 class YBaseDoc(ABC):
@@ -203,12 +231,14 @@ class YBaseDoc(ABC):
         self.set(value)
 
     @abstractmethod
-    def observe(self, callback: Callable[[str, Any], None]) -> None:
+    def observe(self, callback: ObserveCallback) -> None:
         """
         Subscribes to document changes.
 
         :param callback: Callback that will be called when the document changes.
-        :type callback: Callable[[str, Any], None]
+            May accept either ``(part, events)`` or ``(part, events, txn)``. With the
+            3-argument form, the underlying pycrdt :class:`ReadTransaction` is forwarded.
+        :type callback: Callable[[str, Any], None] | Callable[[str, Any, Any], None]
         """
 
     def unobserve(self) -> None:

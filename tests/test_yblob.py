@@ -27,3 +27,19 @@ def test_set_no_op_if_unchanged():
 
     # No changes should be observed at all
     assert changes == []
+
+
+def test_observe_with_transaction():
+    blob = YBlob()
+    received = []
+
+    def cb(part, events, txn):
+        received.append((part, txn.origin))
+
+    blob.observe(cb)
+
+    with blob.ydoc.transaction(origin="my-origin"):
+        blob.set(b"hello")
+
+    assert received
+    assert any(part == "source" and origin == "my-origin" for part, origin in received)
