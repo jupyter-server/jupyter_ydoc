@@ -5,14 +5,14 @@ from abc import ABC, abstractmethod
 from collections.abc import Callable
 from functools import partial
 from inspect import signature
-from typing import Any, Union
+from typing import Any
 
 from anyio import lowlevel
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 TwoArgObserveCallback = Callable[[str, Any], None]
 ThreeArgObserveCallback = Callable[[str, Any, Any], None]
-ObserveCallback = Union[TwoArgObserveCallback, ThreeArgObserveCallback]
+ObserveCallback = TwoArgObserveCallback | ThreeArgObserveCallback
 
 
 def _observe_callback_param_count(callback: ObserveCallback) -> int:

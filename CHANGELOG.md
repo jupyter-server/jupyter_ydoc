@@ -2,15 +2,6 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
-## Unreleased
-
-### Enhancements made
-
-- `observe()` callbacks may now opt into receiving the underlying pycrdt transaction
-  as a 3rd argument: `callback(part, events, txn)`. The original 2-argument form
-  `callback(part, events)` continues to work unchanged. Applies to `YNotebook`,
-  `YUnicode`, `YBlob` (and `YFile` via inheritance).
-
 ## 4.0.0a0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.4.1...844604ab538528c5f54d5e0cc4e185bb8ee050d3))
