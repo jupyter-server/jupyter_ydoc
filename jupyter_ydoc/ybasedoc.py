@@ -26,7 +26,7 @@ def _observe_callback_param_count(callback: ObserveCallback) -> int:
 
 
 def _make_observe_adapter(
-    callback: ObserveCallback, part: str, param_count: int
+    callback: Callable[..., None], part: str, param_count: int
 ) -> Callable[..., None]:
     if param_count == 2:
         return partial(callback, part)
