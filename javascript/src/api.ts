@@ -366,8 +366,9 @@ export interface ISharedNotebook extends ISharedDocument {
    * Override the notebook with a JSON-serialized document.
    *
    * @param value The notebook
+   * @param dirty The dirty state to set.
    */
-  fromJSON(value: nbformat.INotebookContent): void;
+  fromJSON(value: nbformat.INotebookContent, dirty?: boolean): void;
 
   /**
    * Serialize the model to JSON.
