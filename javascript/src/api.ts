@@ -317,15 +317,10 @@ export interface ISharedNotebook extends ISharedDocument {
    *
    * @param index Position to insert the cells.
    * @param cells Array of shared cells to insert.
-   * @param dirty The dirty state to set.
    *
    * @returns The inserted cells.
    */
-  insertCells(
-    index: number,
-    cells: Array<SharedCell.Cell>,
-    dirty?: boolean
-  ): ISharedCell[];
+  insertCells(index: number, cells: Array<SharedCell.Cell>): ISharedCell[];
 
   /**
    * Move a cell.
@@ -357,18 +352,15 @@ export interface ISharedNotebook extends ISharedDocument {
    * @param from: The start index of the range to remove (inclusive).
    *
    * @param to: The end index of the range to remove (exclusive).
-   *
-   * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number, dirty?: boolean): void;
+  deleteCellRange(from: number, to: number): void;
 
   /**
    * Override the notebook with a JSON-serialized document.
    *
    * @param value The notebook
-   * @param dirty The dirty state to set.
    */
-  fromJSON(value: nbformat.INotebookContent, dirty?: boolean): void;
+  fromJSON(value: nbformat.INotebookContent): void;
 
   /**
    * Serialize the model to JSON.

@@ -249,27 +249,18 @@ describe('@jupyter/ydoc', () => {
   });
 
   describe('#dirty', () => {
-    test('should set dirty to false if passed in setMetadata', () => {
+    test('should set dirty when cell metadata changes', () => {
       const notebook = YNotebook.create();
       const cell = notebook.addCell({ cell_type: 'code' });
-      expect(notebook.dirty).toBe(true);
       notebook.dirty = false;
       expect(notebook.dirty).toBe(false);
-      const metadata0 = {
+      const metadata = {
         collapsed: true,
         editable: false,
-        name: 'cell-name0',
+        name: 'cell-name',
         test: 'foo'
       };
-      cell.setMetadata(metadata0, false);
-      expect(notebook.dirty).toBe(false);
-      const metadata1 = {
-        collapsed: true,
-        editable: false,
-        name: 'cell-name1',
-        test: 'bar'
-      };
-      cell.setMetadata(metadata1);
+      cell.setMetadata(metadata);
       expect(notebook.dirty).toBe(true);
       notebook.dispose();
     });

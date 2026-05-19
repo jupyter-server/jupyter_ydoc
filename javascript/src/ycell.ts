@@ -61,8 +61,7 @@ export const createCellModelFromSharedType = (
  */
 export const createCell = (
   cell: SharedCell.Cell,
-  notebook?: YNotebook,
-  dirty: boolean = true
+  notebook?: YNotebook
 ): YCodeCell | YMarkdownCell | YRawCell => {
   const ymodel = new Y.Map();
   const ysource = new Y.Text();
@@ -77,7 +76,7 @@ export const createCell = (
     case 'markdown': {
       ycell = new YMarkdownCell(ymodel, ysource, { notebook }, ymetadata);
       if (cell.attachments != null) {
-        ycell.setAttachments(cell.attachments as nbformat.IAttachments, dirty);
+        ycell.setAttachments(cell.attachments as nbformat.IAttachments);
       }
       break;
     }
@@ -94,9 +93,9 @@ export const createCell = (
         ymetadata
       );
       const cCell = cell as Partial<nbformat.ICodeCell>;
-      ycell.setExecutionCount(cCell.execution_count ?? null, dirty);
+      ycell.setExecutionCount(cCell.execution_count ?? null);
       if (cCell.outputs) {
-        ycell.setOutputs(cCell.outputs, dirty);
+        ycell.setOutputs(cCell.outputs);
       }
       break;
     }
@@ -104,19 +103,18 @@ export const createCell = (
       // raw
       ycell = new YRawCell(ymodel, ysource, { notebook }, ymetadata);
       if (cell.attachments) {
-        ycell.setAttachments(cell.attachments as nbformat.IAttachments, dirty);
+        ycell.setAttachments(cell.attachments as nbformat.IAttachments);
       }
       break;
     }
   }
 
   if (cell.metadata != null) {
-    ycell.setMetadata(cell.metadata, dirty);
+    ycell.setMetadata(cell.metadata);
   }
   if (cell.source != null) {
     ycell.setSource(
-      typeof cell.source === 'string' ? cell.source : cell.source.join(''),
-      dirty
+      typeof cell.source === 'string' ? cell.source : cell.source.join('')
     );
   }
   return ycell;
@@ -409,14 +407,13 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * Sets cell's source.
    *
    * @param value: New source.
-   * @param dirty: The dirty state to set.
    */
-  setSource(value: string, dirty: boolean = true): void {
+  setSource(value: string): void {
     this.transact(() => {
       this.ysource.delete(0, this.ysource.length);
       this.ysource.insert(0, value);
     });
-    this.dirty = dirty;
+    this.dirty = true;
     // @todo Do we need proper replace semantic? This leads to issues in editor bindings because they don't switch source.
     // this.ymodel.set('source', new Y.Text(value));
   }
@@ -505,16 +502,12 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    *
    * @param metadata Cell's metadata key or cell's metadata.
    * @param value Metadata value
-   * @param dirty The dirty state to set.
    */
   setMetadata(metadata: Partial<Metadata>): void;
-  setMetadata(metadata: Partial<Metadata>, dirty: boolean): void;
   setMetadata(metadata: string, value: PartialJSONValue): void;
-  setMetadata(metadata: string, value: PartialJSONValue, dirty: boolean): void;
   setMetadata(
     metadata: Partial<Metadata> | string,
-    value?: PartialJSONValue | boolean,
-    dirty?: boolean
+    value?: PartialJSONValue
   ): void {
     if (typeof metadata === 'string') {
       if (typeof value === 'undefined') {
@@ -552,7 +545,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
           }
         }
       }, false);
-      this.dirty = dirty ?? true;
+      this.dirty = true;
     } else {
       const clone = JSONExt.deepCopy(metadata) as any;
       if (clone.collapsed != null) {
@@ -567,7 +560,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
             this._ymetadata.set(key, value);
           }
         }, false);
-        this.dirty = (value as boolean | undefined) ?? true;
+        this.dirty = true;
       }
     }
   }
@@ -768,7 +761,7 @@ export class YCodeCell
     this.setExecutionCount(count);
   }
 
-  setExecutionCount(count: number | null, dirty: boolean = true) {
+  setExecutionCount(count: number | null) {
     // Do not use `this.execution_count`. When initializing the
     // cell, we need to set execution_count to `null` if we compare
     // using `this.execution_count` it will return `null` and we will
@@ -777,7 +770,7 @@ export class YCodeCell
       this.transact(() => {
         this.ymodel.set('execution_count', count);
       }, false);
-      this.dirty = dirty;
+      this.dirty = true;
     }
   }
 
@@ -843,13 +836,13 @@ export class YCodeCell
   /**
    * Replace all outputs.
    */
-  setOutputs(outputs: Array<nbformat.IOutput>, dirty: boolean = true): void {
+  setOutputs(outputs: Array<nbformat.IOutput>): void {
     this.transact(() => {
       this._youtputs.delete(0, this._youtputs.length);
       const newOutputs = this.createOutputs(outputs);
       this._youtputs.insert(0, newOutputs);
     }, false);
-    this.dirty = dirty;
+    this.dirty = true;
   }
 
   /**
@@ -1021,12 +1014,8 @@ class YAttachmentCell
    * Sets the cell attachments
    *
    * @param attachments: The cell attachments.
-   * @param dirty: The dirty state to set.
    */
-  setAttachments(
-    attachments: nbformat.IAttachments | undefined,
-    dirty: boolean = true
-  ): void {
+  setAttachments(attachments: nbformat.IAttachments | undefined): void {
     this.transact(() => {
       if (attachments == null) {
         this.ymodel.delete('attachments');
@@ -1034,7 +1023,7 @@ class YAttachmentCell
         this.ymodel.set('attachments', attachments);
       }
     }, false);
-    this.dirty = dirty;
+    this.dirty = true;
   }
 
   /**
