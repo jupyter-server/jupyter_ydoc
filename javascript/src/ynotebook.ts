@@ -89,7 +89,7 @@ export class YNotebook
       metadata: options.data?.metadata ?? {}
     };
 
-    ynotebook.fromJSON(data, false);
+    ynotebook.setSource(data as JSONValue);
     return ynotebook;
   }
 
@@ -207,17 +207,15 @@ export class YNotebook
    *
    * @param index: Position to insert the cells.
    * @param cells: Array of shared cells to insert.
-   * @param dirty: The dirty state to set.
    *
    * @returns The inserted cells.
    */
   insertCells(
     index: number,
-    cells: SharedCell.Cell[],
-    dirty: boolean = true
+    cells: SharedCell.Cell[]
   ): YBaseCell<nbformat.IBaseCellMetadata>[] {
     const yCells = cells.map(c => {
-      const cell = createCell(c, this, dirty);
+      const cell = createCell(c, this);
       this._ycellMapping.set(cell.ymodel, cell);
       return cell;
     });
@@ -229,7 +227,7 @@ export class YNotebook
       );
     });
 
-    this.dirty = dirty;
+    this.dirty = true;
 
     return yCells;
   }
@@ -281,14 +279,13 @@ export class YNotebook
    *
    * @param from: The start index of the range to remove (inclusive).
    * @param to: The end index of the range to remove (exclusive).
-   * @param dirty: The dirty state to set.
    */
-  deleteCellRange(from: number, to: number, dirty: boolean = true): void {
+  deleteCellRange(from: number, to: number): void {
     // Cells will be removed from the mapping in the model event listener.
     this.transact(() => {
       this._ycells.delete(from, to - from);
     });
-    this.dirty = dirty;
+    this.dirty = true;
   }
 
   /**
@@ -427,7 +424,8 @@ export class YNotebook
    * @param value The notebook
    */
   setSource(value: JSONValue): void {
-    this.fromJSON(value as nbformat.INotebookContent, false);
+    this.fromJSON(value as nbformat.INotebookContent);
+    this.dirty = false;
   }
 
   /**
@@ -435,7 +433,7 @@ export class YNotebook
    *
    * @param value The notebook
    */
-  fromJSON(value: nbformat.INotebookContent, dirty: boolean = true): void {
+  fromJSON(value: nbformat.INotebookContent): void {
     this.transact(() => {
       this.nbformat = value.nbformat;
       this.nbformat_minor = value.nbformat_minor;
@@ -462,8 +460,8 @@ export class YNotebook
         }
         return cell;
       });
-      this.insertCells(this.cells.length, ycells, dirty);
-      this.deleteCellRange(0, this.cells.length, dirty);
+      this.insertCells(this.cells.length, ycells);
+      this.deleteCellRange(0, this.cells.length);
     });
   }
 
