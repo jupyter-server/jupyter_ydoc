@@ -506,3 +506,79 @@ async def test_async_notebook():
     # check that the max blocking time is at least 20 times
     # smaller than if we did a blocking get:
     assert max_blocking_time < get_time / 20
+
+
+async def test_remove_duplicate_cells():
+    """remove_duplicate_cells removes duplicates and returns count."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                make_code_cell("print(1)", id="cell-A"),
+                make_code_cell("print(2)", id="cell-B"),
+            ]
+        }
+    )
+    assert nb.cell_number == 2
+
+    # Insert a duplicate of the first cell
+    with nb.ydoc.transaction():
+        dup = Map({"id": "cell-A", "cell_type": "code", "source": "duplicate"})
+        nb.ycells.append(dup)
+
+    assert nb.cell_number == 3
+
+    removed = nb.remove_duplicate_cells()
+
+    assert removed == 1
+    assert nb.cell_number == 2
+    ids = [nb.ycells[i].get("id") for i in range(nb.cell_number)]
+    assert ids == ["cell-A", "cell-B"]
+
+
+async def test_remove_duplicate_cells_no_duplicates():
+    """No-op when there are no duplicate cells."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                make_code_cell("print(1)", id="cell-A"),
+                make_code_cell("print(2)", id="cell-B"),
+            ]
+        }
+    )
+    assert nb.cell_number == 2
+    removed = nb.remove_duplicate_cells()
+    assert removed == 0
+    assert nb.cell_number == 2
+
+
+async def test_observe_triggers_dedup_on_cells_change():
+    """observe() auto-deduplicates when cells change."""
+    nb = YNotebook()
+    nb.set(
+        {
+            "cells": [
+                make_code_cell("print(1)", id="cell-A"),
+                make_code_cell("print(2)", id="cell-B"),
+            ]
+        }
+    )
+
+    changes = []
+    nb.observe(lambda target, event: changes.append(target))
+
+    # Insert a duplicate of the first cell
+    with nb.ydoc.transaction():
+        dup = Map({"id": "cell-A", "cell_type": "code", "source": "duplicate"})
+        nb.ycells.append(dup)
+
+    # The observer fires synchronously; dedup is scheduled via call_soon.
+    # Give the event loop a tick so the scheduled dedup runs.
+    await lowlevel.checkpoint()
+
+    assert nb.cell_number == 2
+    ids = [nb.ycells[i].get("id") for i in range(nb.cell_number)]
+    assert ids == ["cell-A", "cell-B"]
+    # The observer should have fired for both the insert and the dedup removal
+    assert "cells" in changes
