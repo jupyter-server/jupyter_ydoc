@@ -2,6 +2,25 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 3.5.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.4.1...38e4494ea7bcd9d8bb20d8aae43ae3f8e356bed0))
+
+### Maintenance and upkeep improvements
+
+- Bump pycrdt v0.13.0 [#412](https://github.com/jupyter-server/jupyter_ydoc/pull/412) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-04-14&to=2026-06-03&type=c))
+
+@davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-04-14..2026-06-03&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-04-14..2026-06-03&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 3.4.1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@3.4.0...1426b48e1da34bb2e0370ba6d06e06066144f0f1))
@@ -31,8 +50,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-02-06&to=2026-04-14&type=c))
 
 @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-02-06..2026-04-14&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-02-06..2026-04-14&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 3.4.0
 
