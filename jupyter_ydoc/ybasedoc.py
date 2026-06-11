@@ -40,7 +40,7 @@ class YBaseDoc(ABC):
 
         self._ystate = self._ydoc.get("state", type=Map)
         self._subscriptions = {}
-        self._undo_manager = UndoManager(doc=self._ydoc, capture_timeout_millis=0)
+        self._undo_manager = UndoManager(capture_timeout_millis=0)
 
     @property
     @abstractmethod
