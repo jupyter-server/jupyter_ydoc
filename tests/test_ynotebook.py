@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import json
 from time import monotonic
 from uuid import uuid4
 
@@ -68,7 +69,8 @@ async def test_set_populates_metadata(do):
     }
 
 
-async def test_set_preserves_cells_with_insert_and_remove(do):
+@pytest.mark.parametrize("progressive", [False, True], ids=["not progressive", "progressive"])
+async def test_set_preserves_cells_with_insert_and_remove(do, progressive):
     nb = YNotebook()
     await do(
         nb,
@@ -107,7 +109,10 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
         changes.append((topic, event))
 
     nb.observe(record_changes)
-    await do(nb, "set", model)
+    if progressive:
+        await nb.aset(model, progressive=True)
+    else:
+        await do(nb, "set", model)
 
     assert nb.cell_number == 3
 
@@ -118,16 +123,215 @@ async def test_set_preserves_cells_with_insert_and_remove(do):
     # The middle cell should have a different source now
     assert str(nb.ycells[1]["source"]) == "print('x')\n"
 
-    # We should have one cell event
     cell_events = [e for t, e in changes if t == "cells"]
-    assert len(cell_events) == 1
-    event_transactions = cell_events[0]
-    assert len(event_transactions) == 1
-    assert event_transactions[0].delta == [
-        {"retain": 1},
-        {"delete": 1},
-        {"insert": [AnyInstanceOf(Map)]},
-    ]
+    if progressive:
+        assert len(cell_events) == 2
+        event_transactions = cell_events[0]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"delete": 1},
+        ]
+        event_transactions = cell_events[1]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"insert": [AnyInstanceOf(Map)]},
+        ]
+    else:
+        # We should have one cell event
+        assert len(cell_events) == 1
+        event_transactions = cell_events[0]
+        assert len(event_transactions) == 1
+        assert event_transactions[0].delta == [
+            {"retain": 1},
+            {"delete": 1},
+            {"insert": [AnyInstanceOf(Map)]},
+        ]
+
+
+async def test_aset_progressive_populates_metadata_before_cells():
+    nb = YNotebook()
+    changes = []
+
+    def record_changes(topic, event):
+        changes.append((topic, event))
+
+    nb.observe(record_changes)
+    await nb.aset(
+        {
+            "cells": [
+                make_code_cell("print('a')\n", id="cell-a"),
+                make_code_cell("print('b')\n", id="cell-b"),
+            ]
+        },
+        progressive=True,
+    )
+
+    topics = [topic for topic, _ in changes]
+    assert topics[0] == "meta"
+
+    cell_events = [event for topic, event in changes if topic == "cells"]
+    assert len(cell_events) == 2
+    assert cell_events[0][0].delta == [{"insert": [AnyInstanceOf(Map)]}]
+    assert cell_events[1][0].delta == [{"retain": 1}, {"insert": [AnyInstanceOf(Map)]}]
+
+
+async def test_aset_progressive_delays_large_outputs_until_after_cells():
+    nb = YNotebook()
+    outputs = [{"name": "stdout", "output_type": "stream", "text": "x" * 1024}]
+    cell = make_code_cell("print('x')\n", id="cell-with-output")
+    cell["outputs"] = outputs
+    snapshots = []
+
+    def record_changes(topic, event):
+        if topic == "cells":
+            snapshots.append(nb.ycells.to_py())
+
+    nb.observe(record_changes)
+    await nb.aset(
+        {"cells": [cell]},
+        progressive=True,
+        delay_outputs_above_mb=0,
+    )
+
+    assert len(snapshots) == 2
+    assert snapshots[0][0]["outputs"] == []
+    assert snapshots[1][0]["outputs"] == outputs
+    assert nb.ycells[0]["outputs"][0]["text"].to_py() == outputs[0]["text"]
+
+    model = await nb.aget()
+    assert model["cells"][0]["outputs"] == outputs
+
+
+async def test_aset_progressive_keeps_small_outputs_with_cell():
+    nb = YNotebook()
+    outputs = [{"name": "stdout", "output_type": "stream", "text": "x"}]
+    cell = make_code_cell("print('x')\n", id="cell-with-small-output")
+    cell["outputs"] = outputs
+    snapshots = []
+
+    def record_changes(topic, event):
+        if topic == "cells":
+            snapshots.append(nb.ycells.to_py())
+
+    nb.observe(record_changes)
+    await nb.aset(
+        {"cells": [cell]},
+        progressive=True,
+        delay_outputs_above_mb=100,
+    )
+
+    assert len(snapshots) == 1
+    assert snapshots[0][0]["outputs"] == outputs
+
+
+async def test_aset_progressive_restores_delayed_outputs_after_hard_reload():
+    nb = YNotebook()
+    await nb.aset(
+        {
+            "cells": [
+                {
+                    "id": "cell-to-reload",
+                    "cell_type": "markdown",
+                    "source": "old",
+                    "metadata": {},
+                }
+            ]
+        }
+    )
+
+    outputs = [{"name": "stdout", "output_type": "stream", "text": "x" * 1024}]
+    cell = make_code_cell("print('x')\n", id="cell-to-reload")
+    cell["outputs"] = outputs
+
+    await nb.aset(
+        {"cells": [cell]},
+        progressive=True,
+        delay_outputs_above_mb=0,
+    )
+
+    model = await nb.aget()
+    assert model["cells"][0]["cell_type"] == "code"
+    assert model["cells"][0]["outputs"] == outputs
+
+
+async def test_aset_progressive_hard_reload_does_not_emit_partial_cell_update():
+    nb = YNotebook()
+    await nb.aset(
+        {
+            "cells": [
+                make_code_cell("print('keep')\n", id="keep-cell"),
+                {
+                    "id": "cell-to-reload",
+                    "cell_type": "markdown",
+                    "source": "old",
+                    "metadata": {},
+                },
+            ]
+        }
+    )
+    model = await nb.aget()
+    model["cells"][1] = make_code_cell("print('new')\n", id="cell-to-reload")
+    cell_events = []
+
+    def record_changes(topic, event):
+        if topic == "cells":
+            cell_events.extend(event)
+
+    nb.observe(record_changes)
+    await nb.aset(model, progressive=True)
+
+    assert all(event.path == [] for event in cell_events)
+    assert cell_events[0].delta == [{"retain": 1}, {"delete": 1}]
+    assert cell_events[1].delta == [{"retain": 1}, {"insert": [AnyInstanceOf(Map)]}]
+
+
+async def test_aset_non_progressive_does_not_delay_outputs():
+    nb = YNotebook()
+    outputs = [{"name": "stdout", "output_type": "stream", "text": "x" * 1024}]
+    cell = make_code_cell("print('x')\n", id="cell-with-output")
+    cell["outputs"] = outputs
+    snapshots = []
+
+    def record_changes(topic, event):
+        if topic == "cells":
+            snapshots.append(nb.ycells.to_py())
+
+    nb.observe(record_changes)
+    await nb.aset(
+        {"cells": [cell]},
+        progressive=False,
+        delay_outputs_above_mb=0,
+    )
+
+    assert len(snapshots) == 1
+    assert snapshots[0][0]["outputs"] == outputs
+
+
+async def test_aset_rejects_negative_delay_outputs_threshold():
+    nb = YNotebook()
+    with pytest.raises(ValueError, match="delay_outputs_above_mb"):
+        await nb.aset(
+            {"cells": [make_code_cell("print('x')\n")]},
+            progressive=True,
+            delay_outputs_above_mb=-1,
+        )
+
+
+def test_outputs_should_be_delayed_uses_configured_mb_threshold():
+    nb = YNotebook()
+    outputs = [{"name": "stdout", "output_type": "stream", "text": "x"}]
+    output_size = len(
+        json.dumps(
+            outputs,
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    )
+
+    assert not nb._outputs_should_be_delayed(outputs, output_size / 1024 / 1024)
+    assert nb._outputs_should_be_delayed(outputs, (output_size - 1) / 1024 / 1024)
 
 
 @mark.parametrize(
