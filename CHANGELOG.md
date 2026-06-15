@@ -2,6 +2,43 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 4.0.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/0954b475ced864d22d983dc1f7eb586df408d962...33d5f7d166d195e80fcc890c9e85bfed352624f5))
+
+### API and Breaking Changes
+
+- Set dirty state on document change [#406](https://github.com/jupyter-server/jupyter_ydoc/pull/406) ([@davidbrochart](https://github.com/davidbrochart), [@SylvainCorlay](https://github.com/SylvainCorlay), [@brichet](https://github.com/brichet), [@jtpio](https://github.com/jtpio), [@krassowski](https://github.com/krassowski), [@trungleduc](https://github.com/trungleduc))
+
+### Enhancements made
+
+- Remove dirty argument in methods: follow up #406 [#415](https://github.com/jupyter-server/jupyter_ydoc/pull/415) ([@brichet](https://github.com/brichet), [@davidbrochart](https://github.com/davidbrochart))
+
+### Bugs fixed
+
+- Add dirty parameter to fromJSON API [#413](https://github.com/jupyter-server/jupyter_ydoc/pull/413) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+- Bump pycrdt v0.14.0 [#420](https://github.com/jupyter-server/jupyter_ydoc/pull/420) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump pycrdt v0.13.0 [#412](https://github.com/jupyter-server/jupyter_ydoc/pull/412) ([@davidbrochart](https://github.com/davidbrochart), [@krassowski](https://github.com/krassowski))
+
+### Other merged PRs
+
+- Bump toshimaru/auto-author-assign from 3.0.2 to 3.0.3 [#421](https://github.com/jupyter-server/jupyter_ydoc/pull/421) ([@davidbrochart](https://github.com/davidbrochart))
+- Bump toshimaru/auto-author-assign from 3.0.1 to 3.0.2 [#411](https://github.com/jupyter-server/jupyter_ydoc/pull/411) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-04-20&to=2026-06-15&type=c))
+
+@brichet ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2026-04-20..2026-06-15&type=Issues)) | @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-04-20..2026-06-15&type=Issues)) | @jtpio ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2026-04-20..2026-06-15&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-04-20..2026-06-15&type=Issues)) | @SylvainCorlay ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3ASylvainCorlay+updated%3A2026-04-20..2026-06-15&type=Issues)) | @trungleduc ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Atrungleduc+updated%3A2026-04-20..2026-06-15&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 4.0.0b1
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@4.0.0-b0...86f5b5bb34e3607a3fd8d8502f81564ca18be190))
@@ -18,8 +55,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-05-28&to=2026-06-11&type=c))
 
 @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-05-28..2026-06-11&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 4.0.0b0
 
