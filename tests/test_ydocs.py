@@ -1,9 +1,37 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+from typing import Any
+
+import pytest
 from pycrdt import Awareness, Doc
 
 from jupyter_ydoc import YBlob, YNotebook
+from jupyter_ydoc.ybasedoc import YBaseDoc
+
+
+class SimpleYDoc(YBaseDoc):
+    def __init__(self):
+        super().__init__()
+        self.aset_values = []
+        self.value = None
+
+    @property
+    def version(self):
+        return "1.0.0"
+
+    def get(self):
+        return self.value
+
+    def set(self, value: Any) -> None:
+        self.value = value
+
+    async def aset(self, value: Any) -> None:
+        self.aset_values.append(value)
+        await super().aset(value)
+
+    def observe(self, callback):
+        pass
 
 
 def test_yblob():
@@ -23,6 +51,17 @@ def test_yblob():
     assert topic == "source"
     assert event.keys["bytes"]["oldValue"] == b"012"
     assert event.keys["bytes"]["newValue"] == b"345"
+
+
+@pytest.mark.anyio
+async def test_ybasedoc_aset_progressively_falls_back_to_aset_and_ignores_kwargs():
+    doc = SimpleYDoc()
+    value = {"cells": []}
+
+    await doc.aset_progressively(value, delay_outputs_above_mb=0)
+
+    assert doc.aset_values == [value]
+    assert doc.get() == value
 
 
 def test_ynotebook_undo_manager():

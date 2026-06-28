@@ -490,21 +490,28 @@ class YNotebook(YBaseDoc):
         assert val is not None
         return val
 
-    async def aset(
-        self,
-        value: dict,
-        progressive: bool = False,
-        delay_outputs_above_mb: float | None = None,
-    ) -> None:
+    async def aset(self, value: dict) -> None:
         """
         Sets the content of the document, yielding to the event loop often enough
         to not block it for too long.
 
         :param value: The content of the document.
         :type value: Dict
-        :param progressive: Whether to progressively update the notebook in
-                            multiple transactions.
-        :type progressive: bool
+        """
+        with self._ydoc.transaction():
+            for _ in self._set(value):
+                await lowlevel.checkpoint()
+
+    async def aset_progressively(
+        self,
+        value: dict,
+        delay_outputs_above_mb: float | None = None,
+    ) -> None:
+        """
+        Sets notebook content progressively in multiple transactions.
+
+        :param value: The content of the notebook.
+        :type value: Dict
         :param delay_outputs_above_mb: Size in MB above which code cell outputs
                                        should be delayed during progressive loading.
         :type delay_outputs_above_mb: float, optional
@@ -513,22 +520,17 @@ class YNotebook(YBaseDoc):
             msg = "delay_outputs_above_mb must be greater than or equal to 0"
             raise ValueError(msg)
 
-        if progressive:
-            gen = self._set(value, delay_outputs_above_mb)
-            while True:
-                done = False
-                async with self._ydoc.transaction():
-                    try:
-                        next(gen)
-                    except StopIteration:
-                        done = True
-                await lowlevel.checkpoint()
-                if done:
-                    break
-        else:
-            with self._ydoc.transaction():
-                for _ in self._set(value):
-                    await lowlevel.checkpoint()
+        gen = self._set(value, delay_outputs_above_mb)
+        while True:
+            done = False
+            async with self._ydoc.transaction():
+                try:
+                    next(gen)
+                except StopIteration:
+                    done = True
+            await lowlevel.checkpoint()
+            if done:
+                break
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """

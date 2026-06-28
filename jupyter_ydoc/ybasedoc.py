@@ -202,6 +202,15 @@ class YBaseDoc(ABC):
         await lowlevel.checkpoint()
         self.set(value)
 
+    async def aset_progressively(self, value: Any, **kwargs: Any) -> None:
+        """
+        Sets the content of the document progressively, if supported by the document.
+
+        The default implementation falls back to `aset`, so document types without
+        custom progressive behavior still support the generic API.
+        """
+        await self.aset(value)
+
     @abstractmethod
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
