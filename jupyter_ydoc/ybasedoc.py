@@ -202,7 +202,7 @@ class YBaseDoc(ABC):
         await lowlevel.checkpoint()
         self.set(value)
 
-    async def aset_progressively(self, value: Any, **kwargs: Any) -> None:
+    async def aset_progressively(self, value: Any) -> None:
         """
         Sets the content of the document progressively, if supported by the document.
 
