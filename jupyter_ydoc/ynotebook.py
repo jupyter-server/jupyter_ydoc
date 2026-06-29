@@ -9,7 +9,7 @@ from functools import partial
 from typing import Any
 from uuid import uuid4
 
-from anyio import lowlevel
+from anyio import Event, lowlevel
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
@@ -327,36 +327,12 @@ class YNotebook(YBaseDoc):
             for _ in self._set(value):
                 pass
 
-    def _set(self, value: dict, delay_outputs_above_mb: float | None = None) -> Iterator[None]:
+    def _set(self, value: dict, delay_outputs_above_mb: float | None = None) -> Iterator[bool]:
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
 
         meta = self._ymeta.to_py()
-
-        new_cells = value["cells"] or [
-            {
-                "cell_type": "code",
-                "execution_count": None,
-                # auto-created empty code cell without outputs ought be trusted
-                "metadata": {"trusted": True},
-                "outputs": [],
-                "source": "",
-                "id": str(uuid4()),
-            }
-        ]
-        # Build dict of old cells by ID, keeping only the first occurrence of each ID
-        # to handle the case where the stored doc already has duplicate IDs.
-        old_ycells_by_id: dict[str, Map] = {}
-        for ycell in self._ycells:
-            yield
-            cell_id = ycell.get("id")
-            if cell_id is not None and cell_id not in old_ycells_by_id:
-                old_ycells_by_id[cell_id] = ycell
-
-        for key in [k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")]:
-            del self._ystate[key]
-
         nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
         nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
 
@@ -374,13 +350,38 @@ class YNotebook(YBaseDoc):
             metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
             self._ymeta["metadata"] = Map(metadata)
 
+        yield True  # notify that the notebook is initialized
+
+        new_cells = value["cells"] or [
+            {
+                "cell_type": "code",
+                "execution_count": None,
+                # auto-created empty code cell without outputs ought be trusted
+                "metadata": {"trusted": True},
+                "outputs": [],
+                "source": "",
+                "id": str(uuid4()),
+            }
+        ]
+        # Build dict of old cells by ID, keeping only the first occurrence of each ID
+        # to handle the case where the stored doc already has duplicate IDs.
+        old_ycells_by_id: dict[str, Map] = {}
+        for ycell in self._ycells:
+            yield False
+            cell_id = ycell.get("id")
+            if cell_id is not None and cell_id not in old_ycells_by_id:
+                old_ycells_by_id[cell_id] = ycell
+
+        for key in [k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")]:
+            del self._ystate[key]
+
         new_cell_list: list[dict] = []
         delayed_outputs: list[list[dict[str, Any]] | None] = []
         retained_cells = set()
 
         # Determine cells to be retained
         for new_cell in new_cells:
-            yield
+            yield False
             cell_id = new_cell.get("id")
             if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
                 old_cell = self._cell_to_py(old_ycell, meta)
@@ -417,7 +418,7 @@ class YNotebook(YBaseDoc):
             index = 0
             seen: set[str] = set()
             while True:
-                yield
+                yield False
                 if index == len(self._ycells):
                     break
                 old_ycell = self._ycells[index]
@@ -430,7 +431,7 @@ class YNotebook(YBaseDoc):
 
         # Now reorder/insert cells to match new_cell_list
         for index, new_cell in enumerate(new_cell_list):
-            yield
+            yield False
             new_id = new_cell.get("id")
 
             # Fast path: correct cell already at this position
@@ -441,7 +442,7 @@ class YNotebook(YBaseDoc):
             if new_id is not None and new_id in retained_cells:
                 # Linear scan to find the cell (O(n) per retained cell)
                 for cur in range(index + 1, len(self._ycells)):
-                    yield
+                    yield False
                     if self._ycells[cur].get("id") == new_id:
                         # Use delete+recreate instead of move() for yjs 13.x compatibility
                         # (yjs 13.x doesn't support the move operation that pycrdt generates)
@@ -459,7 +460,7 @@ class YNotebook(YBaseDoc):
         for index, outputs in enumerate(delayed_outputs):
             if outputs is None:
                 continue
-            yield
+            yield False
             self._set_ycell_outputs(self._ycells[index], outputs)
 
     def _without_delayed_outputs(
@@ -505,6 +506,7 @@ class YNotebook(YBaseDoc):
     async def aset_progressively(
         self,
         value: dict,
+        initialized: Event | None = None,
         delay_outputs_above_mb: float | None = None,
     ) -> None:
         """
@@ -515,6 +517,8 @@ class YNotebook(YBaseDoc):
         :param delay_outputs_above_mb: Size in MB above which code cell outputs
                                        should be delayed during progressive loading.
         :type delay_outputs_above_mb: float, optional
+        :param initialized: An optional event to set when the notebook metada has been set.
+        :type value: anyio.Event
         """
         if delay_outputs_above_mb is not None and delay_outputs_above_mb < 0:
             msg = "delay_outputs_above_mb must be greater than or equal to 0"
@@ -525,7 +529,8 @@ class YNotebook(YBaseDoc):
             done = False
             async with self._ydoc.transaction():
                 try:
-                    next(gen)
+                    if next(gen) and initialized is not None:
+                        initialized.set()
                 except StopIteration:
                     done = True
             await lowlevel.checkpoint()
