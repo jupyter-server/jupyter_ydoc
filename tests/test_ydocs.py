@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import re
 from typing import Any
 
 import pytest
@@ -54,11 +55,20 @@ def test_yblob():
 
 
 @pytest.mark.anyio
-async def test_ybasedoc_aset_progressively_falls_back_to_aset_and_ignores_kwargs():
+async def test_ybasedoc_aset_progressively_falls_back_to_aset():
     doc = SimpleYDoc()
     value = {"cells": []}
 
-    await doc.aset_progressively(value, delay_outputs_above_mb=0)
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "YBaseDoc.aset_progressively() got an unexpected keyword argument "
+            "'delay_outputs_above_mb'"
+        ),
+    ):
+        await doc.aset_progressively(value, delay_outputs_above_mb=0)
+
+    await doc.aset_progressively(value)
 
     assert doc.aset_values == [value]
     assert doc.get() == value
