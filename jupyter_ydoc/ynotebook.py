@@ -1,6 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 import copy
 import json
 import warnings
@@ -9,7 +10,7 @@ from functools import partial
 from typing import Any
 from uuid import uuid4
 
-from anyio import Event, lowlevel
+import anyio
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
@@ -486,7 +487,7 @@ class YNotebook(YBaseDoc):
         :rtype: Dict
         """
         for val in self._get(deduplicate):
-            await lowlevel.checkpoint()
+            await anyio.lowlevel.checkpoint()
 
         assert val is not None
         return val
@@ -501,12 +502,12 @@ class YNotebook(YBaseDoc):
         """
         with self._ydoc.transaction():
             for _ in self._set(value):
-                await lowlevel.checkpoint()
+                await anyio.lowlevel.checkpoint()
 
     async def aset_progressively(
         self,
         value: dict,
-        initialized: Event | None = None,
+        initialized: anyio.Event | asyncio.Event | None = None,
         delay_outputs_above_mb: float | None = None,
     ) -> None:
         """
@@ -518,7 +519,7 @@ class YNotebook(YBaseDoc):
                                        should be delayed during progressive loading.
         :type delay_outputs_above_mb: float, optional
         :param initialized: An optional event to set when the notebook metada has been set.
-        :type value: anyio.Event
+        :type value: Event
         """
         if delay_outputs_above_mb is not None and delay_outputs_above_mb < 0:
             msg = "delay_outputs_above_mb must be greater than or equal to 0"
@@ -533,7 +534,7 @@ class YNotebook(YBaseDoc):
                         initialized.set()
                 except StopIteration:
                     done = True
-            await lowlevel.checkpoint()
+            await anyio.lowlevel.checkpoint()
             if done:
                 break
 
