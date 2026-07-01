@@ -2,6 +2,31 @@
 
 <!-- <START NEW CHANGELOG ENTRY> -->
 
+## 4.1.0
+
+([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/@jupyter/ydoc@4.0.0...17c0976471a8bafc612e1398d3ee92ab4cb78bbc))
+
+### Enhancements made
+
+- Stream notebook loading with delayed large outputs [#418](https://github.com/jupyter-server/jupyter_ydoc/pull/418) ([@MUFFANUJ](https://github.com/MUFFANUJ), [@davidbrochart](https://github.com/davidbrochart))
+
+### Maintenance and upkeep improvements
+
+### Other merged PRs
+
+- Bump actions/checkout from 6 to 7 [#423](https://github.com/jupyter-server/jupyter_ydoc/pull/423) ([@davidbrochart](https://github.com/davidbrochart))
+
+### Contributors to this release
+
+The following people contributed discussions, new ideas, code and documentation contributions, and review.
+See [our definition of contributors](https://github-activity.readthedocs.io/en/latest/use/#how-does-this-tool-define-contributions-in-the-reports).
+
+([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-06-15&to=2026-07-01&type=c))
+
+@davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-06-15..2026-07-01&type=Issues)) | @MUFFANUJ ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3AMUFFANUJ+updated%3A2026-06-15..2026-07-01&type=Issues))
+
+<!-- <END NEW CHANGELOG ENTRY> -->
+
 ## 4.0.0
 
 ([Full Changelog](https://github.com/jupyter-server/jupyter_ydoc/compare/0954b475ced864d22d983dc1f7eb586df408d962...33d5f7d166d195e80fcc890c9e85bfed352624f5))
@@ -36,8 +61,6 @@ See [our definition of contributors](https://github-activity.readthedocs.io/en/l
 ([GitHub contributors page for this release](https://github.com/jupyter-server/jupyter_ydoc/graphs/contributors?from=2026-04-20&to=2026-06-15&type=c))
 
 @brichet ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Abrichet+updated%3A2026-04-20..2026-06-15&type=Issues)) | @davidbrochart ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Adavidbrochart+updated%3A2026-04-20..2026-06-15&type=Issues)) | @jtpio ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Ajtpio+updated%3A2026-04-20..2026-06-15&type=Issues)) | @krassowski ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Akrassowski+updated%3A2026-04-20..2026-06-15&type=Issues)) | @SylvainCorlay ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3ASylvainCorlay+updated%3A2026-04-20..2026-06-15&type=Issues)) | @trungleduc ([activity](https://github.com/search?q=repo%3Ajupyter-server%2Fjupyter_ydoc+involves%3Atrungleduc+updated%3A2026-04-20..2026-06-15&type=Issues))
-
-<!-- <END NEW CHANGELOG ENTRY> -->
 
 ## 4.0.0b1
 
