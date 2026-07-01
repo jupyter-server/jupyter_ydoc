@@ -1,11 +1,12 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from typing import Any
 
-from anyio import lowlevel
+import anyio
 from pycrdt import Awareness, Doc, Map, Subscription, UndoManager
 
 
@@ -188,7 +189,7 @@ class YBaseDoc(ABC):
         :return: Document's content.
         :rtype: Any
         """
-        await lowlevel.checkpoint()
+        await anyio.lowlevel.checkpoint()
         return self.get()
 
     async def aset(self, value: Any) -> None:
@@ -199,8 +200,23 @@ class YBaseDoc(ABC):
         :param value: The content of the document.
         :type value: Any
         """
-        await lowlevel.checkpoint()
+        await anyio.lowlevel.checkpoint()
         self.set(value)
+
+    async def aset_progressively(
+        self,
+        value: Any,
+        initialized: anyio.Event | asyncio.Event | None = None,
+    ) -> None:
+        """
+        Sets the content of the document progressively, if supported by the document.
+
+        The default implementation falls back to `aset`, so document types without
+        custom progressive behavior still support the generic API.
+        """
+        await self.aset(value)
+        if initialized is not None:
+            initialized.set()
 
     @abstractmethod
     def observe(self, callback: Callable[[str, Any], None]) -> None:

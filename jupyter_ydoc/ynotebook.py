@@ -1,14 +1,16 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
+import asyncio
 import copy
+import json
 import warnings
 from collections.abc import Callable, Iterator
 from functools import partial
 from typing import Any
 from uuid import uuid4
 
-from anyio import lowlevel
+import anyio
 from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
@@ -178,19 +180,51 @@ class YNotebook(YBaseDoc):
                 del cell["attachments"]
         elif cell_type == "code":
             outputs = cell.get("outputs", [])
-            for idx, output in enumerate(outputs):
-                if output.get("output_type") == "stream":
-                    text = output.get("text", "")
-                    if isinstance(text, str):
-                        ytext = Text(text)
-                    else:
-                        ytext = Text("".join(text))
-                    output["text"] = ytext
-                outputs[idx] = Map(output)
-            cell["outputs"] = Array(outputs)
+            cell["outputs"] = Array(self._create_youtputs(outputs, copy_outputs=False))
             cell["execution_state"] = "idle"
 
         return Map(cell)
+
+    def _create_youtputs(
+        self, outputs: list[dict[str, Any]], copy_outputs: bool = True
+    ) -> list[Map]:
+        if copy_outputs:
+            outputs = copy.deepcopy(outputs)
+        youtputs = []
+        for output in outputs:
+            if output.get("output_type") == "stream":
+                text = output.get("text", "")
+                if isinstance(text, str):
+                    ytext = Text(text)
+                else:
+                    ytext = Text("".join(text))
+                output["text"] = ytext
+            youtputs.append(Map(output))
+        return youtputs
+
+    def _set_ycell_outputs(self, ycell: Map, outputs: list[dict[str, Any]]) -> None:
+        if not isinstance(ycell.get("outputs"), Array):
+            ycell["outputs"] = Array()
+        youtputs: Array = ycell["outputs"]
+        youtputs.clear()
+        youtputs.extend(self._create_youtputs(outputs))
+
+    def _outputs_should_be_delayed(
+        self, outputs: list[dict[str, Any]], delay_outputs_above_mb: float | None
+    ) -> bool:
+        if delay_outputs_above_mb is None or not outputs:
+            return False
+
+        max_size = delay_outputs_above_mb * 1024 * 1024
+        output_size = 0
+        for chunk in json.JSONEncoder(
+            ensure_ascii=False,
+            separators=(",", ":"),
+        ).iterencode(outputs):
+            output_size += len(chunk.encode("utf-8"))
+            if output_size > max_size:
+                return True
+        return False
 
     def set_ycell(self, index: int, ycell: Map) -> None:
         """
@@ -290,15 +324,34 @@ class YNotebook(YBaseDoc):
         # runs it until completion and the latter inserts async checkpoints
         # in order to not block the event loop for too long for notebooks
         # with a lot of cells.
-        for _ in self._set(value):
-            pass
+        with self._ydoc.transaction():
+            for _ in self._set(value):
+                pass
 
-    def _set(self, value: dict) -> Iterator[None]:
+    def _set(self, value: dict, delay_outputs_above_mb: float | None = None) -> Iterator[bool]:
         nb_without_cells = {key: value[key] for key in value.keys() if key != "cells"}
         nb = copy.deepcopy(nb_without_cells)
         cast_all(nb, int, float)  # Yjs expects numbers to be floating numbers
 
         meta = self._ymeta.to_py()
+        nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
+        nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
+
+        if meta.get("nbformat") != nbformat_major:
+            self._ymeta["nbformat"] = nbformat_major
+
+        if meta.get("nbformat_minor") != nbformat_minor:
+            self._ymeta["nbformat_minor"] = nbformat_minor
+
+        old_metadata = meta.get("metadata")
+        metadata = nb.get("metadata", {})
+
+        if metadata != old_metadata:
+            metadata.setdefault("language_info", {"name": ""})
+            metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
+            self._ymeta["metadata"] = Map(metadata)
+
+        yield True  # notify that the notebook is initialized
 
         new_cells = value["cells"] or [
             {
@@ -315,100 +368,113 @@ class YNotebook(YBaseDoc):
         # to handle the case where the stored doc already has duplicate IDs.
         old_ycells_by_id: dict[str, Map] = {}
         for ycell in self._ycells:
-            yield
+            yield False
             cell_id = ycell.get("id")
             if cell_id is not None and cell_id not in old_ycells_by_id:
                 old_ycells_by_id[cell_id] = ycell
 
-        with self._ydoc.transaction():
-            new_cell_list: list[dict] = []
-            retained_cells = set()
+        for key in [k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")]:
+            del self._ystate[key]
 
-            # Determine cells to be retained
-            for new_cell in new_cells:
-                yield
-                cell_id = new_cell.get("id")
-                if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
-                    old_cell = self._cell_to_py(old_ycell, meta)
-                    updated_granularly = self._update_cell(
-                        old_cell=old_cell, new_cell=new_cell, old_ycell=old_ycell
-                    )
+        new_cell_list: list[dict] = []
+        delayed_outputs: list[list[dict[str, Any]] | None] = []
+        retained_cells = set()
 
-                    if updated_granularly:
-                        new_cell_list.append(new_cell)
-                        retained_cells.add(cell_id)
-                        continue
-                # New or changed cell
-                new_cell_list.append(new_cell)
+        # Determine cells to be retained
+        for new_cell in new_cells:
+            yield False
+            cell_id = new_cell.get("id")
+            if cell_id and (old_ycell := old_ycells_by_id.get(cell_id)):
+                old_cell = self._cell_to_py(old_ycell, meta)
+                if old_cell == new_cell:
+                    new_cell_list.append(new_cell)
+                    delayed_outputs.append(None)
+                    retained_cells.add(cell_id)
+                    continue
+                prepared_cell, outputs = self._without_delayed_outputs(
+                    new_cell, delay_outputs_above_mb
+                )
+                updated_granularly = self._update_cell(
+                    old_cell=old_cell, new_cell=prepared_cell, old_ycell=old_ycell
+                )
 
-            # First delete all non-retained cells and duplicates
-            if not retained_cells:
-                # fast path if no cells were retained
-                self._ycells.clear()
-            else:
-                index = 0
-                seen: set[str] = set()
-                while True:
-                    yield
-                    if index == len(self._ycells):
+                if updated_granularly:
+                    new_cell_list.append(prepared_cell)
+                    delayed_outputs.append(outputs)
+                    retained_cells.add(cell_id)
+                    continue
+                new_cell_list.append(prepared_cell)
+                delayed_outputs.append(outputs)
+                continue
+            # New cell
+            new_cell, outputs = self._without_delayed_outputs(new_cell, delay_outputs_above_mb)
+            new_cell_list.append(new_cell)
+            delayed_outputs.append(outputs)
+
+        # First delete all non-retained cells and duplicates
+        if not retained_cells:
+            # fast path if no cells were retained
+            self._ycells.clear()
+        else:
+            index = 0
+            seen: set[str] = set()
+            while True:
+                yield False
+                if index == len(self._ycells):
+                    break
+                old_ycell = self._ycells[index]
+                cell_id = old_ycell.get("id")
+                if cell_id is None or cell_id not in retained_cells or cell_id in seen:
+                    self._ycells.pop(index)
+                else:
+                    seen.add(cell_id)
+                    index += 1
+
+        # Now reorder/insert cells to match new_cell_list
+        for index, new_cell in enumerate(new_cell_list):
+            yield False
+            new_id = new_cell.get("id")
+
+            # Fast path: correct cell already at this position
+            if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
+                continue
+
+            # Retained cell: find and move it into position
+            if new_id is not None and new_id in retained_cells:
+                # Linear scan to find the cell (O(n) per retained cell)
+                for cur in range(index + 1, len(self._ycells)):
+                    yield False
+                    if self._ycells[cur].get("id") == new_id:
+                        # Use delete+recreate instead of move() for yjs 13.x compatibility
+                        # (yjs 13.x doesn't support the move operation that pycrdt generates)
+                        del self._ycells[cur]
+                        self._ycells.insert(index, self.create_ycell(new_cell))
                         break
-                    old_ycell = self._ycells[index]
-                    cell_id = old_ycell.get("id")
-                    if cell_id is None or cell_id not in retained_cells or cell_id in seen:
-                        self._ycells.pop(index)
-                    else:
-                        seen.add(cell_id)
-                        index += 1
+                continue
 
-            # Now reorder/insert cells to match new_cell_list
-            for index, new_cell in enumerate(new_cell_list):
-                yield
-                new_id = new_cell.get("id")
+            # New cell: insert at position
+            self._ycells.insert(index, self.create_ycell(new_cell))
 
-                # Fast path: correct cell already at this position
-                if len(self._ycells) > index and self._ycells[index].get("id") == new_id:
-                    continue
+        # Remove any extra cells at the end
+        del self._ycells[len(new_cell_list) :]
 
-                # Retained cell: find and move it into position
-                if new_id is not None and new_id in retained_cells:
-                    # Linear scan to find the cell (O(n) per retained cell)
-                    for cur in range(index + 1, len(self._ycells)):
-                        yield
-                        if self._ycells[cur].get("id") == new_id:
-                            # Use delete+recreate instead of move() for yjs 13.x compatibility
-                            # (yjs 13.x doesn't support the move operation that pycrdt generates)
-                            del self._ycells[cur]
-                            self._ycells.insert(index, self.create_ycell(new_cell))
-                            break
-                    continue
+        for index, outputs in enumerate(delayed_outputs):
+            if outputs is None:
+                continue
+            yield False
+            self._set_ycell_outputs(self._ycells[index], outputs)
 
-                # New cell: insert at position
-                self._ycells.insert(index, self.create_ycell(new_cell))
-
-            # Remove any extra cells at the end
-            del self._ycells[len(new_cell_list) :]
-
-            for key in [
-                k for k in self._ystate.keys() if k not in ("dirty", "path", "document_id")
-            ]:
-                del self._ystate[key]
-
-            nbformat_major = nb.get("nbformat", NBFORMAT_MAJOR_VERSION)
-            nbformat_minor = nb.get("nbformat_minor", NBFORMAT_MINOR_VERSION)
-
-            if meta.get("nbformat") != nbformat_major:
-                self._ymeta["nbformat"] = nbformat_major
-
-            if meta.get("nbformat_minor") != nbformat_minor:
-                self._ymeta["nbformat_minor"] = nbformat_minor
-
-            old_metadata = meta.get("metadata")
-            metadata = nb.get("metadata", {})
-
-            if metadata != old_metadata:
-                metadata.setdefault("language_info", {"name": ""})
-                metadata.setdefault("kernelspec", {"name": "", "display_name": ""})
-                self._ymeta["metadata"] = Map(metadata)
+    def _without_delayed_outputs(
+        self, cell: dict, delay_outputs_above_mb: float | None
+    ) -> tuple[dict, list[dict[str, Any]] | None]:
+        outputs = cell.get("outputs", [])
+        if cell.get("cell_type") == "code" and self._outputs_should_be_delayed(
+            outputs, delay_outputs_above_mb
+        ):
+            first_pass_cell = copy.deepcopy(cell)
+            first_pass_cell["outputs"] = []
+            return first_pass_cell, outputs
+        return cell, None
 
     async def aget(self, deduplicate: bool = True) -> dict:
         """
@@ -421,7 +487,7 @@ class YNotebook(YBaseDoc):
         :rtype: Dict
         """
         for val in self._get(deduplicate):
-            await lowlevel.checkpoint()
+            await anyio.lowlevel.checkpoint()
 
         assert val is not None
         return val
@@ -434,8 +500,43 @@ class YNotebook(YBaseDoc):
         :param value: The content of the document.
         :type value: Dict
         """
-        for val in self._set(value):
-            await lowlevel.checkpoint()
+        with self._ydoc.transaction():
+            for _ in self._set(value):
+                await anyio.lowlevel.checkpoint()
+
+    async def aset_progressively(
+        self,
+        value: dict,
+        initialized: anyio.Event | asyncio.Event | None = None,
+        delay_outputs_above_mb: float | None = None,
+    ) -> None:
+        """
+        Sets notebook content progressively in multiple transactions.
+
+        :param value: The content of the notebook.
+        :type value: Dict
+        :param delay_outputs_above_mb: Size in MB above which code cell outputs
+                                       should be delayed during progressive loading.
+        :type delay_outputs_above_mb: float, optional
+        :param initialized: An optional event to set when the notebook metada has been set.
+        :type value: Event
+        """
+        if delay_outputs_above_mb is not None and delay_outputs_above_mb < 0:
+            msg = "delay_outputs_above_mb must be greater than or equal to 0"
+            raise ValueError(msg)
+
+        gen = self._set(value, delay_outputs_above_mb)
+        while True:
+            done = False
+            async with self._ydoc.transaction():
+                try:
+                    if next(gen) and initialized is not None:
+                        initialized.set()
+                except StopIteration:
+                    done = True
+            await anyio.lowlevel.checkpoint()
+            if done:
+                break
 
     def observe(self, callback: Callable[[str, Any], None]) -> None:
         """
@@ -474,12 +575,22 @@ class YNotebook(YBaseDoc):
                     return False
 
                 if key in _CELL_KEY_TYPE_MAP:
-                    kind = _CELL_KEY_TYPE_MAP[key]
-
-                    if not isinstance(old_ycell[key], kind):
+                    if not isinstance(old_ycell.get(key), _CELL_KEY_TYPE_MAP[key]):
                         # if our assumptions about types do not hold, fall back to hard update
                         return False
 
+        for key in added_keys:
+            if key in _CELL_KEY_TYPE_MAP:
+                # we hard-reload cells when keys that require nested types get added
+                # to allow the frontend to connect observers; this could be changed
+                # in the future, once frontends learn how to observe all changes
+                return False
+
+        for key in shared_keys:
+            if old_cell[key] != new_cell[key]:
+                value = new_cell[key]
+                if key in _CELL_KEY_TYPE_MAP:
+                    kind = _CELL_KEY_TYPE_MAP[key]
                     if kind == Text:
                         old_text: Text = old_ycell[key]
                         old_text.clear()
@@ -499,11 +610,5 @@ class YNotebook(YBaseDoc):
             del old_ycell[key]
 
         for key in added_keys:
-            if key in _CELL_KEY_TYPE_MAP:
-                # we hard-reload cells when keys that require nested types get added
-                # to allow the frontend to connect observers; this could be changed
-                # in the future, once frontends learn how to observe all changes
-                return False
-            else:
-                old_ycell[key] = new_cell[key]
+            old_ycell[key] = new_cell[key]
         return True
