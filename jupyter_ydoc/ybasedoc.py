@@ -207,6 +207,8 @@ class YBaseDoc(ABC):
         self,
         value: Any,
         initialized: anyio.Event | asyncio.Event | None = None,
+        finish: anyio.Event | asyncio.Event | None = None,
+        **kwargs: Any,
     ) -> None:
         """
         Sets the content of the document progressively, if supported by the document.
