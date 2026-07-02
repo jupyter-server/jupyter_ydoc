@@ -508,6 +508,7 @@ class YNotebook(YBaseDoc):
         self,
         value: dict,
         initialized: anyio.Event | asyncio.Event | None = None,
+        finish: anyio.Event | asyncio.Event | None = None,
         delay_outputs_above_mb: float | None = None,
     ) -> None:
         """
@@ -519,6 +520,8 @@ class YNotebook(YBaseDoc):
                                        should be delayed during progressive loading.
         :type delay_outputs_above_mb: float, optional
         :param initialized: An optional event to set when the notebook metada has been set.
+        :type value: Event
+        :param finish: An optional event set when to start setting the notebook cells.
         :type value: Event
         """
         if delay_outputs_above_mb is not None and delay_outputs_above_mb < 0:
@@ -532,9 +535,10 @@ class YNotebook(YBaseDoc):
                 try:
                     if next(gen) and initialized is not None:
                         initialized.set()
+                        if finish is not None:
+                            await finish.wait()
                 except StopIteration:
                     done = True
-            await anyio.lowlevel.checkpoint()
             if done:
                 break
 
