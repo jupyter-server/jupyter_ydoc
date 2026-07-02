@@ -510,6 +510,7 @@ class YNotebook(YBaseDoc):
         initialized: anyio.Event | asyncio.Event | None = None,
         finish: anyio.Event | asyncio.Event | None = None,
         delay_outputs_above_mb: float | None = None,
+        **kwargs: Any,
     ) -> None:
         """
         Sets notebook content progressively in multiple transactions.
@@ -539,6 +540,7 @@ class YNotebook(YBaseDoc):
                             await finish.wait()
                 except StopIteration:
                     done = True
+            await anyio.lowlevel.checkpoint()
             if done:
                 break
 
