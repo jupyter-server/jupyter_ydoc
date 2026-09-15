@@ -17,7 +17,7 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
-
+    console.log('Instanciate the ydoc in dev');
     this._ystate = this._ydoc.getMap('state');
 
     this._undoManager = new Y.UndoManager([], {
@@ -110,17 +110,41 @@ export abstract class YDocument<T extends DocumentChange>
   }
 
   /**
+   * Whether the document is read-only.
+   *
+   * When true, all local write operations via `transact` are no-ops.
+   */
+  get readOnly(): boolean {
+    return this._readOnly;
+  }
+
+  set readOnly(value: boolean) {
+    if (value === this._readOnly) {
+      return;
+    }
+    this._readOnly = value;
+    this._readOnlyChanged.emit(value);
+  }
+
+  /**
+   * A signal emitted when the read-only state changes.
+   */
+  get readOnlyChanged(): ISignal<this, boolean> {
+    return this._readOnlyChanged;
+  }
+
+  /**
    * Whether the object can undo changes.
    */
   canUndo(): boolean {
-    return this.undoManager.undoStack.length > 0;
+    return !this._readOnly && this.undoManager.undoStack.length > 0;
   }
 
   /**
    * Whether the object can redo changes.
    */
   canRedo(): boolean {
-    return this.undoManager.redoStack.length > 0;
+    return !this._readOnly && this.undoManager.redoStack.length > 0;
   }
 
   /**
@@ -199,6 +223,9 @@ export abstract class YDocument<T extends DocumentChange>
    * Undo an operation.
    */
   undo(): boolean {
+    if (this._readOnly) {
+      return false;
+    }
     const undone = !!this.undoManager.undo();
     if (undone) {
       this.dirty = true;
@@ -210,6 +237,9 @@ export abstract class YDocument<T extends DocumentChange>
    * Redo an operation.
    */
   redo(): boolean {
+    if (this._readOnly) {
+      return false;
+    }
     const redone = !!this.undoManager.redo();
     if (redone) {
       this.dirty = true;
@@ -227,8 +257,13 @@ export abstract class YDocument<T extends DocumentChange>
   /**
    * Perform a transaction. While the function f is called, all changes to the shared
    * document are bundled into a single event.
+   *
+   * When the document is read-only, the transaction is a no-op.
    */
   transact(f: () => void, undoable = true, origin: any = null): void {
+    if (this._readOnly) {
+      return;
+    }
     this.ydoc.transact(f, undoable ? this : origin);
   }
 
@@ -257,7 +292,9 @@ export abstract class YDocument<T extends DocumentChange>
   private _undoManager: Y.UndoManager;
   private _awareness: Awareness;
   private _isDisposed = false;
+  private _readOnly = false;
   private _disposed = new Signal<this, void>(this);
+  private _readOnlyChanged = new Signal<this, boolean>(this);
 }
 
 /**
