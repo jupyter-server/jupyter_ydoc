@@ -17,7 +17,6 @@ export abstract class YDocument<T extends DocumentChange>
 {
   constructor(options?: YDocument.IOptions) {
     this._ydoc = options?.ydoc ?? new Y.Doc();
-    console.log('Instanciate the ydoc in dev');
     this._ystate = this._ydoc.getMap('state');
 
     this._undoManager = new Y.UndoManager([], {

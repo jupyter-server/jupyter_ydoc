@@ -590,6 +590,108 @@ describe('@jupyter/ydoc', () => {
         });
       });
 
+      describe('#readOnly', () => {
+        test('should default to false', () => {
+          const notebook = YNotebook.create();
+          expect(notebook.readOnly).toBe(false);
+          notebook.dispose();
+        });
+
+        test('should emit readOnlyChanged when set to true', () => {
+          const notebook = YNotebook.create();
+          const changes: boolean[] = [];
+          notebook.readOnlyChanged.connect((_, v) => {
+            changes.push(v);
+          });
+          notebook.readOnly = true;
+
+          expect(changes).toEqual([true]);
+          notebook.dispose();
+        });
+
+        test('should not emit readOnlyChanged when set to same value', () => {
+          const notebook = YNotebook.create();
+          const changes: boolean[] = [];
+          notebook.readOnlyChanged.connect((_, v) => {
+            changes.push(v);
+          });
+          notebook.readOnly = false;
+
+          expect(changes).toHaveLength(0);
+          notebook.dispose();
+        });
+
+        test('should block cell additions when read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.readOnly = true;
+          notebook.addCell({ cell_type: 'code' });
+
+          expect(notebook.cells).toHaveLength(0);
+          notebook.dispose();
+        });
+
+        test('should block cell source changes when read-only', () => {
+          const notebook = YNotebook.create();
+          const cell = notebook.addCell({ cell_type: 'code' });
+          notebook.readOnly = true;
+          cell.setSource('blocked');
+
+          expect(cell.getSource()).toBe('');
+          notebook.dispose();
+        });
+
+        test('canUndo should return false when read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.readOnly = true;
+
+          expect(notebook.canUndo()).toBe(false);
+          notebook.dispose();
+        });
+
+        test('undo should return false when read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.readOnly = true;
+
+          expect(notebook.undo()).toBe(false);
+          expect(notebook.cells).toHaveLength(1);
+          notebook.dispose();
+        });
+
+        test('canRedo should return false when read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undo();
+          notebook.readOnly = true;
+
+          expect(notebook.canRedo()).toBe(false);
+          notebook.dispose();
+        });
+
+        test('redo should return false when read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.addCell({ cell_type: 'code' });
+          notebook.undo();
+          notebook.readOnly = true;
+
+          expect(notebook.redo()).toBe(false);
+          expect(notebook.cells).toHaveLength(0);
+          notebook.dispose();
+        });
+
+        test('should allow changes again after disabling read-only', () => {
+          const notebook = YNotebook.create();
+          notebook.readOnly = true;
+          notebook.addCell({ cell_type: 'code' });
+          notebook.readOnly = false;
+          notebook.addCell({ cell_type: 'code' });
+
+          expect(notebook.cells).toHaveLength(1);
+          notebook.dispose();
+        });
+      });
+
       describe('per cells', () => {
         test('should undo cell addition', () => {
           const notebook = YNotebook.create({
