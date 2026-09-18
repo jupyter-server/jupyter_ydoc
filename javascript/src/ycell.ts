@@ -406,7 +406,7 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Sets cell's source.
    *
-   * @param value: New source.
+   * @param value New source.
    */
   setSource(value: string): void {
     this.transact(() => {
@@ -421,11 +421,11 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   /**
    * Replace content from `start' to `end` with `value`.
    *
-   * @param start: The start index of the range to replace (inclusive).
+   * @param start The start index of the range to replace (inclusive).
    *
-   * @param end: The end index of the range to replace (exclusive).
+   * @param end The end index of the range to replace (exclusive).
    *
-   * @param value: New source (optional).
+   * @param value New source (optional).
    */
   updateSource(start: number, end: number, value = ''): void {
     this.transact(() => {
@@ -469,12 +469,17 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
-   * Returns all or a single metadata associated with the cell.
+   * Returns all metadata associated with the cell.
    *
-   * @param key The metadata key
    * @returns cell's metadata.
    */
   getMetadata(): Partial<Metadata>;
+  /**
+   * Returns a single metadata value.
+   *
+   * @param key The metadata key
+   * @returns The metadata value for the key.
+   */
   getMetadata(key: string): PartialJSONValue | undefined;
   getMetadata(key?: string): Partial<Metadata> | PartialJSONValue | undefined {
     const metadata = this._ymetadata;
@@ -495,15 +500,17 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   }
 
   /**
-   * Sets all or a single cell metadata.
+   * Overrides all cell metadata.
    *
-   * If only one argument is provided, it will override all cell metadata.
-   * Otherwise a single key will be set to a new value.
-   *
-   * @param metadata Cell's metadata key or cell's metadata.
-   * @param value Metadata value
+   * @param metadata Cell's metadata.
    */
   setMetadata(metadata: Partial<Metadata>): void;
+  /**
+   * Sets a single cell metadata key.
+   *
+   * @param metadata Cell's metadata key.
+   * @param value Metadata value
+   */
   setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: Partial<Metadata> | string,
@@ -881,11 +888,11 @@ export class YCodeCell
   /**
    * Replace content from `start' to `end` with `outputs`.
    *
-   * @param start: The start index of the range to replace (inclusive).
+   * @param start The start index of the range to replace (inclusive).
    *
-   * @param end: The end index of the range to replace (exclusive).
+   * @param end The end index of the range to replace (exclusive).
    *
-   * @param outputs: New outputs (optional).
+   * @param outputs New outputs (optional).
    */
   updateOutputs(
     start: number,
@@ -1013,7 +1020,7 @@ class YAttachmentCell
   /**
    * Sets the cell attachments
    *
-   * @param attachments: The cell attachments.
+   * @param attachments The cell attachments.
    */
   setAttachments(attachments: nbformat.IAttachments | undefined): void {
     this.transact(() => {
