@@ -87,8 +87,11 @@ def setup(app):
     dest_dir = Path(app.outdir) / "api"
 
     print("Building @jupyter/ydoc API docs")
-    cmd = ["yarn"] if shutil.which("yarn") is not None else ["npm"]
-    check_call(cmd + ["install"], cwd=str(js))
+    if shutil.which("yarn") is None:
+        check_call(["corepack", "enable"])
+    cmd = ["yarn"]
+    root = HERE.parent.parent
+    check_call(cmd + ["install"], cwd=str(root))
     check_call(cmd + ["run", "build"], cwd=str(js))
     check_call(cmd + ["run", "docs"], cwd=str(js))
 
