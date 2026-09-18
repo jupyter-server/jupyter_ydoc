@@ -87,13 +87,10 @@ def setup(app):
     dest_dir = Path(app.outdir) / "api"
 
     print("Building @jupyter/ydoc API docs")
-    if shutil.which("yarn") is None:
-        check_call(["corepack", "enable"])
-    cmd = ["yarn"]
     root = HERE.parent.parent
-    check_call(cmd + ["install"], cwd=str(root))
-    check_call(cmd + ["run", "build"], cwd=str(js))
-    check_call(cmd + ["run", "docs"], cwd=str(js))
+    check_call(["jlpm", "install"], cwd=str(root))
+    check_call(["jlpm", "run", "build"], cwd=str(js))
+    check_call(["jlpm", "run", "docs"], cwd=str(js))
 
     if dest_dir.exists():
         shutil.rmtree(dest_dir)
