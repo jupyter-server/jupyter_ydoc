@@ -168,7 +168,7 @@ export class YNotebook
   /**
    * Get a shared cell by index.
    *
-   * @param index: Cell's position.
+   * @param index Cell's position.
    *
    * @returns The requested shared cell.
    */
@@ -190,8 +190,8 @@ export class YNotebook
   /**
    * Insert a shared cell into a specific position.
    *
-   * @param index: Cell's position.
-   * @param cell: Cell to insert.
+   * @param index Cell's position.
+   * @param cell Cell to insert.
    *
    * @returns The inserted cell.
    */
@@ -205,8 +205,8 @@ export class YNotebook
   /**
    * Insert a list of shared cells into a specific position.
    *
-   * @param index: Position to insert the cells.
-   * @param cells: Array of shared cells to insert.
+   * @param index Position to insert the cells.
+   * @param cells Array of shared cells to insert.
    *
    * @returns The inserted cells.
    */
@@ -235,8 +235,8 @@ export class YNotebook
   /**
    * Move a cell.
    *
-   * @param fromIndex: Index of the cell to move.
-   * @param toIndex: New position of the cell.
+   * @param fromIndex Index of the cell to move.
+   * @param toIndex New position of the cell.
    */
   moveCell(fromIndex: number, toIndex: number): void {
     this.moveCells(fromIndex, toIndex);
@@ -245,9 +245,9 @@ export class YNotebook
   /**
    * Move cells.
    *
-   * @param fromIndex: Index of the first cells to move.
-   * @param toIndex: New position of the first cell (in the current array).
-   * @param n: Number of cells to move (default 1)
+   * @param fromIndex Index of the first cells to move.
+   * @param toIndex New position of the first cell (in the current array).
+   * @param n Number of cells to move (default 1)
    */
   moveCells(fromIndex: number, toIndex: number, n = 1): void {
     // FIXME we need to use yjs move feature to preserve undo history
@@ -268,7 +268,7 @@ export class YNotebook
   /**
    * Remove a cell.
    *
-   * @param index: Index of the cell to remove.
+   * @param index Index of the cell to remove.
    */
   deleteCell(index: number): void {
     this.deleteCellRange(index, index + 1);
@@ -277,8 +277,8 @@ export class YNotebook
   /**
    * Remove a range of cells.
    *
-   * @param from: The start index of the range to remove (inclusive).
-   * @param to: The end index of the range to remove (exclusive).
+   * @param from The start index of the range to remove (inclusive).
+   * @param to The end index of the range to remove (exclusive).
    */
   deleteCellRange(from: number, to: number): void {
     // Cells will be removed from the mapping in the model event listener.
@@ -304,15 +304,17 @@ export class YNotebook
   }
 
   /**
-   * Returns some metadata associated with the notebook.
+   * Returns all metadata associated with the notebook.
    *
-   * If no `key` is provided, it will return all metadata.
-   * Else it will return the value for that key.
-   *
-   * @param key Key to get from the metadata
    * @returns Notebook's metadata.
    */
   getMetadata(): nbformat.INotebookMetadata;
+  /**
+   * Returns a single metadata value.
+   *
+   * @param key Key to get from the metadata
+   * @returns The metadata value for the key.
+   */
   getMetadata(key: string): PartialJSONValue | undefined;
   getMetadata(
     key?: string
@@ -335,15 +337,17 @@ export class YNotebook
   }
 
   /**
-   * Sets some metadata associated with the notebook.
+   * Overrides all notebook metadata.
    *
-   * If only one argument is provided, it will override all notebook metadata.
-   * Otherwise a single key will be set to a new value.
-   *
-   * @param metadata All Notebook's metadata or the key to set.
-   * @param value New metadata value
+   * @param metadata All Notebook's metadata.
    */
   setMetadata(metadata: nbformat.INotebookMetadata): void;
+  /**
+   * Sets a single notebook metadata key.
+   *
+   * @param metadata The key to set.
+   * @param value New metadata value
+   */
   setMetadata(metadata: string, value: PartialJSONValue): void;
   setMetadata(
     metadata: nbformat.INotebookMetadata | string,
@@ -388,7 +392,7 @@ export class YNotebook
   /**
    * Updates the metadata associated with the notebook.
    *
-   * @param value: Metadata's attribute to update.
+   * @param value Metadata's attribute to update.
    */
   updateMetadata(value: Partial<nbformat.INotebookMetadata>): void {
     // TODO: Maybe modify only attributes instead of replacing the whole metadata?

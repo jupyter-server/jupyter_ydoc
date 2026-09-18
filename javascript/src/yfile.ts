@@ -90,9 +90,9 @@ export class YFile
   /**
    * Replace content from `start' to `end` with `value`.
    *
-   * @param start: The start index of the range to replace (inclusive).
-   * @param end: The end index of the range to replace (exclusive).
-   * @param value: New source (optional).
+   * @param start The start index of the range to replace (inclusive).
+   * @param end The end index of the range to replace (exclusive).
+   * @param value New source (optional).
    */
   updateSource(start: number, end: number, value = ''): void {
     this.transact(() => {

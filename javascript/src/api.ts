@@ -196,9 +196,9 @@ export interface ISharedText extends ISharedBase {
   /**
    * Replace content from `start` to `end` with `value`.
    *
-   * @param start: The start index of the range to replace (inclusive).
-   * @param end: The end index of the range to replace (exclusive).
-   * @param value: New source (optional).
+   * @param start The start index of the range to replace (inclusive).
+   * @param end The end index of the range to replace (exclusive).
+   * @param value New source (optional).
    */
   updateSource(start: number, end: number, value?: string): void;
 }
@@ -293,7 +293,7 @@ export interface ISharedNotebook extends ISharedDocument {
   /**
    * Updates the metadata associated with the notebook.
    *
-   * @param value: Metadata's attribute to update.
+   * @param value Metadata's attribute to update.
    */
   updateMetadata(value: Partial<nbformat.INotebookMetadata>): void;
 
@@ -309,7 +309,7 @@ export interface ISharedNotebook extends ISharedDocument {
   /**
    * Get a shared cell by index.
    *
-   * @param index: Cell's position.
+   * @param index Cell's position.
    *
    * @returns The requested shared cell.
    */
@@ -338,33 +338,33 @@ export interface ISharedNotebook extends ISharedDocument {
   /**
    * Move a cell.
    *
-   * @param fromIndex: Index of the cell to move.
-   * @param toIndex: New position of the cell.
+   * @param fromIndex Index of the cell to move.
+   * @param toIndex New position of the cell.
    */
   moveCell(fromIndex: number, toIndex: number): void;
 
   /**
    * Move cells.
    *
-   * @param fromIndex: Index of the first cells to move.
-   * @param toIndex: New position of the first cell (in the current array).
-   * @param n: Number of cells to move (default 1)
+   * @param fromIndex Index of the first cells to move.
+   * @param toIndex New position of the first cell (in the current array).
+   * @param n Number of cells to move (default 1)
    */
   moveCells(fromIndex: number, toIndex: number, n?: number): void;
 
   /**
    * Remove a cell.
    *
-   * @param index: Index of the cell to remove.
+   * @param index Index of the cell to remove.
    */
   deleteCell(index: number): void;
 
   /**
    * Remove a range of cells.
    *
-   * @param from: The start index of the range to remove (inclusive).
+   * @param from The start index of the range to remove (inclusive).
    *
-   * @param to: The end index of the range to remove (exclusive).
+   * @param to The end index of the range to remove (exclusive).
    */
   deleteCellRange(from: number, to: number): void;
 
@@ -587,11 +587,11 @@ export interface ISharedCodeCell
   /**
    * Replace content from `start' to `end` with `outputs`.
    *
-   * @param start: The start index of the range to replace (inclusive).
+   * @param start The start index of the range to replace (inclusive).
    *
-   * @param end: The end index of the range to replace (exclusive).
+   * @param end The end index of the range to replace (exclusive).
    *
-   * @param outputs: New outputs (optional).
+   * @param outputs New outputs (optional).
    */
   updateOutputs(
     start: number,
@@ -630,7 +630,7 @@ export interface ISharedAttachmentsCell
   /**
    * Sets the cell attachments
    *
-   * @param attachments: The cell attachments.
+   * @param attachments The cell attachments.
    */
   setAttachments(attachments: nbformat.IAttachments | undefined): void;
 }

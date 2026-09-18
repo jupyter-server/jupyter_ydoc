@@ -37,6 +37,7 @@ test = [
     "mypy",
 ]
 docs = [
+    "jupyter-builder",
     "sphinx",
     "myst-parser",
     "pydata-sphinx-theme"
