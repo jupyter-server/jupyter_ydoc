@@ -60,7 +60,7 @@
         "prettier": "^3.0.0",
         "rimraf": "^5.0.1",
         "tsc-esm-fix": "^2.20.0",
-        "typedoc": "^0.23.21",
+        "typedoc": "^0.28.0",
         "typescript": "~5.8.0"
     },
     "publishConfig": {
