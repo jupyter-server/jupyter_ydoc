@@ -84,6 +84,19 @@ export interface ISharedBase extends IObservableDisposable {
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
   transact(f: () => void, undoable?: boolean, origin?: any): void;
+
+  /**
+   * Whether the object is read-only.
+   *
+   * When true, all local write operations (via `transact`) are no-ops.
+   * Remote collaborative updates are unaffected.
+   */
+  readOnly: boolean;
+
+  /**
+   * A signal emitted when the read-only state changes.
+   */
+  readonly readOnlyChanged: ISignal<this, boolean>;
 }
 
 /**
