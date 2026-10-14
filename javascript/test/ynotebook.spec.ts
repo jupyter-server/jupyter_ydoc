@@ -591,6 +591,42 @@ describe('@jupyter/ydoc', () => {
       });
 
       describe('per cells', () => {
+        test('should not warn when inserting a cell', () => {
+          const warn = jest.spyOn(console, 'warn').mockImplementation();
+          const notebook = YNotebook.create({
+            disableDocumentWideUndoRedo: true
+          });
+
+          try {
+            notebook.insertCell(0, {
+              cell_type: 'code',
+              source: 'print("hello")',
+              metadata: {},
+              outputs: [],
+              execution_count: null
+            });
+
+            expect(warn).not.toHaveBeenCalled();
+          } finally {
+            warn.mockRestore();
+            notebook.dispose();
+          }
+        });
+
+        test('should create cell undo manager after inserting a cell', () => {
+          const notebook = YNotebook.create({
+            disableDocumentWideUndoRedo: true
+          });
+
+          try {
+            const cell = notebook.addCell({ cell_type: 'code' });
+
+            expect(cell.undoManager).not.toBeNull();
+          } finally {
+            notebook.dispose();
+          }
+        });
+
         test('should undo cell addition', () => {
           const notebook = YNotebook.create({
             disableDocumentWideUndoRedo: true
