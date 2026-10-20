@@ -138,4 +138,121 @@ describe('@jupyter/ydoc', () => {
       });
     });
   });
+
+  describe('#readOnly', () => {
+    test('should default to false', () => {
+      const file = new YFile();
+      expect(file.readOnly).toBe(false);
+      file.dispose();
+    });
+
+    test('should emit readOnlyChanged when set to true', () => {
+      const file = new YFile();
+      const changes: boolean[] = [];
+      file.readOnlyChanged.connect((_, v) => {
+        changes.push(v);
+      });
+      file.readOnly = true;
+
+      expect(changes).toEqual([true]);
+      file.dispose();
+    });
+
+    test('should emit readOnlyChanged when toggled back to false', () => {
+      const file = new YFile();
+      const changes: boolean[] = [];
+      file.readOnly = true;
+      file.readOnlyChanged.connect((_, v) => {
+        changes.push(v);
+      });
+      file.readOnly = false;
+
+      expect(changes).toEqual([false]);
+      file.dispose();
+    });
+
+    test('should not emit readOnlyChanged when set to the same value', () => {
+      const file = new YFile();
+      const changes: boolean[] = [];
+      file.readOnlyChanged.connect((_, v) => {
+        changes.push(v);
+      });
+      file.readOnly = false;
+
+      expect(changes).toHaveLength(0);
+      file.dispose();
+    });
+
+    test('should block source changes when read-only', () => {
+      const file = new YFile();
+      file.source = 'initial';
+      file.readOnly = true;
+      file.source = 'blocked';
+
+      expect(file.source).toBe('initial');
+      file.dispose();
+    });
+
+    test('should block updateSource when read-only', () => {
+      const file = new YFile();
+      file.source = 'initial';
+      file.readOnly = true;
+      file.updateSource(0, 0, 'blocked');
+
+      expect(file.source).toBe('initial');
+      file.dispose();
+    });
+
+    test('canUndo should return false when read-only', () => {
+      const file = new YFile();
+      file.source = 'hello';
+      file.readOnly = true;
+
+      expect(file.canUndo()).toBe(false);
+      file.dispose();
+    });
+
+    test('undo should return false when read-only', () => {
+      const file = new YFile();
+      file.source = 'hello';
+      file.readOnly = true;
+
+      expect(file.undo()).toBe(false);
+      expect(file.source).toBe('hello');
+      file.dispose();
+    });
+
+    test('canRedo should return false when read-only', () => {
+      const file = new YFile();
+      file.source = 'hello';
+      file.undo();
+      file.readOnly = true;
+
+      expect(file.canRedo()).toBe(false);
+      file.dispose();
+    });
+
+    test('redo should return false when read-only', () => {
+      const file = new YFile();
+      file.source = 'hello';
+      file.undo();
+      file.readOnly = true;
+
+      expect(file.redo()).toBe(false);
+      expect(file.source).toBe('');
+      file.dispose();
+    });
+
+    test('should allow changes again after disabling read-only', () => {
+      const file = new YFile();
+      file.source = 'initial';
+      file.readOnly = true;
+      file.source = 'blocked';
+      file.readOnly = false;
+      file.source = 'allowed';
+
+      expect(file.source).toBe('allowed');
+      file.dispose();
+    });
+  });
 });

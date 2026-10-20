@@ -320,14 +320,22 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * Whether the object can undo changes.
    */
   canUndo(): boolean {
-    return !!this.undoManager && this.undoManager.undoStack.length > 0;
+    return (
+      !this._isReadOnly() &&
+      !!this.undoManager &&
+      this.undoManager.undoStack.length > 0
+    );
   }
 
   /**
    * Whether the object can redo changes.
    */
   canRedo(): boolean {
-    return !!this.undoManager && this.undoManager.redoStack.length > 0;
+    return (
+      !this._isReadOnly() &&
+      !!this.undoManager &&
+      this.undoManager.redoStack.length > 0
+    );
   }
 
   /**
@@ -341,6 +349,9 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * Undo an operation.
    */
   undo(): boolean {
+    if (this._isReadOnly()) {
+      return false;
+    }
     const undone = !!this.undoManager?.undo();
     if (undone) {
       this.dirty = true;
@@ -352,11 +363,36 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * Redo an operation.
    */
   redo(): boolean {
+    if (this._isReadOnly()) {
+      return false;
+    }
     const redone = !!this.undoManager?.redo();
     if (redone) {
       this.dirty = true;
     }
     return redone;
+  }
+
+  /**
+   * Whether the cell is read-only.
+   */
+  get readOnly(): boolean {
+    return this._readOnly;
+  }
+
+  set readOnly(value: boolean) {
+    if (value === this._readOnly) {
+      return;
+    }
+    this._readOnly = value;
+    this._readOnlyChanged.emit(value);
+  }
+
+  /**
+   * A signal emitted when the read-only state changes.
+   */
+  get readOnlyChanged(): ISignal<this, boolean> {
+    return this._readOnlyChanged;
   }
 
   /**
@@ -592,11 +628,21 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
    * @param undoable Whether to track the change in the action history or not (default `true`)
    */
   transact(f: () => void, undoable = true, origin: any = null): void {
+    if (this._isReadOnly()) {
+      return;
+    }
     !this.notebook || this.notebook.disableDocumentWideUndoRedo
       ? this.ymodel.doc == null
         ? f()
         : this.ymodel.doc.transact(f, undoable ? this : origin)
       : this.notebook.transact(f, undoable);
+  }
+
+  /**
+   * Returns true if this cell or its parent notebook is read-only.
+   */
+  private _isReadOnly(): boolean {
+    return this._readOnly || (this.notebook?.readOnly ?? false);
   }
 
   /**
@@ -702,6 +748,8 @@ export class YBaseCell<Metadata extends nbformat.IBaseCellMetadata>
   private _disposed = new Signal<this, void>(this);
   private _isDisposed = false;
   private _prevSourceLength: number;
+  private _readOnly = false;
+  private _readOnlyChanged = new Signal<this, boolean>(this);
   private _undoManager: Y.UndoManager | null = null;
   private _ymetadata: Y.Map<any>;
   private _ysource: Y.Text;
