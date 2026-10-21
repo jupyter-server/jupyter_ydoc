@@ -15,6 +15,7 @@ from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
 from .ybasedoc import YBaseDoc
+from .yunicode import _set_text
 
 # The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
@@ -155,6 +156,17 @@ class YNotebook(YBaseDoc):
         """
         ycell = self.create_ycell(value)
         self.set_ycell(index, ycell)
+
+    def set_cell_source(self, index: int, source: str) -> None:
+        """
+        Sets a cell's source using granular text changes where practical.
+
+        :param index: The index of the cell.
+        :type index: int
+        :param source: The new source of the cell.
+        :type source: str
+        """
+        _set_text(self._ydoc, self._ycells[index]["source"], source)
 
     def create_ycell(self, value: dict[str, Any]) -> Map:
         """
