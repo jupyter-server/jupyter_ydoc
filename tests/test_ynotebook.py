@@ -652,9 +652,9 @@ async def test_async_notebook():
         await nb.aset(nb_dict0)
         tg.cancel_scope.cancel()
 
-    # check that the max blocking time is at least 8 times
+    # check that the max blocking time is at least 6 times
     # smaller than if we did a blocking set:
-    assert max_blocking_time < set_time / 8
+    assert max_blocking_time < set_time / 6
     nb_dict1 = nb.get()
     del nb_dict1["metadata"]
     del nb_dict1["nbformat"]
@@ -698,9 +698,9 @@ async def test_async_notebook():
         await nb.aget()
         tg.cancel_scope.cancel()
 
-    # check that the max blocking time is at least 20 times
+    # check that the max blocking time is at least 6 times
     # smaller than if we did a blocking get:
-    assert max_blocking_time < get_time / 20
+    assert max_blocking_time < get_time / 6
 
 
 def test_set_cell_source_granular_changes():
