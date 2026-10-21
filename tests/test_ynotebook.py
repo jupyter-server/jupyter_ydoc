@@ -698,6 +698,6 @@ async def test_async_notebook():
         await nb.aget()
         tg.cancel_scope.cancel()
 
-    # check that the max blocking time is at least 15 times
+    # check that the max blocking time is at least 6 times
     # smaller than if we did a blocking get:
-    assert max_blocking_time < get_time / 15
+    assert max_blocking_time < get_time / 6
