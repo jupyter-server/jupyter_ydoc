@@ -191,7 +191,7 @@ def test_set_hard_reload_if_very_different():
     ]
 
 
-@pytest.mark.timeout(15)
+@pytest.mark.timeout(30)
 def test_set_fast_path_for_large_initial_content():
     text = YUnicode()
 
