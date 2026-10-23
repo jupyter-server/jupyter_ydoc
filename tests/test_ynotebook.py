@@ -715,7 +715,7 @@ def test_set_cell_source_granular_changes():
     changes = []
     subscription = ysource.observe(lambda event: changes.append(event.delta))
 
-    nb.set_cell_source(0, "print('hello world')")
+    nb.set_cell(0, source="print('hello world')")
 
     assert changes == [[{"retain": 12}, {"insert": " world"}]]
     assert str(ysource) == "print('hello world')"
@@ -742,7 +742,7 @@ def test_set_cell_source(before, after):
     changes = []
     nb.observe(lambda topic, event: changes.append(topic))
 
-    nb.set_cell_source(0, after)
+    nb.set_cell(0, source=after)
 
     assert nb.get_cell(0)["source"] == after
     if before == after:
@@ -754,6 +754,35 @@ def test_set_cell_source_invalid_index():
     nb.append_cell(make_code_cell("original"))
 
     with pytest.raises(IndexError):
-        nb.set_cell_source(1, "new source")
+        nb.set_cell(1, source="new source")
 
     assert nb.get_cell(0)["source"] == "original"
+
+
+@pytest.mark.parametrize("keyword", [False, True])
+def test_set_cell_replaces_cell(keyword):
+    nb = YNotebook()
+    nb.append_cell(make_code_cell("original", id="old-cell"))
+    replacement = make_code_cell("replacement", id="new-cell")
+
+    if keyword:
+        nb.set_cell(0, value=replacement)
+    else:
+        nb.set_cell(0, replacement)
+
+    assert nb.get_cell(0) == replacement
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [{}, {"value": make_code_cell("replacement"), "source": ""}],
+)
+def test_set_cell_invalid_arguments(kwargs):
+    nb = YNotebook()
+    original = make_code_cell("original", id="cell-id")
+    nb.append_cell(original)
+
+    with pytest.raises(ValueError, match="Provide exactly one of value or source"):
+        nb.set_cell(0, **kwargs)
+
+    assert nb.get_cell(0) == original
