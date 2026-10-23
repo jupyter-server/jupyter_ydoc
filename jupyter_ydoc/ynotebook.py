@@ -15,6 +15,7 @@ from pycrdt import Array, Awareness, Doc, Map, Text
 
 from .utils import cast_all
 from .ybasedoc import YBaseDoc
+from .yunicode import _set_text
 
 # The default major version of the notebook format.
 NBFORMAT_MAJOR_VERSION = 4
@@ -143,18 +144,33 @@ class YNotebook(YBaseDoc):
         ycell = self.create_ycell(value)
         self._ycells.append(ycell)
 
-    def set_cell(self, index: int, value: dict[str, Any]) -> None:
+    def set_cell(
+        self, index: int, value: dict[str, Any] | None = None, *, source: str | None = None
+    ) -> None:
         """
-        Sets a cell into indicated position.
+        Replaces a cell or updates its source in place.
+
+        Provide exactly one of ``value`` or ``source``. Updating the source
+        preserves the existing cell and shared text, using granular text changes
+        where practical.
 
         :param index: The index of the cell.
         :type index: int
 
-        :param value: A cell.
-        :type value: Dict[str, Any]
+        :param value: A replacement cell.
+        :type value: Dict[str, Any], optional
+        :param source: The new source of the cell.
+        :type source: str, optional
+        :raises ValueError: If neither or both of ``value`` and ``source`` are provided.
         """
-        ycell = self.create_ycell(value)
-        self.set_ycell(index, ycell)
+        if (value is None) == (source is None):
+            raise ValueError("Provide exactly one of value or source")
+        if source is not None:
+            _set_text(self._ydoc, self._ycells[index]["source"], source)
+        else:
+            assert value is not None
+            ycell = self.create_ycell(value)
+            self.set_ycell(index, ycell)
 
     def create_ycell(self, value: dict[str, Any]) -> Map:
         """
