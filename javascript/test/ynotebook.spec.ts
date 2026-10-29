@@ -2,6 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import type * as nbformat from '@jupyterlab/nbformat';
+import * as Y from 'yjs';
 import { IMapChange, NotebookChange, YNotebook } from '../src';
 
 describe('@jupyter/ydoc', () => {
@@ -20,6 +21,86 @@ describe('@jupyter/ydoc', () => {
         expect(notebook.cells.length).toBe(0);
         expect(notebook.dirty).toBe(false);
         notebook.dispose();
+      });
+    });
+
+    describe('state notifications after peer synchronization', () => {
+      test('exposes complete notebook content when saved state arrives before cells', () => {
+        const saved = YNotebook.create({
+          data: {
+            cells: [
+              {
+                id: 'first-cell',
+                cell_type: 'code',
+                source: 'print(1)',
+                metadata: {},
+                outputs: [],
+                execution_count: null
+              }
+            ],
+            metadata: { kernelspec: { name: 'python', display_name: 'Python' } }
+          }
+        });
+        saved.setState('hash', 'saved-hash');
+        saved.setState('dirty', false);
+        const joining = new YNotebook();
+        const snapshots: unknown[] = [];
+        joining.changed.connect((_, change) => {
+          if (change.stateChange?.some(value => value.name === 'hash')) {
+            snapshots.push(joining.source);
+          }
+        });
+        Y.applyUpdate(joining.ydoc, Y.encodeStateAsUpdate(saved.ydoc));
+        // No timer or microtask: state listeners must see a consistent model
+        // during the synchronous update itself.
+        expect(snapshots).toEqual([saved.source]);
+        joining.dispose();
+        saved.dispose();
+      });
+
+      test('keeps content consistent for subsequent cell replacement and state updates', () => {
+        const saved = YNotebook.create({
+          data: {
+            cells: [
+              {
+                id: 'first',
+                cell_type: 'code',
+                source: '',
+                metadata: {},
+                outputs: [],
+                execution_count: null
+              }
+            ]
+          }
+        });
+        const joining = new YNotebook();
+        Y.applyUpdate(joining.ydoc, Y.encodeStateAsUpdate(saved.ydoc));
+        const snapshots: unknown[] = [];
+        joining.changed.connect((_, change) => {
+          if (change.stateChange?.some(value => value.name === 'hash'))
+            snapshots.push(joining.source);
+        });
+        saved.transact(() => {
+          saved.source = {
+            nbformat: 4,
+            nbformat_minor: 5,
+            metadata: { title: 'updated notebook' },
+            cells: [
+              {
+                id: 'replacement',
+                cell_type: 'markdown',
+                source: 'changed',
+                metadata: {}
+              }
+            ]
+          };
+          saved.setState('hash', 'new-saved-hash');
+          saved.setState('dirty', false);
+        });
+        Y.applyUpdate(joining.ydoc, Y.encodeStateAsUpdate(saved.ydoc));
+        expect(snapshots).toEqual([saved.source]);
+        joining.dispose();
+        saved.dispose();
       });
     });
 
