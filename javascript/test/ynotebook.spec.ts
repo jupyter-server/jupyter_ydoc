@@ -14,6 +14,78 @@ describe('@jupyter/ydoc', () => {
   });
 
   describe('YNotebook', () => {
+    describe('#toJSON', () => {
+      test('serializes equivalent notebooks identically regardless of object key insertion order', () => {
+        const content: nbformat.INotebookContent = {
+          nbformat: 4,
+          nbformat_minor: 5,
+          metadata: { custom: { z: 1, a: { y: 2, b: 3 } } },
+          cells: [
+            {
+              id: 'code-cell',
+              cell_type: 'code',
+              source: 'print(1)',
+              metadata: { tags: ['z', 'a'], custom: { z: 1, a: 2 } },
+              execution_count: null,
+              outputs: [
+                {
+                  // eslint-disable-next-line camelcase
+                  output_type: 'display_data',
+                  data: {
+                    'text/plain': ['z', 'a'],
+                    'application/json': { z: 1, a: 2 }
+                  },
+                  metadata: { custom: { z: 1, a: 2 } }
+                }
+              ]
+            },
+            {
+              id: 'markdown-cell',
+              cell_type: 'markdown',
+              source: '![image](attachment:image.png)',
+              metadata: {},
+              attachments: {
+                'image.png': {
+                  'image/png': 'image',
+                  'text/plain': 'description'
+                }
+              }
+            }
+          ]
+        };
+        const reversed = JSON.parse(
+          JSON.stringify(content, (_key, value: unknown) => {
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+              return Object.entries(value)
+                .reverse()
+                .reduce(
+                  (result, [key, item]) => ({ ...result, [key]: item }),
+                  {}
+                );
+            }
+            return value;
+          })
+        );
+        const first = YNotebook.create({ data: content });
+        const second = YNotebook.create({ data: reversed });
+        try {
+          expect(first.toJSON()).toEqual(content);
+          expect(second.toJSON()).toEqual(content);
+          expect(JSON.stringify(first.toJSON())).toBe(
+            JSON.stringify(second.toJSON())
+          );
+          expect(JSON.stringify(first.source)).toBe(
+            JSON.stringify(second.source)
+          );
+          expect(first.dirty).toBe(false);
+          expect(second.dirty).toBe(false);
+        } finally {
+          first.dispose();
+          second.dispose();
+        }
+      });
+    });
+
     describe('#constructor', () => {
       test('should create a notebook without arguments', () => {
         const notebook = YNotebook.create();
