@@ -28,6 +28,7 @@ export abstract class YDocument<T extends DocumentChange>
     this._awareness = new Awareness(this._ydoc);
 
     this._ystate.observe(this.onStateChanged);
+    this._ydoc.on('afterTransaction', this._emitStateChanges);
   }
 
   /**
@@ -132,6 +133,8 @@ export abstract class YDocument<T extends DocumentChange>
     }
     this._isDisposed = true;
     this.ystate.unobserve(this.onStateChanged);
+    this._ydoc.off('afterTransaction', this._emitStateChanges);
+    this._pendingStateChanges.clear();
     this.awareness.destroy();
     this.undoManager.destroy();
     this.ydoc.destroy();
@@ -248,8 +251,21 @@ export abstract class YDocument<T extends DocumentChange>
       }
     });
 
-    this._changed.emit({ stateChange } as any);
+    // Other type observers may still need to update cached model data, such
+    // as YNotebook.cells. Keep the transaction's state values, but notify
+    // consumers only after all of its type observers have run.
+    this._pendingStateChanges.set(event.transaction, stateChange);
   };
+
+  private _emitStateChanges = (transaction: Y.Transaction): void => {
+    const stateChange = this._pendingStateChanges.get(transaction);
+    this._pendingStateChanges.delete(transaction);
+    if (stateChange && !this.isDisposed) {
+      this._changed.emit({ stateChange } as any);
+    }
+  };
+
+  private _pendingStateChanges = new Map<Y.Transaction, StateChange<any>[]>();
 
   protected _changed = new Signal<this, T>(this);
   private _ydoc: Y.Doc;
