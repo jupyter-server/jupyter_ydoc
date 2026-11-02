@@ -470,13 +470,13 @@ export class YNotebook
   }
 
   /**
-   * Serialize the model to JSON.
+   * Serialize the model to JSON with deterministic object key ordering.
    */
   toJSON(): nbformat.INotebookContent {
     // strip cell ids if we have notebook format 4.0-4.4
     const pruneCellId = this.nbformat === 4 && this.nbformat_minor <= 4;
 
-    return {
+    return sortKeys({
       metadata: this.metadata,
       nbformat_minor: this.nbformat_minor,
       nbformat: this.nbformat,
@@ -487,7 +487,7 @@ export class YNotebook
         }
         return raw;
       })
-    };
+    });
   }
 
   /**
@@ -648,4 +648,27 @@ export class YNotebook
 
   private _disableDocumentWideUndoRedo: boolean;
   private _ycellMapping: WeakMap<Y.Map<any>, YCellType> = new WeakMap();
+}
+
+/** Recursively sort JSON object keys without changing array order or input data. */
+function sortKeys<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value.map(item => sortKeys(item)) as T;
+  }
+  if (value !== null && typeof value === 'object') {
+    const sorted: Record<string, unknown> = {};
+    const entries = Object.entries(value).sort(([left], [right]) =>
+      left < right ? -1 : left > right ? 1 : 0
+    );
+    for (const [key, item] of entries) {
+      Object.defineProperty(sorted, key, {
+        value: sortKeys(item),
+        enumerable: true,
+        writable: true,
+        configurable: true
+      });
+    }
+    return sorted as T;
+  }
+  return value;
 }
