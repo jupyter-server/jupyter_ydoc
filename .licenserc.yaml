@@ -24,4 +24,4 @@ header:
     - 'yarn.lock'
     - '**/py.typed'
 
-  comment: on-failure
+  comment: never
