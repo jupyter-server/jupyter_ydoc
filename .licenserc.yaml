@@ -23,5 +23,6 @@ header:
     - 'LICENSE'
     - 'yarn.lock'
     - '**/py.typed'
+    - '.yarn'
 
-  comment: on-failure
+  comment: never
